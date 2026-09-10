@@ -13,7 +13,7 @@
  * ordinary engineering; hiding that you did it is what makes a demo dishonest.
  */
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Invite } from "./invite";
 import { Badge } from "@/components/ui/badge";
@@ -69,22 +69,65 @@ export function Intake({
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const upload = useCallback(async (files: File[]) => {
+  /**
+   * Files kept by name so an unmatched one can be retried once the buyer says
+   * whose it is, without asking them to find it on disk again.
+   *
+   * This is the gap that made "here is my own quotation" a dead end: a file
+   * whose name matches no supplier was skipped with a sensible message and no
+   * way forward. Refusing to guess is right; refusing to guess and then
+   * offering nothing is half a feature.
+   */
+  const [pending, setPending] = useState<Record<string, File>>({});
+  const [roster, setRoster] = useState<Array<{ code: string; name: string }>>([]);
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const [newName, setNewName] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        const r = await fetch("/api/rfx/inbox", { cache: "no-store" });
+        const j = await r.json();
+        if (!ignore && j.ok) {
+          setRoster((j.suppliers as Array<{ code: string; name: string }>) ?? []);
+        }
+      } catch { /* the picker just falls back to a free-text name */ }
+    })();
+    return () => { ignore = true; };
+  }, []);
+
+  const upload = useCallback(async (files: File[], vendor?: string) => {
     if (!files.length) return;
     setBusy(true);
     setError(null);
     setQueue(files.map((f) => f.name));
-    setResults([]);
+    if (!vendor) setResults([]);
 
     try {
       const form = new FormData();
       for (const f of files) form.append("files", f);
+      if (vendor) form.append("vendor", vendor);
+      setPending((p) => {
+        const n = { ...p };
+        for (const f of files) n[f.name] = f;
+        return n;
+      });
       const res = await fetch("/api/extract", { method: "POST", body: form });
       const json = await res.json();
       if (!json.ok) {
         setError(json.error ?? "Reading failed.");
       } else {
-        setResults(json.results as FileResult[]);
+        const fresh = json.results as FileResult[];
+        // A retry replaces only the rows for the files it re-sent, so the
+        // other results on screen do not vanish underneath the buyer.
+        setResults((prev) => {
+          if (!vendor) return fresh;
+          const names = new Set(files.map((f) => f.name));
+          return [...prev.filter((r) => !names.has(String(r.filename))), ...fresh];
+        });
+        setAssigning(null);
+        setNewName("");
         onDone();
       }
     } catch (e) {
@@ -174,7 +217,19 @@ export function Intake({
         </div>
       )}
 
-      {results.length > 0 && <ResultList results={results} />}
+      {results.length > 0 && (
+        <ResultList
+          results={results}
+          roster={roster}
+          pending={pending}
+          busy={busy}
+          upload={upload}
+          assigning={assigning}
+          setAssigning={setAssigning}
+          newName={newName}
+          setNewName={setNewName}
+        />
+      )}
 
       {hasData && !busy && (
         <div className="flex justify-end">
@@ -185,7 +240,19 @@ export function Intake({
   );
 }
 
-function ResultList({ results }: { results: FileResult[] }) {
+function ResultList({
+  results, roster, pending, busy, upload, assigning, setAssigning, newName, setNewName,
+}: {
+  results: FileResult[];
+  roster: Array<{ code: string; name: string }>;
+  pending: Record<string, File>;
+  busy: boolean;
+  upload: (files: File[], vendor?: string) => void;
+  assigning: string | null;
+  setAssigning: (v: string | null) => void;
+  newName: string;
+  setNewName: (v: string) => void;
+}) {
   return (
     <div className="space-y-2">
       {results.map((r) => (
@@ -220,6 +287,77 @@ function ResultList({ results }: { results: FileResult[] }) {
           </div>
 
           {!r.ok && <p className="mt-2 leading-relaxed">{r.error}</p>}
+
+          {/*
+            The way forward for a file whose supplier we could not identify.
+            Refusing to guess is the right call, because a price in the wrong
+            column is a mistake nobody downstream can detect. Refusing to guess
+            and then offering nothing was the bug: an interviewer handing over
+            their own quotation hit a wall.
+          */}
+          {r.needsVendor && (
+            <div className="mt-2.5 space-y-2 rounded-md border bg-background p-2.5">
+              <p className="text-[11px] font-medium">Whose quotation is this?</p>
+              <div className="flex flex-wrap gap-1">
+                {roster.map((v) => (
+                  <Button
+                    key={v.code}
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-[10px]"
+                    disabled={busy}
+                    onClick={() => {
+                      const f = pending[String(r.filename)];
+                      if (f) void upload([f], v.code);
+                    }}
+                  >
+                    {v.name.split(" ")[0]}
+                  </Button>
+                ))}
+              </div>
+              {assigning === r.filename ? (
+                <div className="flex gap-1.5">
+                  <input
+                    autoFocus
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="Supplier name"
+                    aria-label={`Name the supplier who sent ${r.filename}`}
+                    className="h-6 flex-1 rounded border bg-background px-2 text-[10px]"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newName.trim().length > 1) {
+                        const f = pending[String(r.filename)];
+                        if (f) void upload([f], newName.trim());
+                      }
+                      if (e.key === "Escape") setAssigning(null);
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    className="h-6 text-[10px]"
+                    disabled={busy || newName.trim().length < 2}
+                    onClick={() => {
+                      const f = pending[String(r.filename)];
+                      if (f) void upload([f], newName.trim());
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  className="text-[10px] text-muted-foreground underline"
+                  onClick={() => setAssigning(String(r.filename))}
+                >
+                  none of these, it is a new supplier
+                </button>
+              )}
+              <p className="text-[10px] leading-relaxed text-muted-foreground">
+                A new supplier gets their own column, marked as not assessed until their
+                questionnaire is read.
+              </p>
+            </div>
+          )}
 
           {r.ok && (
             <div className="mt-2 space-y-1.5 text-muted-foreground">

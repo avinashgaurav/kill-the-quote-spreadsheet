@@ -474,6 +474,121 @@ def main():
     req("/api/dev/fixture?reset=true", "POST")
     req("/api/dev/fixture", "POST")
 
+    # ---- nothing is bound to the demo path ---------------------------------
+    print(f"\n{D}--- an interviewer's own data, not mine ---{X}")
+
+    req("/api/dev/fixture?reset=true", "POST")
+    req("/api/dev/fixture", "POST")
+
+    st, roster = req("/api/rfx/inbox")
+    with_reply = [s for s in roster.get("suppliers", []) if s["reply_on_file"]]
+    without = [s for s in roster.get("suppliers", []) if not s["reply_on_file"]]
+    case(
+        "the buyer chooses who to invite, and not everyone answers",
+        "a demo where every supplier replies teaches the wrong lesson, because "
+        "every interesting state in this product is one where somebody did not",
+        len(roster.get("suppliers", [])) >= 8 and len(with_reply) >= 4 and len(without) >= 4,
+        f"{len(roster.get('suppliers', []))} on the roster, {len(with_reply)} with a "
+        f"response on file, {len(without)} who will never reply",
+    )
+
+    st, body = req("/api/rfx/inbox", "POST",
+                   data={"supplierCode": without[0]["code"]}) if without else (0, {})
+    case(
+        "inviting a supplier who does not bid is a fact, not an error",
+        "a non-response is reported as a failure, so the buyer cannot tell "
+        "'they declined' from 'the tool broke'",
+        st == 200 and body.get("ok") and body.get("replied") is False,
+        f"{without[0]['code'] if without else '?'}: replied={body.get('replied')}, "
+        f"HTTP {st}",
+    )
+
+    # A quotation from a supplier this build has never heard of, in a filename
+    # that matches nothing. This is what an interviewer handing over their own
+    # file actually looks like.
+    xlsx_magic = b"PK\x03\x04" + b"\x00" * 26
+    st, body = req(
+        "/api/extract", "POST",
+        files=[("files", "quote_from_nowhere.xlsx", xlsx_magic,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")],
+    )
+    r0 = (body.get("results") or [{}])[0]
+    case(
+        "an unrecognised supplier is refused AND offered a way forward",
+        "refusing to guess is right; refusing to guess and then offering nothing "
+        "is a dead end, and an interviewer handing over their own quotation hits it",
+        r0.get("needsVendor") is True and len(r0.get("knownVendors") or []) > 0,
+        f"needsVendor={r0.get('needsVendor')}, and the response names the "
+        f"{len(r0.get('knownVendors') or [])} suppliers it could be assigned to",
+    )
+
+    st, body = req(
+        "/api/extract", "POST",
+        files=[("files", "quote_from_nowhere.xlsx", xlsx_magic,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")],
+    )
+    # Re-sent WITH a supplier nobody has heard of.
+    boundary = "----e2eboundary"
+    parts = [
+        f"--{boundary}\r\nContent-Disposition: form-data; name=\"files\"; "
+        f"filename=\"quote_from_nowhere.xlsx\"\r\nContent-Type: application/octet-stream"
+        f"\r\n\r\n".encode(),
+        xlsx_magic, b"\r\n",
+        f"--{boundary}\r\nContent-Disposition: form-data; name=\"vendor\"\r\n\r\n"
+        f"NEWCO_TEST\r\n".encode(),
+        f"--{boundary}--\r\n".encode(),
+    ]
+    r = urllib.request.Request(
+        BASE + "/api/extract", data=b"".join(parts),
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(r, timeout=300) as resp:
+            body = json.loads(resp.read())
+    except Exception as e:
+        body = {"error": str(e)}
+    created = [x for x in body.get("results", []) if x.get("vendorId") == "NEWCO_TEST"]
+    st, comp = req("/api/comparison")
+    has_col = any(v["code"] == "NEWCO_TEST" for v in comp.get("vendors", []))
+    case(
+        "a supplier named on the fly gets their own column",
+        "the product only works on the five suppliers that ship with it, so an "
+        "interviewer's own file has nowhere to go",
+        bool(created) and has_col,
+        f"NEWCO_TEST created and rendering as a column: {has_col}",
+    )
+
+    newco = next((v for v in comp.get("vendors", []) if v["code"] == "NEWCO_TEST"), {})
+    case(
+        "a supplier created on the fly is unassessed, never eligible-looking",
+        "a brand-new supplier silently reads as having passed a questionnaire "
+        "nobody has seen",
+        newco.get("assessed") is False,
+        f"assessed={newco.get('assessed')}, failedMandatory={newco.get('failedMandatory')}",
+    )
+
+    st, ch = req("/api/rfx/chase")
+    case(
+        "a supplier created on the fly can be chased like any other",
+        "the chase loop only knows the built-in suppliers",
+        any(s["vendorId"] == "NEWCO_TEST" and s["items"] for s in ch.get("suppliers", [])),
+        f"outstanding items computed for NEWCO_TEST: "
+        f"{next((len(s['items']) for s in ch.get('suppliers', []) if s['vendorId'] == 'NEWCO_TEST'), 0)}",
+    )
+
+    st, note = req("/api/export/award-note", raw=True)
+    case(
+        "the award note covers whoever is actually on the enquiry",
+        "the export is written against a fixed supplier list and silently omits "
+        "one the buyer added",
+        st == 200 and b"NEWCO_TEST" in note,
+        "the new supplier appears in the exported award note",
+    )
+
+    req("/api/dev/fixture?reset=true", "POST")
+    req("/api/dev/fixture", "POST")
+
     print(f"\n{D}--- sad paths: the analyst ---{X}")
 
     req("/api/dev/fixture", "POST")
