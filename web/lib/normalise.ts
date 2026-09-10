@@ -38,7 +38,8 @@ export type CellStatus =
   | "omitted"                 // silently absent, vendor may not have noticed
   | "non_comparable"          // an "offer" that is not a price
   | "unresolvable"            // priced by reference to data we do not hold
-  | "unmapped";               // vendor invented a line with no RFx equivalent
+  | "unmapped"                // vendor invented a line with no RFx equivalent
+  | "not_read";               // WE have not read their response. Not their fault.
 
 /**
  * Statuses that may enter award arithmetic.
@@ -560,7 +561,35 @@ export function buildMatrix(
   for (const v of ctx.vendors) {
     const rows: Record<number, Cell> = {};
     const vq = rawByVendor[v.code] ?? {};
+
+    /**
+     * Nothing at all from this supplier: WE have not read them.
+     *
+     * Distinct from `omitted`, which means we read their document and this line
+     * was not in it. The grid used to render both identically, so a supplier
+     * whose file nobody had opened showed thirty cells saying "they never
+     * mentioned it. Worth chasing" — blaming them for our own inaction, and
+     * inviting a buyer to chase somebody who has done nothing wrong.
+     *
+     * The same distinction the questionnaire makes between "failed" and "not
+     * read", which I built there and did not build here.
+     */
+    const unread = Object.keys(vq).length === 0;
+
     for (const line of ctx.lines) {
+      if (unread) {
+        rows[line.no] = {
+          vendor: v.code, lineNo: line.no, status: "not_read",
+          unitInr: null, extendedInr: null,
+          flags: ["nothing has been read from this supplier yet"],
+          trace: [{
+            rule: "not read",
+            basis: "no response from this supplier has been extracted",
+            result: "no cell, and no claim about what they did or did not quote",
+          }],
+        };
+        continue;
+      }
       // A vendor may state a blanket fallback ("rest we'll match Zenith").
       const raw = vq[String(line.no)] ?? vq["_default"];
       rows[line.no] = normaliseCell(v.code, line.no, raw, vq, ctx.lines);
@@ -616,6 +645,9 @@ export function trustSummary(m: Matrix, ctx: RfxContext = defaultContext()) {
   // No number exists at all: declined, silently missing, or not a price.
   const noPrice = n("declined") + n("omitted") + n("non_comparable")
     + n("unresolvable") + n("unmapped");
+  // Its own bucket, deliberately. Folding it into "no price" would put our own
+  // inaction in the same column as a supplier's decline.
+  const notRead = n("not_read");
 
   return {
     total,
@@ -629,6 +661,8 @@ export function trustSummary(m: Matrix, ctx: RfxContext = defaultContext()) {
     derivedAwaitingVendor: awaitingSupplier,
     unreadable,
     noPrice,
+    /** Cells where nothing has been read yet. Ours to fix, not theirs. */
+    notRead,
     /**
      * Cells the BUYER must act on before they can be used.
      *

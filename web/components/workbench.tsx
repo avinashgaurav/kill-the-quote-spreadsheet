@@ -376,6 +376,7 @@ export function Workbench({
                   totalLines={payload.lines.length}
                   supplierCount={payload.vendors.length}
                   qualifiedCount={payload.vendors.filter((v) => v.qualified).length}
+                  assessedCount={payload.vendors.filter((v) => v.assessed !== false).length}
                   onAsk={(q) => { setPendingQuestion(q); setAskOpen(true); }}
                 />
                 <TrustBar

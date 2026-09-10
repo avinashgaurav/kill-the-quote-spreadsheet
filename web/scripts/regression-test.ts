@@ -64,7 +64,7 @@ async function main() {
   //
   // The property is arithmetic, not wording: the parts must sum to the whole.
   const t = trustSummary(matrix);
-  const sum = t.usable + t.needsHuman + t.derivedAwaitingVendor + t.noPrice;
+  const sum = t.usable + t.needsHuman + t.derivedAwaitingVendor + t.noPrice + t.notRead;
   check(
     "1. Trust bar double-counted (twice)",
     "the disjoint groups sum exactly to the cell count, so no cell is in two",
@@ -505,6 +505,72 @@ async function main() {
     "an answer contradicted by its own evidence is caught, and says which and why",
     q2?.status === "evidence_contradicts" && /2013|2022/.test(q2.why),
     q2?.why ?? "not caught",
+  );
+
+  // ---- 18. "They never mentioned it" for a supplier nobody had read -----
+  //
+  // A supplier whose document had not been opened showed thirty cells reading
+  // "Missing. They never mentioned it. Worth chasing." That blames them for our
+  // own inaction and invites a buyer to chase somebody who has done nothing
+  // wrong. It is the same distinction the questionnaire already made between
+  // "failed" and "not read", which I built there and not here.
+  const oneRead = buildMatrix({ V1: quotes.V1 }, {
+    lines: LINES,
+    vendors: [{ code: "V1" }, { code: "V2" }],
+    qualification: {},
+  });
+  const notReadCell = oneRead.V2?.[1];
+  const read = oneRead.V1?.[1];
+  check(
+    "18. A supplier nobody had read was shown as having omitted every line",
+    "an unread supplier reads as not_read, never as omitted",
+    notReadCell?.status === "not_read" && read?.status !== "not_read",
+    `V2 was never read: status ${notReadCell?.status} ("${notReadCell?.flags[0]}"). ` +
+    `V1 was read: status ${read?.status}. Two different facts, two statuses.`,
+  );
+  const t2 = trustSummary(oneRead, {
+    lines: LINES, vendors: [{ code: "V1" }, { code: "V2" }], qualification: {},
+  });
+  check(
+    "18b. Our own inaction counted as the supplier having no price",
+    "not_read has its own bucket and the parts still sum to the whole",
+    t2.notRead === LINES.length
+      && t2.usable + t2.needsHuman + t2.derivedAwaitingVendor + t2.noPrice
+         + t2.notRead === t2.total,
+    `${t2.notRead} cells not read, and ${t2.usable}+${t2.needsHuman}+` +
+    `${t2.derivedAwaitingVendor}+${t2.noPrice}+${t2.notRead} = ${t2.total}`,
+  );
+
+  // ---- 19. The accuracy harness could not fail --------------------------
+  //
+  // Two bugs, both in the tool whose whole job is catching bugs, which is why
+  // they are worth a regression each.
+  //
+  // The first: every calibration assertion sat behind `if (ok.length >= 2)`,
+  // so five failed reads skipped every check and printed "ACCURACY: pass".
+  // It did exactly that when the API credit ran out: five 429s, no numbers,
+  // and a pass. "The tests did not run" and "the tests passed" must never
+  // print the same word.
+  //
+  // The second: the calibration check compared only the FIRST and LAST
+  // photographs, and reported "easiest 100% at 0.95, hardest 100% at 0.95"
+  // while the photograph in the middle of the set read at 52% accuracy with
+  // 0.90 confidence on every wrong digit. Ends are not a distribution.
+  const harness = readFileSync(resolve(process.cwd(), "scripts/accuracy.ts"), "utf8");
+  const photoBlock = harness.slice(harness.indexOf("if (wantPhotos)"));
+  check(
+    "19a. The accuracy harness passed when nothing was read",
+    "an unread photograph fails the run instead of skipping the assertions",
+    /ok\.length < 2/.test(photoBlock)
+      && /for \(const r of rows\.filter\(\(r\) => !r\.ok\)\)/.test(photoBlock),
+    "zero usable reads is now a counted failure, not a silent skip",
+  );
+  check(
+    "19b. Calibration was checked on the ends only",
+    "confidence is compared against accuracy on every photograph",
+    /for \(const r of ok\)/.test(photoBlock)
+      && /meanConfidenceOnWrong > 0\.75/.test(photoBlock),
+    "each row is scored, and any row wrong at high confidence fails the run",
   );
 
   console.log(

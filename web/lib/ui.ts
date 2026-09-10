@@ -48,6 +48,9 @@ export const EMPTY_GLYPH: Partial<Record<CellStatus, { glyph: string; short: str
   unresolvable: { glyph: "~", short: "no basis to price it" },
   needs_review: { glyph: "!", short: "needs your call" },
   unmapped: { glyph: "+", short: "no matching line" },
+  // Blank, not a mark. There is nothing to report about this cell, because
+  // nothing has been read. A glyph here would be a claim.
+  not_read: { glyph: "", short: "not read yet" },
 };
 
 export const CELL_CLASS: Record<DisplayState, string> = {
@@ -82,6 +85,12 @@ export const STATUS_ACTION: Record<CellStatus, { label: string; action: string }
   declined: {
     label: "They declined",
     action: "That is an answer, not a gap. Nothing to chase.",
+  },
+  not_read: {
+    label: "Not read yet",
+    action:
+      "Nothing has been read from this supplier. This is not a gap in their " +
+      "quotation, it is a gap in ours. Collect their reply, or upload it.",
   },
   omitted: {
     label: "Missing",

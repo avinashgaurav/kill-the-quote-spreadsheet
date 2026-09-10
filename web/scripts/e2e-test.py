@@ -114,6 +114,7 @@ def main():
         + trust.get("needsHuman", 0)
         + trust.get("derivedAwaitingVendor", 0)
         + trust.get("noPrice", 0)
+        + trust.get("notRead", 0)
     )
     case(
         "the trust counts add up and do not overlap",
@@ -122,7 +123,7 @@ def main():
         total > 0 and disjoint == total,
         f"{trust.get('usable')} usable + {trust.get('needsHuman')} need you "
         f"+ {trust.get('derivedAwaitingVendor')} awaiting supplier "
-        f"+ {trust.get('noPrice')} no price "
+        f"+ {trust.get('noPrice')} no price + {trust.get('notRead')} not read "
         f"= {disjoint}, against {total} cells total",
     )
 

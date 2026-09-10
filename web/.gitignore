@@ -43,3 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Harness extraction cache: real model output, keyed by prompt+file hash.
+# Local only. A committed cache would let a stale reading score a changed prompt.
+.cache/

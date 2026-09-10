@@ -205,7 +205,8 @@ const Dot = () => <span aria-hidden="true" className="mx-1.5 text-border">·</sp
  */
 export function HeadlineNumbers({
   allVendorsInr, allVendorsLines, qualifiedInr, qualifiedLines,
-  deltaInr, deltaPct, baselineInr, totalLines, supplierCount, qualifiedCount, onAsk,
+  deltaInr, deltaPct, baselineInr, totalLines, supplierCount, qualifiedCount,
+  assessedCount, onAsk,
 }: {
   allVendorsInr: number;
   allVendorsLines: number;
@@ -217,9 +218,28 @@ export function HeadlineNumbers({
   totalLines: number;
   supplierCount: number;
   qualifiedCount: number;
+  /** Suppliers whose questionnaire has actually been read. */
+  assessedCount?: number;
   onAsk?: (q: string) => void;
 }) {
   const ready = allVendorsInr > 0;
+
+  /**
+   * Is there enough here to support a conclusion?
+   *
+   * The numbers were arithmetically correct and materially misleading, which is
+   * the exact failure this product exists to catch, on its own headline. With
+   * two of a hundred and fifty cells read, the screen said "what you would
+   * commit: Rs 1.06 cr" and "cost of compliance +Rs 0, 0.0% more". The first
+   * was a total over two lines presented as an answer. The second read as
+   * "compliance is free" when the truth was "no questionnaire has been read, so
+   * every supplier counts as eligible and the two totals are the same number".
+   *
+   * A zero that means "we cannot tell yet" must never be shown as a finding.
+   */
+  const nobodyAssessed = assessedCount !== undefined && assessedCount === 0;
+  const coverage = totalLines > 0 ? qualifiedLines / totalLines : 0;
+  const partial = ready && coverage < 0.6;
 
   return (
     <div className="flex flex-wrap items-stretch gap-x-8 gap-y-4 border-b bg-background px-5 py-4">
@@ -247,17 +267,33 @@ export function HeadlineNumbers({
 
       <Stat
         primary
-        label="What you would commit"
+        label={partial ? "Priced so far, not an award" : "What you would commit"}
         value={ready ? inrShort(qualifiedInr) : "—"}
-        sub={ready
-          ? `${qualifiedLines} of ${totalLines} lines · ${qualifiedCount} of ${supplierCount} suppliers eligible`
-          : "no responses yet"}
+        sub={!ready
+          ? "no responses yet"
+          : nobodyAssessed
+            ? `${qualifiedLines} of ${totalLines} lines · no questionnaire read, so nobody is ruled out yet`
+            : `${qualifiedLines} of ${totalLines} lines · ${qualifiedCount} of ${supplierCount} suppliers eligible`}
       />
 
       {ready && (
         <>
           <Sep />
           <div className="flex items-center">
+            {nobodyAssessed ? (
+              /* A zero here would read as "compliance costs nothing", which is a
+                 finding. The truth is that there is nothing to compare yet. */
+              <div className="max-w-[230px] rounded-lg border bg-muted/40 px-4 py-2">
+                <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+                  Cost of compliance
+                </p>
+                <p className="text-sm leading-tight font-semibold">Cannot tell yet</p>
+                <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">
+                  No questionnaire has been read, so nobody is excluded and both totals
+                  are the same number. Read one to find out what compliance costs.
+                </p>
+              </div>
+            ) : (
             <div className="rounded-lg border border-[var(--cell-review)]/50 bg-[var(--cell-review-bg)] px-4 py-2">
               <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
                 Cost of compliance
@@ -269,6 +305,7 @@ export function HeadlineNumbers({
                 {deltaPct.toFixed(1)}% more
               </p>
             </div>
+            )}
             {onAsk && (
               <Button
                 size="sm"

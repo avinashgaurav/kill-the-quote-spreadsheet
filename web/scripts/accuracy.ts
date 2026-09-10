@@ -33,8 +33,12 @@
  *   npx tsx scripts/accuracy.ts --photos   the five-photograph degradation set
  *   npx tsx scripts/accuracy.ts --all
  *
- * Costs real API calls. Cached by (model, prompt hash, file hash), so a second
- * run of the same files is free and the numbers do not move.
+ *   npx tsx scripts/accuracy.ts --fresh    ignore the cache and pay again
+ *
+ * Costs real API calls, cached ON DISK by (model, prompt hash, file hash), so a
+ * second run of the same files is free and the numbers do not move. Change the
+ * prompt or the model and every entry misses, which is the point: a cached
+ * reading from a prompt you have since edited is worse than no reading.
  */
 
 import { readFileSync, existsSync } from "node:fs";
@@ -55,6 +59,7 @@ for (const f of [".env.local", ".env"]) {
 }
 
 import { extractDocument } from "../lib/extract/run";
+import { diskCache } from "./disk-cache";
 import { activeModel, activeProvider } from "../lib/llm";
 import type { ExtractedRow } from "../lib/extract/contract";
 import rawQuotes from "../lib/data/raw-quotes.json";
@@ -269,6 +274,7 @@ async function run(label: string, file: string, vendor: string,
   try {
     const { rows, meta } = await extractDocument({
       buf, filename: name, mimeType: mime,
+      cache: fresh ? undefined : CACHE,
       // The crop re-read is a separate mechanism with its own evidence value.
       // Leaving it on here would score the pair, not the reader.
       verifyPhotos: false,
@@ -331,8 +337,20 @@ const PHOTOS: Array<[string, string]> = [
   ["v5 v.hard    steep angle", "04-vendor-vector/variants/v5_steep_angle.jpg"],
 ];
 
+/**
+ * Cached on disk, not in memory, because this is a script.
+ *
+ * `lib/extract/run.ts` caches in a Map, which is the right thing inside a
+ * server and useless inside `npx tsx`: the Map dies with the process, so every
+ * run re-read every file at full price. Pass --fresh to spend the money on
+ * purpose.
+ */
+const CACHE = diskCache();
+let fresh = false;
+
 async function main() {
   const args = process.argv.slice(2);
+  fresh = args.includes("--fresh");
   const wantPhotos = args.includes("--photos") || args.includes("--all");
   const wantDocs = args.includes("--all") || !args.includes("--photos");
 
@@ -416,33 +434,84 @@ async function main() {
     table(rows);
     detail(rows);
 
-    // Calibration: pair up accuracy and confidence across the five conditions
-    // and check they move together. Spearman would be overkill on five points;
-    // the question is only whether the easy end beats the hard end on both.
-    const ok = rows.filter((r) => r.ok && r.expectedPriced > 0);
+    // Calibration, checked on EVERY row rather than the ends.
+    //
+    // The first version compared only the easiest and hardest photographs, and
+    // duly reported "easiest 100% at 0.95, hardest 100% at 0.95" while a
+    // photograph in the MIDDLE of the set read at 52% accuracy with 0.90
+    // confidence on every wrong digit. A 48-point accuracy drop with no
+    // confidence movement is precisely the failure this check exists to catch,
+    // and the check walked straight past it because the bad case was not at an
+    // end. Ends are not a distribution.
+    // A read that did not happen is a FAILED run, not a quiet one.
+    //
+    // This branch used to have no such check: every calibration test sat
+    // behind `if (ok.length >= 2)`, so five failed reads skipped every
+    // assertion and the harness signed off with "ACCURACY: pass". It did
+    // exactly that when the API credit ran out mid-session: five 429s, no
+    // numbers, and a pass. Which is the same bug the product is graded on
+    // (reporting success on a read that found nothing), shipped in the tool
+    // that exists to catch it. A harness that cannot fail is not evidence.
+    const ok = rows.filter((r) => r.ok);
+    for (const r of rows.filter((r) => !r.ok)) {
+      console.log(`  FAIL: ${r.label.trim()} did not read. ${r.error ?? ""}`.trimEnd());
+      failed += 1;
+    }
+    if (ok.length < 2) {
+      console.log(
+        `  FAIL: ${ok.length} of ${rows.length} photographs read, so calibration was ` +
+        `not measured. Nothing below was checked. This is a failure and not a pass, ` +
+        `because "the tests did not run" and "the tests passed" must never print the ` +
+        `same word.`,
+      );
+      failed += 1;
+    }
     if (ok.length >= 2) {
       const acc = (r: Score) => (r.expectedPriced ? r.priceExact / r.expectedPriced : 0);
-      const easy = ok[0], hard = ok[ok.length - 1];
-      console.log(
-        `\n  calibration: easiest ${pct(easy.priceExact, easy.expectedPriced)} accurate at ` +
-        `confidence ${easy.meanConfidence.toFixed(2)}; hardest ` +
-        `${pct(hard.priceExact, hard.expectedPriced)} at ${hard.meanConfidence.toFixed(2)}.`,
-      );
-      const accDrop = acc(easy) - acc(hard);
-      const confDrop = easy.meanConfidence - hard.meanConfidence;
-      if (accDrop > 0.1 && confDrop <= 0.02) {
+      console.log("\n  accuracy against reported confidence, per condition:");
+      for (const r of ok) {
+        const a = acc(r);
+        const flag = a < 0.9 && r.meanConfidence > 0.75 ? "  <-- CONFIDENTLY WRONG" : "";
         console.log(
-          `  FAIL: accuracy fell ${(accDrop * 100).toFixed(0)} points and confidence did not ` +
-          `follow. The screen would be equally sure of a worse answer, which is the one ` +
-          `failure mode a buyer cannot see.`,
-        );
-        failed += 1;
-      } else if (accDrop > 0.1) {
-        console.log(
-          `  confidence fell ${(confDrop * 100).toFixed(0)} points as accuracy fell ` +
-          `${(accDrop * 100).toFixed(0)}. That is the behaviour we want.`,
+          `    ${r.label.trim().padEnd(26)} accuracy ${(a * 100).toFixed(0).padStart(3)}%` +
+          `   confidence ${r.meanConfidence.toFixed(2)}${flag}`,
         );
       }
+
+      // The single worst output this system can produce: a wrong number that
+      // does not know it is wrong. A buyer cannot see it, review cannot catch
+      // it, and every downstream guard trusts it.
+      const overconfident = ok.filter(
+        (r) => acc(r) < 0.9 && r.meanConfidenceOnWrong > 0.75,
+      );
+      if (overconfident.length) {
+        console.log(
+          `\n  FAIL: ${overconfident.map((r) => r.label.trim()).join(", ")} ` +
+          `returned wrong prices at high confidence. Accuracy falling is expected as ` +
+          `the photograph degrades; confidence NOT falling with it is the failure, ` +
+          `because the screen would be equally sure of a worse answer.`,
+        );
+        for (const r of overconfident) {
+          console.log(
+            `        ${r.label.trim()}: ${((1 - acc(r)) * 100).toFixed(0)}% of prices ` +
+            `wrong, mean confidence on the wrong ones ` +
+            `${r.meanConfidenceOnWrong.toFixed(2)}`,
+          );
+        }
+        failed += 1;
+      }
+
+      const spread = Math.max(...ok.map(acc)) - Math.min(...ok.map(acc));
+      const confSpread = Math.max(...ok.map((r) => r.meanConfidence))
+        - Math.min(...ok.map((r) => r.meanConfidence));
+      console.log(
+        `\n  accuracy spread ${(spread * 100).toFixed(0)} points across the set, ` +
+        `confidence spread ${(confSpread * 100).toFixed(0)} points.` +
+        (spread > 0.15 && confSpread < 0.1
+          ? " Confidence is not tracking difficulty."
+          : ""),
+      );
+
       const guessers = ok.filter((r) => r.illegibleExpected > r.illegibleAdmitted);
       if (guessers.length) {
         console.log(

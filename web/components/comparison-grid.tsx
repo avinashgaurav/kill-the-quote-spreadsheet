@@ -464,6 +464,7 @@ function Legend() {
     ["?", "can't read it"],
     ["~", "not a price"],
     ["!", "needs your call"],
+    ["", "blank: not read yet"],
   ];
   const markers: Array<[string, string]> = [
     ["\u25b8", "cheapest, eligible"],
