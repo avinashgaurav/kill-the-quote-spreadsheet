@@ -53,7 +53,31 @@ export async function resetDrafts() {
     `select id from rfx where id <> $1`, [RFX_ID],
   );
   await query(`delete from rfx where id <> $1`, [RFX_ID]);
-  return { discarded: r.rows.map((x) => x.id) };
+
+  // Suppliers added by an upload are debris too.
+  //
+  // Reset used to drop only drafted ENQUIRIES, so a supplier created on the
+  // shipped example survived it. The end-to-end suite creates one and the demo
+  // suite then found six columns where it expected five, three of its ten
+  // claims failing for a reason that had nothing to do with the product. A
+  // test that leaves debris behind breaks the next test, and the fix belongs
+  // in the reset rather than in the assertion.
+  const shipped = VENDORS.map((v) => v.code);
+  const extra = await query<{ id: string }>(
+    `select id from vendors where rfx_id = $1 and id <> all($2::text[])`,
+    [RFX_ID, shipped],
+  );
+  if (extra.rows.length) {
+    await query(
+      `delete from vendors where rfx_id = $1 and id <> all($2::text[])`,
+      [RFX_ID, shipped],
+    );
+  }
+
+  return {
+    discarded: r.rows.map((x) => x.id),
+    suppliersRemoved: extra.rows.map((x) => x.id),
+  };
 }
 
 export async function wipeFixture() {
