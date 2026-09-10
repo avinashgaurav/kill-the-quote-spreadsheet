@@ -39,8 +39,8 @@ a failure it has no evidence for.
 not a price, needs your call. Five different next actions, so five different marks. My
 first build rendered all five identically, which turned five decisions into one shrug.
 
-**6. Two correct numbers can still mislead.** One award scenario looks ₹30 lakh cheaper
-and is ₹1 lakh *dearer* like-for-like, because it awards fewer lines. Both numbers are
+**6. Two correct numbers can still mislead.** One award scenario looks ₹77.5 lakh cheaper
+and is ₹4.1 lakh *dearer* like-for-like, because it awards 27 lines instead of 30. Both numbers are
 right, which is exactly why a careful person misses it. Whenever two scenarios don't
 cover the same set of lines, the system says so and restates both on the common basis.
 Nobody asked for this and no test would have caught it.
@@ -71,11 +71,17 @@ request is a real feature, not a flag.
 
 **`.msg` and iWork files.** Refused with instructions rather than half-read.
 
-**Measured extraction accuracy.** The harness is built and runs. It scores recall,
-price exactness, unit correctness and invention rate against the answer key, and reads
-the same rate card five times to check that *confidence falls when accuracy falls*. It
-needs an API key I don't have yet. **This is the one claim in the build I cannot make**,
-and I'd rather say so than show you a number I didn't measure.
+**A confident wrong number, which I can now prove happens.** Accuracy is measured:
+across five formats, 107 of 107 lines, 100% price, 100% unit, nothing invented. Then I
+read the same rate card as five photographs of falling quality, and the fourth came back
+**52% accurate at 0.90 confidence on every wrong digit**. 59900 for 57900. 5600 for 9600.
+
+That is the precise failure this design exists to prevent, so it is the honest answer to
+*what does it show the buyer when it isn't sure*: on that photograph, it showed
+certainty. My harness had missed it by comparing only the easiest and hardest images, so
+a 48-point drop in the middle passed as a pass. It scores every row now. Whether the crop
+re-read catches it in the product is open, and I would rather hand you a measured failure
+than an unmeasured claim.
 
 ---
 
@@ -92,7 +98,7 @@ product, and it deletes a lot of the chaos before it exists.
 
 Then, working on it, a second one appeared that I think is better still. **The reading
 was never the bottleneck. The incomplete response is.** One supplier here sent five
-lines of email: 6 of 30 priced, no questionnaire, no terms. That's ₹2.89 crore sitting
+lines of email: 2 of 30 lines actually priced, no questionnaire, no terms. That's ₹2.89 crore sitting
 behind a request nobody sent. So the system works out what each supplier still owes,
 asks for only that, with a deadline, and records it, splitting "they never sent it" from
 "they sent something we can't use as it stands" because those are different

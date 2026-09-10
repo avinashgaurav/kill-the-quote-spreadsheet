@@ -27,7 +27,8 @@
     "accuracy:fresh": "tsx scripts/accuracy.ts --all --fresh",
     "verify": "npm run types && npm run lint && npm run test:all",
     "contrast-test": "tsx scripts/contrast-test.ts",
-    "cache-test": "tsx scripts/cache-test.ts"
+    "cache-test": "tsx scripts/cache-test.ts",
+    "doc-numbers": "tsx scripts/doc-numbers.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

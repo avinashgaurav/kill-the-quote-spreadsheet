@@ -64,16 +64,24 @@ extraction, don't fake the reasoning, don't hardcode the answers to your demo qu
 - **Real:** drafting, reading and answering are model calls. Extraction is cached on
   `(model, prompt hash, file hash)`, so change one byte of a document or one word of the
   prompt and it genuinely re-reads.
-- **Nothing hardcoded.** Zero branches on question text, on a drafting message, or on
-  a filename. Zero hardcoded amounts. No arithmetic rule keyed to a supplier code or a
-  line number, and no stored qualification verdict. Each of those was once false and
-  each now has a regression test.
+- **Nothing hardcoded, and each of these was once false.** Zero branches on question
+  text or on a drafting message. Zero hardcoded amounts. No arithmetic rule keyed to a
+  supplier code or a line number. No stored qualification verdict, and no analyst tool
+  reading one: the tool that answers *"is Vector's ISO 27001 certificate actually
+  valid?"* used to serve a `passed` boolean and a `finding` sentence out of
+  `catalog.json`, which is the one thing the brief forbids by name. Every one of these
+  now has a regression test, because each was found rather than avoided.
+- **Two branches on a filename, both deliberate.** Which supplier sent an unrecognised
+  file, and whether a document is a questionnaire rather than a quotation. Both are
+  hints that fail safe: the first refuses and asks rather than guessing, and the second
+  is recoverable because a quotation read as a questionnaire returns no answers and
+  throws loudly.
 - **Your data, not the shipped data.** Draft any enquiry, invite any subset of the
   roster, upload a quotation from a company that appears nowhere in this repository:
-  it gets its own column, is marked *not assessed*, can be chased, and lands in the
-  award note. Seven end-to-end cases cover exactly this, because the property worth
-  protecting is not that the demo works but that the demo is not the only thing that
-  does.
+  it gets its own column, is marked *not assessed*, can be chased, is visible to every
+  analyst tool, and lands in the award note. Seven end-to-end cases cover exactly this,
+  because the property worth protecting is not that the demo works but that the demo is
+  not the only thing that does.
 
 The AI reads. The code counts. Two independent implementations of the calculator, one in
 Python and one in TypeScript, are proven to agree on all 150 cells.
@@ -89,18 +97,24 @@ python3 scripts/e2e-test.py     # happy and sad paths over real HTTP
 npm run accuracy            # needs a key: is the reading actually right?
 ```
 
-| Suite | Checks |
-|---|---|
-| `conformance` | 442 assertions: two independent calculators agree on all 150 cells |
-| `reader-test` | 47 cases: every format plus all 11 photographs; four corrupt files must fail |
-| `revision-test` | A replaced quotation resolves, reports what moved, and re-reads the same |
-| `parse-check` | 10 realistic model output shapes: omitted nulls, invented line numbers |
-| `revision-test` | A replaced quote resolves, reports, and re-reads the same |
-| `generality-test` | The product runs on an enquiry in a category it has never seen |
-| `questionnaire-test` | An expired certificate, a superseded standard, a threshold missed, somebody else's certificate: caught, and each says why |
-| `regression-test` | 27 bugs that actually shipped cannot come back unnoticed |
-| `e2e-test` | 45 cases over HTTP, mostly sad paths, including an interviewer's own file |
-| `accuracy` | Recall, price exactness, unit correctness, invention rate, and whether **confidence falls when accuracy falls** |
+`npm run verify` is everything that costs nothing: types, lint, and the eight
+offline suites.
+
+| Suite | Checks | Key |
+|---|---|---|
+| `conformance` | 442 assertions: two independent calculators agree on all 150 cells | no |
+| `reader-test` | 47 cases: every format plus all 11 photographs, and 4 broken files (3 refused with instructions, 1 truncated PDF correctly routed to vision) | no |
+| `parse-check` | 10 realistic model output shapes: omitted nulls, invented line numbers | no |
+| `revision-test` | A replaced quotation resolves, reports what moved, and re-reads the same | no |
+| `generality-test` | The product runs on an enquiry in a category it has never seen | no |
+| `questionnaire-test` | 16 cases. An expired certificate, a superseded standard, a threshold missed, somebody else's certificate: caught, each saying why, and the case that only works because the ATTACHMENT is opened | no |
+| `contrast-test` | Every colour that carries meaning against its WCAG floor, both themes, oklch maths validated against a real browser first | no |
+| `cache-test` | The extraction cache stores, returns, and misses for the right reasons | no |
+| `regression-test` | 39 bugs that actually shipped cannot come back unnoticed | no |
+| `e2e-test` | 42 cases over HTTP, mostly sad paths, including an interviewer's own file | yes |
+| `accuracy` | Recall, price exactness, unit correctness, invention rate, and whether **confidence falls when accuracy falls** | yes |
+| `api-check` | Whether the model is reachable, and which of the three ways a key can be dead this is. Two tokens | yes |
+| `doc-numbers` | Prints every figure the documents claim, from the calculator. Run before editing a number in any doc | no |
 
 ## Layout
 

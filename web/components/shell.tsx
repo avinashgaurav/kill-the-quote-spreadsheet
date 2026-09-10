@@ -386,10 +386,14 @@ export function FixtureWarning({ vendors }: { vendors: string[] }) {
         Test data
       </span>
       <span className="font-medium">
-        {vendors.join(", ")} came from the test harness, not from a real read.
+        {vendors.length === 1
+          ? `${vendors[0]}'s figures came`
+          : `${vendors.length} suppliers' figures came`}{" "}
+        from the test harness, not from reading a document.
       </span>
       <span className="text-muted-foreground">
-        Upload the real files to replace them.
+        {vendors.join(", ")}. Send the enquiry, or upload their files, to replace
+        them with a real read.
       </span>
     </div>
   );
@@ -404,7 +408,8 @@ export function TrustBar({
   trust: {
     total: number; usable: number; excluded: number; needsHuman: number;
     derivedAwaitingVendor: number; awardableWithCaveat: number;
-    unreadable: number; noPrice: number; counts: Record<string, number>;
+    unreadable: number; noPrice: number; notRead: number;
+    counts: Record<string, number>;
   };
   awardedOn?: number;
   /** Derived, never hardcoded: a demo-specific literal in chrome copy goes
@@ -453,8 +458,48 @@ export function TrustBar({
       </Tooltip>
 
       <span className="text-muted-foreground">
-        <span className="num">{trust.excluded}</span> left out
+        <span className="num">{trust.excluded}</span> cells left out
       </span>
+
+      {/*
+        The gap that is OURS, and it belongs first.
+
+        This bar reported "148 left out" on a comparison where 120 of those
+        cells had never been read, and offered no way to tell the two apart. So
+        the product's own headline failure mode was running on its own trust
+        bar: a number that is arithmetically correct and materially misleading.
+        A buyer would reasonably read 148 exclusions as 148 problems with the
+        suppliers, when nearly all of it was work we had not done.
+
+        It sits before every other explanation because it dominates them. If
+        four fifths of the grid is unread, nothing else on this bar is the
+        story.
+      */}
+      {trust.notRead > 0 && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={onShowChase}
+              className={cn(
+                "flex cursor-help items-center gap-1.5 rounded-md border px-2 py-0.5",
+                "border-foreground/25 transition-colors hover:brightness-97",
+              )}
+            >
+              <span className="num font-semibold">{trust.notRead}</span>
+              not read yet
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs text-[11px]">
+            Nothing has been read from {
+              trust.total && trust.notRead % Math.max(1, trust.total / 30) === 0
+                ? "one or more suppliers"
+                : "some suppliers"
+            }, so these cells are blank rather than empty. This is a gap in what
+            we have collected, not in what they sent: it is ours to close, and
+            it is the first thing to fix before reading anything else here.
+          </TooltipContent>
+        </Tooltip>
+      )}
 
       {/* Three disjoint groups. An earlier version counted the caveat cells in
           both "awardable" and "need you", so the bar read as if 12 cells were
@@ -494,7 +539,7 @@ export function TrustBar({
           className="flex items-center gap-1.5 rounded-md border border-[var(--cell-review)]/50 bg-[var(--cell-review-bg)] px-2 py-0.5 transition-colors hover:brightness-97"
         >
           <span className="num font-semibold">{trust.needsHuman}</span>
-          blocked on you
+          cells need your call
         </button>
       )}
 

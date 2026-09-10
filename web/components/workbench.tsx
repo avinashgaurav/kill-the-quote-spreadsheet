@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { shortName } from "@/lib/ui";
 import { ComparisonGrid, type GridVendor } from "./comparison-grid";
 import {
   AppHeader, HeadlineNumbers, FixtureWarning, TrustBar, QualifiedToggle,
@@ -84,7 +85,8 @@ interface Payload {
   trust: {
     total: number; usable: number; excluded: number; needsHuman: number;
     derivedAwaitingVendor: number; awardableWithCaveat: number;
-    unreadable: number; noPrice: number; counts: Record<string, number>;
+    unreadable: number; noPrice: number; notRead: number;
+    counts: Record<string, number>;
   };
   scenarios: {
     allVendors: { totalInr: number; linesAwarded: number;
@@ -310,7 +312,18 @@ export function Workbench({
         }
       />
 
-      {payload && <FixtureWarning vendors={payload.fixtureVendors} />}
+      {payload && (
+        <FixtureWarning
+          /* Names, not codes. This banner is read by the buyer, and "V1, V2,
+             V3" is an internal identifier they have no reason to know: it made
+             the one warning on the screen that must be understood the one
+             sentence written in a private vocabulary. */
+          vendors={payload.fixtureVendors.map((c) => {
+            const v = payload.vendors.find((x) => x.code === c);
+            return v ? shortName(v.name) : c;
+          })}
+        />
+      )}
 
       {loading && (
         <div className="space-y-2 p-6">

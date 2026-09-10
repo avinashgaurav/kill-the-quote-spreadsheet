@@ -241,9 +241,12 @@ useful; it is less, because the buyer now has to check all 150 cells instead of
 
 The dataset produced one on its own while I was verifying it. Cheapest-per-line
 among qualified vendors comes to ₹4,06,81,322 across 30 lines. Adding a
-strict-compliance filter appears to *save* ₹30 lakh (₹3,76,51,250) but only
-because it awards **29** lines instead of 30. Restated on the 29 lines both can
-fill, the strict scenario is higher, which is the true direction.
+strict-compliance filter appears to *save* ₹77.5 lakh (₹3,29,30,800) but only
+because it awards **27** lines instead of 30. Restated on the 27 lines both can
+fill, the strict scenario is ₹4.1 lakh **higher** (₹3,29,30,800 against
+₹3,25,16,450), which is the true direction. The common basis is 90% of the
+enquiry, so the restatement is worth trusting; below half, the engine says the
+basis is too thin to draw a conclusion from at all.
 
 So the engine refuses to rank two scenarios without restating them on their
 common line set, and the analyst surfaces the coverage difference **before** the
@@ -321,13 +324,24 @@ the five replies, the questionnaire results and the answer key cannot drift.
 |---|---|---|---|---|
 | Zenith | `.xlsx`, own template, + a Rev 2 | 30/30 | **Clears all** | Total ≠ sum of lines, by exactly its 2.5% |
 | Cygnus | `.pdf`, 3pp letterhead | 27/30 | **Clears all** | Part USD ex-works; 4.5% discount in footnote 3 on p3 |
-| Orbit | `.docx`, prose letter | 27/30 | Fails Q5, Q6, Q7 | Prices in sentences; 3 lines silently omitted |
+| Orbit | `.docx`, prose letter | 26/30 | Fails Q5, Q6, Q7 | Prices in sentences; lines silently omitted |
 | Vector | `.jpg`, photographed rate card | 21/30 | Fails Q1, Q2, Q4, Q5, Q6, Q7 | Pen overrides; glare-destroyed price; per-DIMM and per-pc |
-| Helios | `.eml`, 5 lines | 5/30 | **No response at all** | Prices by reference to last year's PO |
+| Helios | `.eml`, 5 lines | 2/30 | **No questionnaire at all** | Prices by reference to last year's PO, and "rest we'll match Zenith" |
 
-**Cell census: 150 cells, 106 usable.** comparable 99, with-caveat 8,
+"Priced" above means AWARDABLE, which is the number that matters and is smaller
+than the number of cells carrying a figure. Helios is the clearest case: five
+lines have a value, and only two of them are prices Helios actually quoted. The
+other three were derived from a prior PO and stay out of every total until they
+confirm them.
+
+**Cell census: 150 cells, 106 usable.** comparable 89, with-caveat 17,
 non-comparable 25, omitted 11, declined 3, resolved-from-reference 3,
-unreadable 1.
+needs-review 1, unreadable 1.
+
+Every figure in this section comes from `npx tsx web/scripts/doc-numbers.ts`,
+which prints them from the same calculator the screen uses. Re-run it before
+editing any number here: an earlier version of this table said comparable 99 and
+with-caveat 8, and the caveat cells are precisely the interesting ones.
 
 **Verified award scenarios** (ex-GST, internal baseline ₹4,27,40,500):
 

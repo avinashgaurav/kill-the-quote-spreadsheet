@@ -11,6 +11,38 @@
 
 import type { CellStatus } from "./normalise";
 
+/**
+ * A supplier's name at the width a column header has.
+ *
+ * "Zenith Infotech Solutions Pvt Ltd" does not fit above a price and does not
+ * need to: a buyer comparing five bids calls them Zenith. This was
+ * `v.name.split(" ")[0]` inline, in two places in the grid, which is fine for
+ * these five and wrong for the general case the product claims to handle. An
+ * interviewer uploading a quotation from "The Bombay Cable Company" would get
+ * a column headed "The".
+ *
+ * So: drop the legal form, then take the distinctive part. The full legal name
+ * stays everywhere it matters legally, which is the award note, the supplier
+ * panel and the outbound message.
+ */
+const LEGAL_FORM =
+  /\s+(pvt\.?|private|public|ltd\.?|limited|llp|inc\.?|incorporated|co\.?|company|corp\.?|corporation|gmbh|plc|s\.?a\.?|b\.?v\.?)\b\.?/gi;
+
+export function shortName(full: string): string {
+  const bare = full.replace(LEGAL_FORM, "").replace(/[,.]\s*$/, "").trim();
+  const words = bare.split(/\s+/).filter(Boolean);
+  if (!words.length) return full;
+  // A leading article carries no identity, so "The Bombay Cable" shortens to
+  // "Bombay" rather than to "The".
+  const start = /^(the|m\/s\.?)$/i.test(words[0]) ? 1 : 0;
+  const rest = words.slice(start);
+  if (!rest.length) return words.join(" ");
+  // One word is enough when the name has three or more; two names like
+  // "Vector Digital" stay whole, because "Vector" alone may not be the
+  // distinctive half.
+  return rest.length >= 3 ? rest[0] : rest.join(" ");
+}
+
 export type DisplayState = "trusted" | "review" | "caveat" | "empty";
 
 export function displayState(status: CellStatus): DisplayState {

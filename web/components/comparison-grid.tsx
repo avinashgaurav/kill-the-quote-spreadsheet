@@ -19,7 +19,9 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { CELL_CLASS, EMPTY_GLYPH, STATUS_ACTION, displayState, num } from "@/lib/ui";
+import {
+  CELL_CLASS, EMPTY_GLYPH, STATUS_ACTION, displayState, num, shortName,
+} from "@/lib/ui";
 import type { Cell, CellStatus, RfxLine } from "@/lib/normalise";
 
 export interface GridVendor {
@@ -176,7 +178,7 @@ export function ComparisonGrid({
                     className="flex w-full flex-col items-end gap-0.5 px-2 py-1.5 text-right transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                   >
                     <span className="flex items-center gap-1.5 font-semibold">
-                      {v.name.split(" ")[0]}
+                      {shortName(v.name)}
                       {!v.qualified && v.assessed !== false && (
                         <span className="rounded-sm bg-destructive px-1 text-[9px] font-semibold tracking-wide text-white">
                           FAILED {v.failedMandatory.length}
@@ -247,7 +249,7 @@ export function ComparisonGrid({
                   {vendors.map((v) => (
                     <GridCell
                       key={v.code}
-                      vendorName={v.name.split(" ")[0]}
+                      vendorName={shortName(v.name)}
                       lineLabel={`line ${line.no}, ${line.sku}`}
                       cell={matrix[v.code]?.[line.no]}
                       confidence={confidence[`${v.code}:${line.no}`]}

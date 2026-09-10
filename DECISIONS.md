@@ -204,7 +204,7 @@ different reasons a cell can have no number, and they need five different action
 Rendering all five as a dash was the original build. It was wrong, because it turned
 five different actions into one shrug.
 
-**What they never sent.** A supplier who quotes 6 of 30 lines with no questionnaire is
+**What they never sent.** A supplier who prices 2 of 30 lines with no questionnaire is
 not an edge case, it is the normal case. The gap is surfaced per supplier, priced by
 money at risk, and asked for in one message containing only the outstanding items. In
 this dataset that is **₹2.89 crore sitting behind one unsent request.**
@@ -243,7 +243,7 @@ trust bar was quietly double-counting.
 
 ---
 
-## 7. Judgment: the Rs 30 lakh saving that is not one
+## 7. Judgment: the Rs 77.5 lakh saving that is not one
 
 **Lead with this.**
 
@@ -251,11 +251,11 @@ Three award scenarios: cheapest across all suppliers, cheapest across only the
 suppliers who passed the mandatory questions, and the same again excluding
 substitutions and below-spec offers.
 
-The third scenario's headline is about **Rs 30 lakh lower**. It looks like the
+The third scenario's headline is about **Rs 77.5 lakh lower**. It looks like the
 disciplined choice saves you money.
 
 It does not. It is lower **because it awards fewer lines.** Restated on only the lines
-all three scenarios can actually fill, it is about **Rs 1 lakh dearer.**
+all three scenarios can actually fill, it is about **Rs 4.1 lakh dearer.**
 
 Both numbers are individually correct. That is exactly why a careful human misses it,
 and it is why the guard exists: whenever two scenarios do not cover the same set of

@@ -158,7 +158,8 @@ want of a document nobody chased is its own kind of wrong.
 
 **The guard worth knowing about:** if two award scenarios do not cover the same set of
 lines, the system says so and restates both on the common basis. One scenario looks
-₹30 lakh cheaper and is ₹1 lakh dearer like-for-like, because it awards fewer lines.
+₹77.5 lakh cheaper and is ₹4.1 lakh dearer like-for-like, because it awards 27 lines
+of 30.
 Both numbers are correct, which is why a careful person misses it.
 
 ---
@@ -248,19 +249,34 @@ Reading this list is the fastest way to understand the product.
 
 # Testing
 
-| Suite | Checks | Result |
-|---|---|---|
-| Conformance | Two calculators agree on all 150 cells | 442 assertions ✅ |
-| Readers | Every format, all 11 images, 4 corrupt files must fail | 47/47 ✅ |
-| Parser | 10 realistic model output shapes | 10/10 ✅ |
-| Revisions | A replaced quote resolves, reports, re-reads the same | 7/7 ✅ |
-| Generality | Runs on an enquiry it has never seen, in another category | 8/8 ✅ |
-| Questionnaire | Verdicts derived from evidence, each able to say why | 13/13 ✅ |
-| Regressions | 27 bugs that shipped cannot return unnoticed | 27/27 ✅ |
-| End to end | Happy and sad paths over HTTP, plus an interviewer's own file | 45/45 ✅ |
-| Demo | Ten walkthrough claims against the brief | 10/10 ✅ |
-| Contrast | Every text node measured in the browser | 0 failures ✅ |
-| Build, types, lint, audit | Production build, 0 vulnerabilities | ✅ |
+`npm run verify` runs everything below that costs nothing: types, lint, and the
+eight suites. No API key, no network, about forty seconds.
 
-**One gap:** extraction *accuracy* against a live model is unmeasured. The harness exists
-and runs; it needs an API key.
+| Suite | Checks | Result | Needs a key |
+|---|---|---|---|
+| Conformance | Two calculators agree on all 150 cells | 442 assertions ✅ | no |
+| Readers | Every format, all 11 photographs, and 4 broken files: 3 refused with instructions, 1 (a truncated PDF) correctly routed to vision | 47/47 ✅ | no |
+| Parser | 10 realistic model output shapes | 10/10 ✅ | no |
+| Revisions | A replaced quote resolves, reports, re-reads the same | 7/7 ✅ | no |
+| Generality | Runs on an enquiry it has never seen, in another category | 8/8 ✅ | no |
+| Questionnaire | Verdicts derived from evidence, each able to say why, and the finding that needs the ATTACHMENT opened | 16/16 ✅ | no |
+| Contrast | Every colour that carries meaning, against its WCAG floor, in both themes, with the oklch maths checked against a real browser first | pass ✅ | no |
+| Cache | The extraction cache stores, returns, and misses for the right reasons | 6/6 ✅ | no |
+| Regressions | 39 bugs that shipped cannot return unnoticed | 39/39 ✅ | no |
+| End to end | Happy and sad paths over HTTP, plus an interviewer's own file | 42 cases | yes |
+| Demo | Ten walkthrough claims against the brief | 10/10 | yes |
+| Accuracy | Recall, price exactness, unit correctness, invention rate, and whether confidence falls when accuracy falls | measured, see below | yes |
+| Build, types, lint, audit | Production build, warning-free, 0 vulnerabilities | ✅ | no |
+
+**Measured extraction accuracy** (Gemini 3.1 Pro): across an xlsx, a 3-page PDF, a
+docx with prices in prose, a photograph and a 5-line email, **107 of 107 lines
+returned, 100% price exactness, 100% unit correctness, nothing invented**, with
+confidence tracking difficulty unprompted (1.00 / 1.00 / 0.81 / 0.95 / 0.40).
+
+**And the finding that matters more.** On the five-photograph degradation set, the
+fourth (low light, motion blur) read at **52% price accuracy with 0.90 confidence on
+every wrong digit**: 59900 for 57900, 5600 for 9600, 260 for 268. Confidence did not
+fall when accuracy did, which is the one failure this whole design exists to prevent.
+The harness now scores every photograph rather than the easiest and hardest only,
+which is how the case in the middle went unnoticed. Whether the crop re-read catches
+it in the product is the open question; that needs credit to answer.

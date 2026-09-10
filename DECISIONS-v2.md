@@ -142,14 +142,15 @@ nodes.
 
 ---
 
-## A5. The ₹30 lakh saving that is not one
+## A5. The ₹77.5 lakh saving that is not one
 
 **The choice.** Whenever two award scenarios do not cover the same set of lines, the
 system says so and restates both on the common basis before anyone compares them.
 
-**Why.** Scenario (c), the strictest one, has a headline about ₹30 lakh **lower** than
+**Why.** Scenario (c), the strictest one, has a headline about ₹77.5 lakh **lower** than
 scenario (b). It looks like discipline saves money. It does not: it is lower because it
-awards fewer lines. On the lines all scenarios can fill, it is about ₹1 lakh **dearer**.
+awards 27 lines instead of 30. On the 27 lines all scenarios can fill, it is about
+₹4.1 lakh **dearer**.
 Both numbers are individually correct, which is exactly why a careful human misses it.
 
 **What it costs.** A guard that fires and an explanation the buyer must read. It makes
@@ -205,7 +206,7 @@ carries a deadline. Proceeding without an answer is a recorded decision with a r
 and the award note prints who was asked, when, and whether they answered.
 
 **Why.** A supplier sending less than the enquiry asked for is not an edge case, it is
-the normal case. In this dataset one supplier sent a five-line email: 6 of 30 lines
+the normal case. In this dataset one supplier sent a five-line email: 2 of 30 lines
 priced, no questionnaire, no terms. **That is ₹2.89 crore sitting behind a request
 nobody had sent.**
 
