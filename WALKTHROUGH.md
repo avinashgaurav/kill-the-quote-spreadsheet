@@ -30,8 +30,17 @@ Forty seconds, no API. If anything here is red, fix it before recording.
 Then reset to a clean state so the arc starts from nothing:
 
 ```bash
-curl -s -X POST 'http://localhost:3000/api/dev/fixture?wipe=true'
+npm run demo:load -- --live
 ```
+
+One supplier at a time, reading all eight documents for real. It reports which
+certificates were opened and what they turned out to say, then the app's own
+numbers. About 50 cents the first time and free afterwards, because every read
+is cached on the file's hash. Add `--dry` to see what it would do and spend
+nothing, or `--channel whatsapp` for the harder version in Part 2.
+
+For the empty-slate opening instead, leave the live site alone: it starts with
+nothing read, which is where a demo should begin.
 
 Recording with **Recordly** (`github.com/webadderallorg/Recordly`, macOS 14+,
 prebuilt from its releases page). Its auto-zoom is genuinely useful here: the
@@ -71,10 +80,16 @@ up in the award note.
 Pick suppliers off the roster of ten. **Deselect one that has a reply on file and
 select one that does not**, so the state that follows is not the scripted one.
 
-Pick **WhatsApp** as the channel and say why it is not cosmetic: it cannot carry an
-attachment, so the pack goes as a link, and the supplier who gets a link on their
-phone is the one who replies with a photograph of a rate card. Your choice here
-becomes the hardest input two minutes from now.
+Pick **WhatsApp** and say what it costs you. It cannot carry an attachment, so the
+pack goes out as a link, the supplier who gets a link on their phone is the one who
+replies with a photograph, and on the way back **their certificate does not arrive
+either.** The screen says so as it happens. Two minutes from now that is why
+Vector's ISO answer has nothing behind it, and the reason is a choice you made
+here.
+
+If you would rather show the expired-certificate finding, pick **email** and the
+certificate arrives and gets opened. Both are worth showing; picking WhatsApp and
+then explaining what you gave up is the stronger version.
 
 Replies land one at a time. **Name the one thing that is faked:** nothing is
 emailed and no mailbox is polled. Everything that arrives is then read for real,
@@ -143,6 +158,11 @@ Comparing a date to today is not a judgement call, so code does it, and the verd
 is recomputed on every read rather than stored. A certificate expiring next week
 changes the answer without anybody editing a row.
 
+**Then open the certificate.** In the supplier panel `VDS_ISO27001.pdf` is a link,
+because a verdict about a document nobody can look at is exactly the kind of
+assertion this tool refuses to make everywhere else. Under it, in the panel's own
+words: *the document itself states ISO/IEC 27001:2013, valid to 2025-11-30.*
+
 Then click "ask them to resolve these 6", so the failure has an action attached to
 it and not just a red badge.
 
@@ -169,7 +189,11 @@ than by count. A tool that can rank its own uncertainty is a different kind of t
 Ask a question with an uncomfortable answer. It will compute it, and it will tell
 you what you are giving up. Do not skip it because the answer is awkward.
 
-**5.** *"Draft the award recommendation and say what it rests on."*
+**5.** *"Chart the split award by supplier."*
+Thirty bars, coloured by who wins each line: the shape of a split award in one
+picture, which a thirty-row table does not give you.
+
+**6.** *"Draft the award recommendation and say what it rests on."*
 Then export it, and read the section that says who was asked for what, when it was
 due, and whether they replied. *"Their questionnaire is missing"* and *"we asked on
 the 10th, gave them until the 16th, and nothing came back"* are different facts,
@@ -177,6 +201,22 @@ and only the second lets a buyer award around a supplier and defend it to a CFO.
 
 **Then ask one thing it cannot do**, and let it refuse. That refusal is the most
 persuasive thing in the recording.
+
+---
+
+## Part 5b. The question they will actually ask (30 seconds)
+
+Somebody will ask "so what is the AI actually doing here?" Do not answer from
+memory. Click **"where the model is used"** on the trust bar.
+
+Six calls, and beside each one what it may **not** do: drafting may not invent a
+price, reading may not convert or rank, the questionnaire reader may not decide
+whether anybody passed, and the analyst may not compute at all. Then what code
+decides instead and why it has to, and the trade it costs: my code returns
+"cannot resolve" where a model would have improvised, which is why 31 of 150
+cells carry no usable price.
+
+Say the sentence: **the model reads, the code counts.**
 
 ---
 

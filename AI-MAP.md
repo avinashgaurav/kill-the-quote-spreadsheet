@@ -17,7 +17,7 @@ to do arithmetic, and never asked whether somebody passed.
 | 1 | **Draft the enquiry**<br>`lib/copilot.ts` → `api/copilot` | Turn "I need 200 laptops for three offices" into scope, 30 line items, a questionnaire and terms. 3 tools, up to 8 turns. | Invent a price or an estimate. It has no view on what things cost. |
 | 2 | **Read a quotation**<br>`lib/extract/run.ts` | What does this document say, line by line, in the supplier's own unit and currency? One forced tool, no others. | Convert, multiply, discount, add, or rank. Report a number it cannot read. Return a value with no source. |
 | 3 | **Re-read a photograph's crop**<br>`lib/extract/run.ts:393` | Just this one value, cropped out, with no surrounding context. Cheap model, thinking off. | See the rest of the document. Two reads that agree is evidence; two that disagree drops the confidence. |
-| 4 | **Read a questionnaire response**<br>`lib/extract/questionnaire.ts` | What did they answer, and what did they attach? Answer and evidence kept strictly apart. | Decide whether they pass. It returns no verdict at all. |
+| 4 | **Read a questionnaire response**<br>`lib/extract/questionnaire.ts` | What did they answer, and what did they attach? Answer and evidence kept strictly apart, against **the questions this enquiry actually asked**. | Decide whether they pass. It returns no verdict at all. |
 | 5 | **Read an attached document**<br>`lib/extract/questionnaire.ts:338` | What do *you* say about yourself: which standard, with its revision year exactly as printed, which expiry date, issued to whom? | Judge whether it satisfies the question it was attached to. |
 | 6 | **Answer the buyer**<br>`lib/analyst.ts` → `api/analyst` | Choose which questions to put to the calculator, and explain what comes back. 10 tools, up to 12 turns. | Compute anything. There is deliberately no `evaluate` tool, no SQL, and no way to hand it two numbers and ask for their sum. |
 
@@ -37,6 +37,12 @@ sized to the real output, and a wall-clock retry budget.
 | Whether two totals are comparable | `likeForLike()` | Two scenarios over different line sets have incomparable totals. A model would compare them because they are both numbers. |
 | What a supplier still owes | `lib/chase.ts` | Splits "never sent it" from "sent something we cannot use", which are different conversations. |
 | Whether a cell can be awarded | `isAwardable()` | A price derived from a prior order is excluded until the supplier confirms it. Awarding against an offer nobody made is not an award. |
+
+Every one of these takes **this enquiry's** context: its lines, its quantities,
+its questions and the discounts read off its suppliers' own documents. That
+sounds obvious and was the source of two separate bugs, because both the
+calculator and the questionnaire reader had a sensible-looking default that was
+the shipped demo.
 
 ---
 
@@ -93,9 +99,20 @@ npm run verify         # 9 suites, no API key, 40 seconds
 npm run accuracy       # is the reading actually right (needs a key)
 ```
 
-`regression-test` includes cases 17, 21, 21b, 21c and 25, each of which exists
-because this rule was once broken here: a qualification verdict from a typed
-table, an analyst tool serving a hand-written finding, an attached certificate
-nothing ever opened, and an award note calling an unassessed supplier
-qualified. Each was found rather than avoided, and each now fails the build if
-it returns.
+`regression-test` includes cases 17, 21, 21b, 21c, 25, 26 and 27, each of which
+exists because this rule was once broken *here*:
+
+- a qualification verdict read from a typed table
+- an analyst tool serving a hand-written finding as tool output
+- an attached certificate nothing ever opened, so a real read could not find
+  the contradiction the whole demo turns on
+- an award note calling an unassessed supplier qualified
+- a discount fix that reached the calculator and not the analyst, which then
+  fell back to the answer key **and** to the shipped catalog's line quantities
+- a drafted enquiry's own questionnaire never persisted, so real answers were
+  graded against the demo's questions
+
+Every one was found rather than avoided, several of them by an audit rather than
+by me, and each now fails the build if it returns. That list is the honest
+answer to whether this rule holds: not "it was never broken", but "it was
+broken six times, here is where, and here is what stops each one coming back".
