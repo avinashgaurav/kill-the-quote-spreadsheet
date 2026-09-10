@@ -28,8 +28,7 @@ import { createHash } from "node:crypto";
 
 import {
   callLlm, activeModel, activeProvider, supportsCitations,
-  type Part, type ToolSpec,
-} from "../llm";
+  type Part, } from "../llm";
 import {
   EXTRACTION_TOOL, extractionSchema, validateExtraction,
   type Extraction, type ExtractedRow, type ValidationIssue,
@@ -214,7 +213,7 @@ export async function extractDocument(opts: {
   const response = await callLlm({
     system: SYSTEM,
     parts,
-    tools: [EXTRACTION_TOOL as unknown as ToolSpec],
+    tools: [EXTRACTION_TOOL],
     forceTool: EXTRACTION_TOOL.name,
     maxTokens: 16000,
     effort: "high",

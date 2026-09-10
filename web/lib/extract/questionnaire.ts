@@ -18,7 +18,7 @@
 
 import { z } from "zod";
 
-import { callLlm, type Part, type ToolSpec } from "../llm";
+import { callLlm, type Part } from "../llm";
 import { readFileParts } from "./readers";
 import type { QuestionSpec, ReadAnswer } from "../questionnaire";
 
@@ -244,7 +244,7 @@ export async function extractQuestionnaire(opts: {
   const response = await callLlm({
     system: SYSTEM,
     parts,
-    tools: [QUESTIONNAIRE_TOOL as unknown as ToolSpec],
+    tools: [QUESTIONNAIRE_TOOL],
     forceTool: QUESTIONNAIRE_TOOL.name,
     maxTokens: 12000,
     effort: "high",

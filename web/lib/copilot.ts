@@ -146,7 +146,7 @@ export const COPILOT_TOOLS: ToolSpec[] = [
     description:
       "Produce the complete enquiry: scope, line items, questionnaire and terms. Call this once " +
       "you have enough from the buyer, not before. Every line must carry a unit and unitsPerUom.",
-    inputSchema: {
+    input_schema: {
       type: "object",
       additionalProperties: false,
       required: ["title", "scope", "lines", "questionnaire", "terms", "clarityIssues"],
@@ -302,7 +302,7 @@ export const COPILOT_TOOLS: ToolSpec[] = [
       "Change an enquiry that already exists: add, remove or revise lines, or change a term. Use " +
       "this instead of redrafting. A line added after the enquiry went out will correctly show as " +
       "one nobody has quoted yet.",
-    inputSchema: {
+    input_schema: {
       type: "object",
       additionalProperties: false,
       required: ["summary", "addLines", "removeLineNos", "reviseLines", "termChanges"],
@@ -348,7 +348,7 @@ export const COPILOT_TOOLS: ToolSpec[] = [
       "Refuse to draft, and say why. Use this when the buyer has not given enough to write an " +
       "enquiry that will not create a clarification round: no quantities, no spec at all, or a " +
       "request too vague to turn into line items. Asking is cheaper than sending something wrong.",
-    inputSchema: {
+    input_schema: {
       type: "object",
       additionalProperties: false,
       required: ["missing", "askInstead"],

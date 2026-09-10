@@ -75,7 +75,7 @@ export async function POST(request: Request) {
         system: ANALYST_SYSTEM,
         history: turns,
         parts: currentParts,
-        tools: ANALYST_TOOLS as unknown as ToolSpec[],
+        tools: ANALYST_TOOLS as ToolSpec[],
         maxTokens: 16000,
         effort: "high",
         // Someone is watching a cursor blink. Twelve turns each waiting on a

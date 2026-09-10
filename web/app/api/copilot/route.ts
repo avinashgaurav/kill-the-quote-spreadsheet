@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { callLlm, activeModel, activeProvider, toolResultPart, type Part, type ToolSpec } from "@/lib/llm";
+import { callLlm, activeModel, activeProvider, toolResultPart, type Part } from "@/lib/llm";
 import { COPILOT_SYSTEM, COPILOT_TOOLS, sendBlockers, type DraftedRfx } from "@/lib/copilot";
 
 /**
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         system: COPILOT_SYSTEM,
         history: turns,
         parts: currentParts,
-        tools: COPILOT_TOOLS as unknown as ToolSpec[],
+        tools: COPILOT_TOOLS,
         maxTokens: 16000,
         effort: "high",
         // Drafting is a conversation. Nobody waits four minutes for a reply.

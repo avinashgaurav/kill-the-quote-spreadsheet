@@ -45,8 +45,16 @@ export const MODEL_IDS = {
   // the real demo on Claude Opus 5. Override with GEMINI_MODEL if a Pro model
   // becomes available.
   gemini: {
-    main: process.env.GEMINI_MODEL || "gemini-flash-latest",
-    cheap: "gemini-flash-latest",
+    // 3.1 Pro for the reading and the reasoning. Gemini's lineage is native
+    // multimodal document understanding, which is exactly the hard part here:
+    // a phone photograph of a printed rate card, taken at an angle, with a
+    // handwritten correction over a struck-through price.
+    main: process.env.GEMINI_MODEL || "gemini-3.1-pro-preview",
+    // The crop re-read only has to say what one number is. It runs eight times
+    // per photograph, so it goes to the cheap model deliberately: paying Pro
+    // rates to read four digits is waste, and the whole point of the second
+    // read is that it is INDEPENDENT, not that it is clever.
+    cheap: process.env.GEMINI_CHEAP_MODEL || "gemini-flash-latest",
   },
 };
 
@@ -70,8 +78,27 @@ export type Part =
 export interface ToolSpec {
   name: string;
   description: string;
-  /** JSON Schema. Anthropic takes it as-is; Gemini needs it translated. */
-  inputSchema: Record<string, unknown>;
+  /**
+   * JSON Schema. Anthropic takes it as-is; Gemini needs it translated.
+   *
+   * SNAKE CASE, deliberately, because that is Anthropic's own field name and
+   * what every tool definition in this codebase actually writes.
+   *
+   * This interface used to say `inputSchema`, and every call site bridged the
+   * gap with `as unknown as ToolSpec`. The result: `t.inputSchema` was
+   * undefined for every tool, so both providers were sent a function
+   * declaration with NO PARAMETERS. Gemini duly called the tool with `args: {}`
+   * and the extractor reported that it had found nothing in a document full of
+   * prices.
+   *
+   * It stayed hidden for the whole build because the loops had no API key to
+   * run against, and because `as unknown as` is precisely the cast that turns a
+   * compile error into a runtime mystery. The casts are gone now, so the
+   * compiler checks this.
+   */
+  input_schema: Record<string, unknown>;
+  /** Anthropic's strict mode. Ignored by Gemini. */
+  strict?: boolean;
 }
 
 export interface ToolCall {
@@ -252,7 +279,7 @@ async function callAnthropic(req: LlmRequest): Promise<LlmResult> {
             description: t.description,
             // Guarantees the arguments validate against the schema exactly.
             strict: true,
-            input_schema: t.inputSchema,
+            input_schema: t.input_schema,
           })) as unknown as Anthropic.ToolUnion[],
           ...(req.forceTool
             ? { tool_choice: { type: "tool" as const, name: req.forceTool } }
@@ -329,7 +356,7 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
       functionDeclarations: req.tools.map((t) => ({
         name: t.name,
         description: t.description,
-        parameters: toGeminiSchema(t.inputSchema),
+        parameters: toGeminiSchema(t.input_schema),
       })),
     }];
     body.toolConfig = {
