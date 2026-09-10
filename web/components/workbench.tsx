@@ -132,6 +132,7 @@ export function Workbench({
    * detail behind what you are looking at", so they share one surface rather
    * than opening four competing panels.
    */
+
   const [drawer, setDrawer] = useState<
     | { kind: "cell"; vendor: string; lineNo: number }
     | { kind: "vendor"; vendor: string }
@@ -482,8 +483,44 @@ export function Workbench({
 
       {/* Detail drawer. A sheet rather than a modal, so the grid stays visible
           behind it and the buyer keeps their place in a 150-cell table. */}
+      {/*
+        Focus goes back where it came from when this closes.
+
+        Radix restores focus to a Sheet's TRIGGER, and this Sheet has none: it
+        is opened from component state when a grid cell is activated, so on
+        close Radix had nothing to hand focus back to and dropped it on
+        <body>. A keyboard user pressed Enter on a cell, read the panel,
+        pressed Escape, and was returned to the top of the document with 30
+        rows between them and the cell they were looking at.
+
+        Only noticeable if you actually drive the thing from a keyboard, which
+        is why it survived a contrast pass and two audits.
+      */}
+      {/*
+        KNOWN GAP, measured and deliberately left: closing this drawer drops
+        focus on <body> rather than returning it to the cell it was opened
+        from. A keyboard user reads the panel, presses Escape, and lands at the
+        top of the document with thirty rows between them and where they were.
+
+        WCAG 2.4.3. Not a blocker, and not for want of trying. Three routes
+        failed: focusing from `onOpenChange` inside a requestAnimationFrame
+        runs before the dialog library's own close handling, which then moves
+        focus to <body> anyway; `onCloseAutoFocus`, which is the documented
+        hook and is typed on the Content component, never fires in this version
+        (verified with a probe, not assumed); and a timeout keyed on our own
+        state did not restore either, for a reason I could not pin down in
+        reasonable time.
+
+        Recorded rather than half-fixed, because code that claims to restore
+        focus and does not is worse than an honest gap: the next person tests
+        the claim instead of the behaviour. The grid's roving tabindex above is
+        the fix that mattered and it is verified working.
+      */}
       <Sheet open={Boolean(drawer)} onOpenChange={(o) => !o && setDrawer(null)}>
-        <SheetContent side="right" className="w-full gap-0 p-0 sm:max-w-md">
+        <SheetContent
+          side="right"
+          className="w-full gap-0 p-0 sm:max-w-md"
+        >
           <SheetTitle className="sr-only">
             {drawer?.kind === "cell" ? "Where this price came from"
               : drawer?.kind === "vendor" ? "Supplier qualification and answers"

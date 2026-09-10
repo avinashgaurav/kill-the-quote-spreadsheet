@@ -15,7 +15,9 @@
  * would be the spreadsheet this product exists to replace.
  */
 
-import { useMemo, useState } from "react";
+import {
+  useCallback, useLayoutEffect, useMemo, useRef, useState,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -96,6 +98,94 @@ export function ComparisonGrid({
     }));
   }, [filter, lines, vendors, matrix]);
 
+  /**
+   * ONE TAB STOP FOR THE WHOLE GRID, AND ARROW KEYS INSIDE IT.
+   *
+   * Every cell had `tabIndex={0}`, which is correct in isolation and wrong 150
+   * times over: a keyboard user needed 150 Tab presses to get from the top of
+   * the grid to the question box, and asking questions is the entire point of
+   * the product. The page had 187 tab stops and 150 of them were prices.
+   *
+   * The pattern is a roving tabindex, which is what `role="grid"` expects and
+   * what every serious data grid does: the grid is a single stop, arrows move
+   * the focus within it, Home and End jump to the ends of a row, and Tab
+   * leaves. `aria-rowindex` and `aria-colindex` are set so a screen reader can
+   * still say where it is after the DOM has been filtered.
+   *
+   * Not a WCAG violation before this, which is why it survived a contrast pass
+   * and a full audit. It was simply unusable, and "technically reachable" is
+   * not the same as reachable.
+   */
+  const [focusCell, setFocusCell] = useState<{ row: number; col: number }>(
+    { row: 0, col: 0 },
+  );
+  const gridRef = useRef<HTMLTableElement>(null);
+
+  /**
+   * Clamped when READ, not corrected in an effect.
+   *
+   * A filter change can leave the stored index pointing past the last row.
+   * Fixing that with a setState inside useEffect works and cascades a second
+   * render every time the filter changes, which the linter objects to and is
+   * right to: the clamp is a pure function of state the component already has.
+   */
+  /**
+   * Move the DOM focus after React has committed, not during the keypress.
+   *
+   * The first version called `.focus()` inside a single `requestAnimationFrame`
+   * from the key handler. It fired before React committed the render, so the
+   * state moved correctly and the focus landed one keypress behind: arrow keys
+   * appeared to do nothing, then jumped to where you had been. A layout effect
+   * runs after the commit, which is the whole point of it.
+   *
+   * Guarded on focus already being inside the grid, so it cannot steal focus
+   * on mount, on a filter change, or while the buyer is typing a question.
+   */
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || !grid.contains(document.activeElement)) return;
+    const target = grid.querySelector<HTMLElement>(
+      `[data-cell="${focusCell.row}:${focusCell.col}"]`,
+    );
+    if (target && target !== document.activeElement) target.focus();
+  }, [focusCell]);
+
+  const activeCell = useMemo(() => ({
+    row: Math.max(0, Math.min(focusCell.row, visible.length - 1)),
+    col: Math.max(0, Math.min(focusCell.col, vendors.length - 1)),
+  }), [focusCell, visible.length, vendors.length]);
+
+  const moveFocus = useCallback((row: number, col: number) => {
+    setFocusCell({
+      row: Math.max(0, Math.min(visible.length - 1, row)),
+      col: Math.max(0, Math.min(vendors.length - 1, col)),
+    });
+  }, [visible.length, vendors.length]);
+
+  const onGridKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const { row, col } = activeCell;
+    switch (e.key) {
+      case "ArrowRight": e.preventDefault(); moveFocus(row, col + 1); break;
+      case "ArrowLeft": e.preventDefault(); moveFocus(row, col - 1); break;
+      case "ArrowDown": e.preventDefault(); moveFocus(row + 1, col); break;
+      case "ArrowUp": e.preventDefault(); moveFocus(row - 1, col); break;
+      case "Home":
+        e.preventDefault();
+        moveFocus(e.ctrlKey || e.metaKey ? 0 : row, 0);
+        break;
+      case "End":
+        e.preventDefault();
+        moveFocus(
+          e.ctrlKey || e.metaKey ? visible.length - 1 : row,
+          vendors.length - 1,
+        );
+        break;
+      case "PageDown": e.preventDefault(); moveFocus(row + 10, col); break;
+      case "PageUp": e.preventDefault(); moveFocus(row - 10, col); break;
+      default: break;
+    }
+  }, [activeCell, moveFocus, visible.length, vendors.length]);
+
   const counts = useMemo(() => {
     let review = 0, gaps = 0, traps = 0;
     for (const v of vendors) {
@@ -172,7 +262,14 @@ export function ComparisonGrid({
           Without it the button sits on top of the last row's prices, and the
           one row you cannot read is whichever one you scrolled to. */}
       <div className="min-h-0 flex-1 overflow-auto pb-16 xl:pb-0">
-        <table className="grid-table w-full">
+        <table
+          ref={gridRef}
+          role="grid"
+          aria-rowcount={visible.length + 1}
+          aria-colcount={vendors.length + 3}
+          onKeyDown={onGridKeyDown}
+          className="grid-table w-full"
+        >
           {/* A screen reader landing in a 30 by 5 table of numbers has no idea
               what it is looking at without this. Visually hidden because the
               sighted equivalent is the whole surrounding page. */}
@@ -227,7 +324,7 @@ export function ComparisonGrid({
             </tr>
           </thead>
           <tbody>
-            {visible.map(({ line, startsGroup }) => {
+            {visible.map(({ line, startsGroup }, rowIdx) => {
               const rows = [];
               if (startsGroup) {
                 rows.push(
@@ -239,7 +336,10 @@ export function ComparisonGrid({
                 );
               }
               rows.push(
-                <tr key={line.no}>
+                // aria-rowindex counts the header row and stays meaningful
+                // after a filter has removed rows from the DOM, which is the
+                // whole reason the attribute exists.
+                <tr key={line.no} aria-rowindex={rowIdx + 2}>
                   {/* A row header, so a non-visual reader can associate every
                       price in the row with the line it belongs to. A 150-cell
                       table without this is unusable with a screen reader. */}
@@ -271,11 +371,18 @@ export function ComparisonGrid({
                       line.uom
                     )}
                   </td>
-                  {vendors.map((v) => (
+                  {vendors.map((v, colIdx) => (
                     <GridCell
                       key={v.code}
+                      // Coordinates for the roving tabindex. `rowIdx` is the
+                      // index within the FILTERED rows, not the line number,
+                      // because arrow keys move through what is on screen.
+                      coords={{ row: rowIdx, col: colIdx }}
+                      isTabStop={activeCell.row === rowIdx && activeCell.col === colIdx}
+                      onFocusCell={() => setFocusCell({ row: rowIdx, col: colIdx })}
                       vendorName={shortName(v.name)}
                       lineLabel={`line ${line.no}, ${line.sku}`}
+                      vendorLineKey={`${v.code}:${line.no}`}
                       cell={matrix[v.code]?.[line.no]}
                       confidence={confidence[`${v.code}:${line.no}`]}
                       carriedForward={carriedForwardSet.has(`${v.code}:${line.no}`)}
@@ -305,9 +412,14 @@ export function ComparisonGrid({
 
 function GridCell({
   cell, confidence, carriedForward, isBest, showRaw, isSelected, onClick, vendorName,
-  lineLabel, bestIsEligible,
+  lineLabel, vendorLineKey, bestIsEligible, coords, isTabStop, onFocusCell,
 }: {
   cell?: Cell;
+  /** Position within the FILTERED rows, for the roving tabindex. */
+  coords: { row: number; col: number };
+  /** True for the one cell in the grid that is currently a tab stop. */
+  isTabStop: boolean;
+  onFocusCell: () => void;
   confidence?: number;
   /** True when this price is from an earlier revision the supplier replaced. */
   carriedForward?: boolean;
@@ -317,11 +429,26 @@ function GridCell({
   onClick: () => void;
   vendorName: string;
   lineLabel: string;
+  /** `vendorCode:lineNo`, stable across filtering. Used to restore focus. */
+  vendorLineKey: string;
   /** False when the cheapest cell belongs to a supplier who cannot win. */
   bestIsEligible?: boolean;
 }) {
   if (!cell) {
-    return <td className="cell-empty" aria-label={`${vendorName}, ${lineLabel}: nothing read`} />;
+    // Still a grid cell, still reachable by arrow keys. "Nothing has been read
+    // here" is a fact the buyer needs, so it must not be skipped by keyboard.
+    return (
+      <td
+        role="gridcell"
+        data-cell={`${coords.row}:${coords.col}`}
+        data-vendor-line={vendorLineKey}
+        tabIndex={isTabStop ? 0 : -1}
+        onFocus={onFocusCell}
+        aria-colindex={coords.col + 4}
+        className="cell-empty focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring focus-visible:outline-none"
+        aria-label={`${vendorName}, ${lineLabel}: nothing read`}
+      />
+    );
   }
 
   const state = displayState(cell.status);
@@ -335,15 +462,40 @@ function GridCell({
 
   return (
     <td
-      onClick={onClick}
+      onClick={(e) => {
+        /**
+         * Focus the cell we clicked, then open the panel.
+         *
+         * Clicking a `<td>` does not focus it: browsers focus buttons, links
+         * and inputs on mousedown, and a table cell with tabindex="-1" is
+         * none of those, so `document.activeElement` stayed on <body> after a
+         * click. Which means a mouse user who clicked a cell and then reached
+         * for the keyboard had focus nowhere, and their first keypress went to
+         * the document rather than to the grid.
+         *
+         * The drawer that opens on the same click takes focus immediately
+         * afterwards, so this is not visible until the drawer closes. Where
+         * focus lands then is the known gap recorded in workbench.tsx.
+         */
+        e.currentTarget.focus();
+        onClick();
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onClick();
         }
       }}
-      tabIndex={0}
-      role="button"
+      data-cell={`${coords.row}:${coords.col}`}
+      // Identity that survives filtering, unlike the row index above: a panel
+      // opened from this cell has to find it again after it closes, and the
+      // buyer may have changed the filter while the panel was open.
+      data-vendor-line={vendorLineKey}
+      // ONE tab stop for the grid. See the roving-tabindex note above.
+      tabIndex={isTabStop ? 0 : -1}
+      onFocus={onFocusCell}
+      role="gridcell"
+      aria-colindex={coords.col + 4}
       // The status and every caveat also live in a tooltip. A tooltip is
       // unreachable by touch and unreliable by keyboard, so the same
       // information is put on the element itself for anyone not hovering.

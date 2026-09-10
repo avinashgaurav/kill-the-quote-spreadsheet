@@ -1012,6 +1012,43 @@ async function main() {
     "exactly like a finished analysis",
   );
 
+  // ---- 37. The grid was 150 tab stops -----------------------------------
+  //
+  // Every cell had tabIndex={0}, which is correct once and wrong 150 times: a
+  // keyboard user needed 150 Tab presses to get from the top of the grid to
+  // the question box, and asking questions is the entire point of the product.
+  // The page had 187 tab stops and 150 of them were prices.
+  //
+  // Not a WCAG failure, which is why it survived a contrast pass and two
+  // audits: every cell was focusable and correctly labelled. It was simply
+  // unusable, and "technically reachable" is not reachable.
+  //
+  // Fixed with a roving tabindex, the pattern role="grid" expects: one tab
+  // stop, arrows to move, Home/End for the row, ctrl+Home/End for the grid.
+  // Verified in a browser: 38 tab stops, and every key lands where it should.
+  {
+    const gridSrc = readFileSync(
+      resolve(process.cwd(), "components/comparison-grid.tsx"), "utf8",
+    );
+    check(
+      "37. The comparison grid was 150 separate tab stops",
+      "the grid is one tab stop and arrow keys move within it",
+      /role="grid"/.test(gridSrc)
+        && /isTabStop \? 0 : -1/.test(gridSrc)
+        && /ArrowRight/.test(gridSrc)
+        && !/\n      tabIndex=\{0\}/.test(gridSrc),
+      "a keyboard user needed 150 Tab presses to reach the question box",
+    );
+    check(
+      "37b. Clicking a cell left focus nowhere",
+      "a clicked cell takes focus, so the next keypress goes to the grid",
+      /e\.currentTarget\.focus\(\)/.test(gridSrc),
+      "browsers do not focus a <td> on click, so a mouse user who clicked a " +
+      "cell and then reached for the keyboard had their first keypress go to " +
+      "the document instead of the grid",
+    );
+  }
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

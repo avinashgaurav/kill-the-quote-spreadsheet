@@ -143,7 +143,7 @@ offline suites.
 | `contrast-test` | Every colour that carries meaning against its WCAG floor, both themes, oklch maths validated against a real browser first | no |
 | `cache-test` | The extraction cache stores, returns, and misses for the right reasons | no |
 | `sees` | What actually reaches the model for any document you give it | no |
-| `regression-test` | 55 bugs that actually shipped cannot come back unnoticed | no |
+| `regression-test` | 57 bugs that actually shipped cannot come back unnoticed | no |
 | `e2e-test` | 42 cases over HTTP, mostly sad paths, including an interviewer's own file | yes |
 | `accuracy` | Recall, price exactness, unit correctness, invention rate, and whether **confidence falls when accuracy falls** | yes |
 | `api-check` | Whether the model is reachable, and which of the three ways a key can be dead this is. Two tokens | yes |
