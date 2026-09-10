@@ -53,12 +53,32 @@ ambiguous and who decided that.
 
 ---
 
-## Step 3. Send it
+## Step 3. Send it, and collect what comes back
 
-**You pick a channel:** email, supplier portal, or WhatsApp.
+**You pick who to invite** from a roster of ten suppliers, and **you pick a channel:**
+email, supplier portal, or WhatsApp. Press send and the replies arrive, one at a time.
 
-The four documents are really generated and downloadable. Only the delivery hop is
-faked, which the brief permits.
+**Five of the ten reply. Five never do.** That asymmetry is deliberate and it is what
+actually happens: you invite ten and five answer. A version where everybody replies
+teaches the wrong lesson, because every interesting state in this product is one where
+somebody did not. Invite a supplier with nothing on file and you get *"no response.
+Invited, sent nothing"*, which is the case step 6 exists for.
+
+**Exactly one thing is simulated.** Nothing is emailed and no mailbox is polled: a
+supplier replies because their document is on file and you invited them. That is the
+SMTP server the brief says to stub. Everything that arrives is then **read for real**,
+through the identical path as a file you drag in: same model call, same schema, same
+provenance, same loud failure on an empty read. No answer is pre-written and none is
+stored beside a file.
+
+A button that makes prepared answers appear is a scripted demo. A button that makes
+real documents arrive, which are then genuinely read, is a stubbed transport. The
+screen says which of those it is doing.
+
+Documents arrive in the order they really would: the quotation first, from somebody in
+sales, and the questionnaire afterwards from somebody in compliance, on a different
+day in a different format. That gap is why a supplier can be priced and unassessed at
+the same time.
 
 **The channel is not cosmetic.** WhatsApp cannot carry an attachment, so the pack goes
 as a link, and the supplier who gets a link on their phone is the one most likely to
@@ -69,9 +89,20 @@ step 4.
 
 ## Step 4. Drop in whatever comes back
 
-**You upload** whatever the suppliers sent. Spreadsheet, PDF on letterhead, Word letter
-with prices in sentences, phone photo of a printed rate card, five-line email, ODT, CSV,
-scanned PDF. Nobody is forced into a template.
+**Or upload it yourself.** Spreadsheet, PDF on letterhead, Word letter with prices in
+sentences, phone photo of a printed rate card, five-line email, ODT, CSV, scanned PDF.
+Nobody is forced into a template.
+
+**A file from a supplier the system has never heard of works too.** If the filename
+matches nobody, the upload is refused rather than guessed, because a price in the wrong
+column is a mistake nobody downstream can detect. It then asks whose it is, offers the
+roster, and takes a new name. That supplier gets their own column, is marked NOT
+ASSESSED, can be chased, and appears in the award note.
+
+**Questionnaire responses are read by their own loop.** The model reports the answer,
+what they attached, and what the attachment itself says: the standard it names, its
+expiry date, who it was issued to. Code then decides whether that satisfies the
+question.
 
 **The system reads each one** with a real model call and turns it into structured facts,
 each traceable to the exact spreadsheet cell, PDF page, paragraph, or pixel box it came
@@ -113,6 +144,17 @@ the photograph, and the supplier's own words.
 **The trust bar** says what the total rests on: how many cells are in it, how many are
 blocked on you, how many are blocked on the supplier, how many have no price. Those four
 groups do not overlap, and a test asserts they sum to the total on every run.
+
+**Qualification has three states, not two.** Passed, failed, and **not read**. A
+supplier whose questionnaire nobody has opened is not the same as one who passed, and
+the screen must never merge them. Every failure carries the sentence that produced it:
+
+> *Answered "Yes" and attached ISO/IEC 27001:2013, EXPIRED 2025-11-30, but the question
+> asks for the 2022 revision. The 2013 revision was superseded, so this certificate does
+> not evidence the answer.*
+
+An unassessed supplier stays in the award scenarios, because excluding a real bid for
+want of a document nobody chased is its own kind of wrong.
 
 **The guard worth knowing about:** if two award scenarios do not cover the same set of
 lines, the system says so and restates both on the common basis. One scenario looks
@@ -183,6 +225,10 @@ Reading this list is the fastest way to understand the product.
 - Compare two totals that cover different sets of lines without saying so.
 - Recommend awarding to a supplier who failed a mandatory question.
 - Show a supplier nobody has assessed as "eligible".
+- Store a qualification verdict. It is recomputed from the answers every read, so a
+  certificate that expires next week changes it without anybody editing a row.
+- Guess which supplier sent an unrecognised file.
+- Invent a reply for a supplier who did not send one.
 - Let harness data look like a real read.
 
 ---
@@ -195,7 +241,8 @@ Reading this list is the fastest way to understand the product.
 | **Real** | The calculator, proven against an independent implementation, 442 assertions |
 | **Real** | The four enquiry documents, generated and downloadable |
 | **Real** | The chase record: what was asked, when, and whether they answered |
-| **Stubbed** | The delivery hop. No SMTP server, no WhatsApp API. The brief permits this. |
+| **Real** | Every qualification verdict, derived from answers that were actually read |
+| **Stubbed** | The delivery hop only. No SMTP server, no WhatsApp API, no mailbox polled. The brief permits this. |
 
 ---
 
@@ -207,9 +254,10 @@ Reading this list is the fastest way to understand the product.
 | Readers | Every format, all 11 images, 4 corrupt files must fail | 47/47 ✅ |
 | Parser | 10 realistic model output shapes | 10/10 ✅ |
 | Revisions | A replaced quote resolves, reports, re-reads the same | 7/7 ✅ |
-| Generality | Runs on an enquiry it has never seen | 8/8 ✅ |
-| Regressions | Ten bugs that shipped cannot return unnoticed | 10/10 ✅ |
-| End to end | Happy and sad paths over real HTTP | 38/38 ✅ |
+| Generality | Runs on an enquiry it has never seen, in another category | 8/8 ✅ |
+| Questionnaire | Verdicts derived from evidence, each able to say why | 13/13 ✅ |
+| Regressions | 27 bugs that shipped cannot return unnoticed | 27/27 ✅ |
+| End to end | Happy and sad paths over HTTP, plus an interviewer's own file | 45/45 ✅ |
 | Demo | Ten walkthrough claims against the brief | 10/10 ✅ |
 | Contrast | Every text node measured in the browser | 0 failures ✅ |
 | Build, types, lint, audit | Production build, 0 vulnerabilities | ✅ |

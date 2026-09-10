@@ -23,9 +23,13 @@ you **what it is not sure about**, in a form you can act on.
 refresh". A model drafts scope, line items, questionnaire and terms. The buyer edits
 by talking.
 
-**Step 2. Send.** The buyer picks a channel: email, supplier portal or WhatsApp. The
-four documents are really generated and downloadable. Only the delivery hop is faked,
-which the brief explicitly permits.
+**Step 2. Send.** The buyer picks who to invite from a roster of ten suppliers and a
+channel: email, supplier portal or WhatsApp. The four documents are really generated.
+Only the delivery hop is faked, which the brief explicitly permits.
+
+**Five of the ten reply, five never do.** That is what actually happens, and a version
+where everybody answers teaches the wrong lesson, because every interesting state in
+this product is one where somebody did not.
 
 **The decision worth explaining here:** the send is **held**, not just warned about. If
 a line says "box" without saying how many pieces are in a box, it names the line and
@@ -43,7 +47,18 @@ until the check stops firing, which is worse: that leaves no record at all. When
 supplier later quotes per piece against that line, the comparison can show the enquiry
 went out ambiguous and who decided it should.
 
-**Step 3. Read.** The buyer drops in whatever came back. Spreadsheet, PDF on
+**Step 3. Read.** Press send and the replies arrive, one at a time, or drop them in by
+hand. **Exactly one thing is simulated:** a supplier replies because their document is
+on file and you invited them, which is the SMTP server the brief says to stub. The
+reading is real, through the identical path either way. A button that makes prepared
+answers appear is a scripted demo; a button that makes real documents arrive, which are
+then genuinely read, is a stubbed transport.
+
+**A file from a company that appears nowhere in the build works too.** An unrecognised
+filename is refused rather than guessed, then asks whose it is. That supplier gets a
+column, is marked not assessed, can be chased, and lands in the award note.
+
+The buyer drops in whatever came back. Spreadsheet, PDF on
 letterhead, Word letter with prices in sentences, phone photo of a printed rate card,
 five-line email. Each is read by a real model call and turned into structured facts,
 each traceable to the exact cell, page, paragraph or pixel box it came from.
@@ -127,6 +142,16 @@ contradicts its own payload is rejected.
 **Three. Provenance is a database constraint, not a convention.** The `provenance`
 column is NOT NULL. A number that cannot say where it came from **physically cannot be
 stored.** That is different from "we try to record provenance".
+
+**Five. There are two loops, not one, and the second is where the split earns its keep.**
+A questionnaire response is read by its own reader. The model reports the answer, what
+they attached, and what the attachment *itself says*: the standard it names, its expiry
+date, who it was issued to. Code then decides whether that satisfies the question.
+
+The case that makes it worth building: a supplier answers *"Yes, we are ISO 27001
+certified"* and attaches a certificate that expired and names the withdrawn 2013
+revision. The answer and its own evidence disagree. A model asked "did they pass?" might
+say yes, because they said yes. Comparing a date to today is not a judgement call.
 
 **Four. The failure modes are engineered, not hoped for.**
 - If the reader returns zero rows from a document that plainly has prices, that
@@ -275,12 +300,13 @@ headline by Rs 7.1 lakh. I would rather tell you that than show you the bigger n
 |---|---|---|
 | Conformance | Two independent calculators agree on all 150 cells and every scenario | 442 assertions, pass |
 | Reader test | Every format plus odt, csv, tsv, ods, rtf, and all 11 images, surface their prices, units and locators. Four corrupt files must fail, and do | 47 of 47 |
+| Questionnaire test | An expired certificate, a superseded standard, a missed threshold, somebody else's certificate: each caught, each able to say why | 13 of 13 |
 | Parse check | The parser survives 10 realistic provider output shapes | 10 of 10 |
 | Revision test | A replaced quote resolves, is reported, and re-reads the same | 7 of 7 |
 | Generality test | The product runs on an enquiry it has never seen, in another category | 8 of 8 |
-| End-to-end test | Happy and sad paths over real HTTP, two thirds of them sad | 38 of 38 |
+| End-to-end test | Happy and sad paths over HTTP, plus seven on an interviewer's own data | 45 of 45 |
 | Demo test | Each of the 10 walkthrough claims maps to a sentence in the brief | 10 of 10 |
-| Regression test | 21 bugs that actually shipped cannot come back unnoticed | 21 of 21 |
+| Regression test | 27 bugs that actually shipped cannot come back unnoticed | 27 of 27 |
 | Contrast audit | Every text node measured in the browser | 0 failures, 0 unlabelled controls, 0 controls without a focus ring |
 | Accuracy harness | Whether the reading is actually **right**, scored against the answer key | needs a live key |
 

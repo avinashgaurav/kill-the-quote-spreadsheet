@@ -245,7 +245,91 @@ for the wrong thing is worse than a plain one that asks for the right thing.
 
 ---
 
-## A8. Your enquiry, not my demo data
+## A8. The AI reads the questionnaire too, and code decides what it means
+
+**The choice.** A supplier's questionnaire response is read by its own loop. The model
+reports the answer in their words, what they attached, and what the attachment *itself
+states*: the standard it names with its revision year, its expiry date, who it was
+issued to. Code then decides whether that satisfies the question. The verdict is never
+stored, only the answers.
+
+**Why.** This one came out of a contradiction somebody spotted on the screen. A
+supplier's row said "nothing read" next to "FAILED 6". Both were on screen at once and
+only one could be true: the six failures were entries in a table I had typed, nothing
+had opened that supplier's questionnaire, and the four questionnaire responses sitting in
+the corpus had no code path that read them.
+
+It also hollowed out the best finding in the dataset. A supplier answers *"Yes, we are
+ISO 27001 certified"* and attaches a certificate that expired and names the withdrawn
+2013 revision. The answer and its own evidence disagree. That was not something the
+system caught; it was something I had written down as already caught. Asked *"how did
+you find the expired certificate?"*, the honest answer was "I didn't."
+
+**What code decides, and why each is code rather than a model.**
+
+| Check | Why not the model |
+|---|---|
+| An expired date | Comparing a date to today is arithmetic. A model asked "did they pass?" says yes, because they said yes |
+| A superseded revision | The year on the certificate against the year the question asked for. Two strings |
+| A threshold missed | "Rs 19 crore approx" against "at least Rs 50 crore". Their own figure, so the least arguable failure there is |
+| Named requirements | Three cities the question calls mandatory against the five listed, two of which are absent |
+| Somebody else's certificate | A group company is not the bidding entity |
+| A Yes with no document | The question asked for evidence and none came |
+
+**What it costs.** A second extraction contract, a second reader, and a rule library that
+will always be incomplete: I found the named-requirements check only because the derived
+verdict disagreed with my typed table. There will be others.
+
+**What I rejected.** Asking the model for a pass or fail, which is one prompt instead of
+a rule library and produces a verdict nobody can check or explain. And flagging the typed
+verdicts as harness data, which would have been honest and would have left the system
+catching nothing.
+
+**Criteria.** All three. The **ugly edge** is an answer contradicted by its own evidence.
+The **trust** is that every verdict carries the sentence that produced it, because a red
+badge that cannot say why is the same unaccountable thing as a typed table in a different
+colour. The **judgment** is the third state: passed, failed, and NOT READ. The third one
+was missing, and its absence is precisely what let a screen claim a failure it had no
+evidence for.
+
+**Against the AI-loops rule.** This is the entry where the rule bit hardest. A faked
+verdict and a derived one look identical on screen. Only the sentence underneath
+distinguishes them.
+
+---
+
+## A9. Replies arrive, rather than the buyer playing postman
+
+**The choice.** A roster of ten suppliers, of whom five have a response on file. The
+buyer picks who to invite, picks a channel, presses send, and the replies arrive one at a
+time and are read. Suppliers with nothing on file never reply.
+
+**Why.** The flow used to say "now find nine files on your disk and drag them in", which
+is not what a buyer does and broke the story exactly in the middle: you draft an enquiry,
+you send it, and replies turn up. Making the buyer play postman for their own suppliers
+was the part that felt like a demo rather than a product.
+
+**The line I would not cross.** The arrival is simulated; the reading is not. Every
+document that lands goes through the identical path as a drag-and-drop upload. A button
+that makes prepared answers appear is a scripted demo. A button that makes real documents
+arrive, which are then genuinely read, is a stubbed transport, and the difference is the
+whole of the brief's one rule. The panel says which it is doing, because a viewer cannot
+tell by looking.
+
+**Why five of ten and not ten of ten.** You invite ten and five answer. A version where
+everybody replies teaches the wrong lesson, because every interesting state in this
+product is one where somebody did not. The five without documents carry no prices and no
+answers, because inventing a reply for them would be inventing extraction output.
+
+**What it costs.** A reader could mistake the arrival for a real integration, which is
+why it is labelled twice. And five suppliers on the roster can never be demonstrated
+beyond their own silence.
+
+**Criteria.** Judgment, mostly. The asymmetry is the decision, not the button.
+
+---
+
+## A10. Your enquiry, not my demo data
 
 **The choice.** The line list, the supplier list and the qualification verdicts are
 loaded from the database for whichever enquiry is active, not from the catalog that
@@ -406,6 +490,12 @@ demo".
 | D28 | The chase shows what it settled itself, next to what it asks for | A supplier who quotes per piece against a line asked per box has done nothing wrong; the pack size is in our own enquiry, so the conversion is ours. Emailing about it is how you lose their attention | More on screen |
 | D29 | A global `:focus-visible` rule rather than per-component rings | A per-component rule is one somebody forgets on the ninth button | A default that a component must override rather than opt into |
 | D30 | Two independent implementations can be wrong the same way | Conformance proves agreement, not correctness. The ex-works bug sat in both for exactly that reason, so the regression suite tests PROPERTIES, not agreement | Two kinds of test to maintain |
+| D31 | Questionnaire verdicts derived on every read, never stored | A certificate that expires between now and award changes the verdict with nothing to migrate. A stored verdict is the typed table again | Recomputed on every page load |
+| D32 | `asOf` is injected into the assessor, not read from the clock | An audit months later must reproduce the decision somebody actually signed, not re-judge it against today | One more parameter to thread |
+| D33 | An unassessed supplier stays in the award scenarios | Excluding a real bid for want of a document nobody chased is its own kind of wrong. The panel says plainly that nobody has assessed them | A buyer could miss the marker |
+| D34 | An unrecognised filename is refused, then offered a picker | Refusing to guess is right; refusing and offering nothing is the wall an interviewer's own file hits | One more interaction |
+| D35 | Uploaded documents are stored in Postgres as base64, not on disk | A serverless filesystem is read-only, and the Neon HTTP driver and PGlite disagree about binary encoding | A third more bytes on a photograph |
+| D36 | The function region is pinned to the database region | Twenty queries per page across the Pacific was two seconds of loading skeleton | A config that must move if the database does |
 | D27 | Schema changes ship as idempotent ALTER migrations | `CREATE TABLE IF NOT EXISTS` never adds a column to an existing database, and the failure is silent | Migrations must be written by hand |
 | D22 | Muted text darkened to `oklch(0.52)` | It cleared 4.5:1 on white and failed on every tinted surface in the grid, which is where the caveats live | Slightly heavier page |
 
@@ -430,6 +520,13 @@ Kept because "can you say why" includes the decisions I had to reverse.
 | "5 blocked on you" including 3 blocked on the supplier | Second instance of the same double-count, in the fields I had just fixed | The e2e suite summing the parts and getting 154 of 150 |
 | A schema change that never reached an existing database | `CREATE TABLE IF NOT EXISTS` is a no-op on an existing table, so the new column never arrived, the insert threw, and a defensively-caught write became a feature that silently did nothing | Two e2e cases failing with nothing on screen |
 | `sendIssues` throwing on a null line | A gate on an outbound action must fail closed, not crash | The regression suite, on its first run |
+| **Qualification verdicts from a hand-typed table** | A row said "nothing read" beside "FAILED 6". The screen was asserting a conclusion it could not have reached, and the expired-certificate finding was a fact I had written down as already found | Being asked, directly, where that data came from |
+| A supplier who returned no questionnaire read as unassessed, and therefore eligible | Being asked ten mandatory questions and answering none is a failure. Never being asked is not. I had collapsed two different rows | The derived verdict disagreeing with the typed table |
+| The assessor not checking requirements a question names inline | Q5 lists three mandatory cities and two suppliers passed it while omitting two of the three | The same disagreement |
+| An adjusted price getting a clean tick | The caveat rode on the supplier's raw status rather than on the fact that an adjustment happened | Pointing the scope rule at a supplier outside the corpus |
+| Uploads dead on Vercel with EROFS | A serverless filesystem is read-only. Worked perfectly in development, which is the worst shape a bug can have | The user trying to upload on the live site |
+| Every git push failing to deploy | Root directory unset, so the GitHub build looked for package.json where there is none. My own deploys ran from inside web/ and worked, so the only symptom was an email | A failure email |
+| A test that left debris and broke the next test | The e2e suite creates a supplier; reset only cleared drafted enquiries, so the demo suite found six columns where it expected five | Running the suites in order |
 | A missing-document reason that always talked about certificates | It appeared under a question about turnover and read as boilerplate, which is how a buyer learns to stop reading the reasons | Looking at the rendered chase panel |
 | **Ex-works detection nested inside the USD branch** | An ex-works price quoted in rupees was ranked as a delivered cost. It worked flawlessly for the one supplier in my corpus who quotes ex-works in dollars. A domestic ex-works quote is ordinary in Indian procurement, so this was not a corner case | Writing the regression guard for it. The same bug was in the Python reference, which is why conformance never caught it: both implementations were wrong in the same way |
 | No heading of any level on the page, and no table caption | A screen reader user had nothing to navigate by and no description of a 30 by 5 table of numbers | The accessibility pass |

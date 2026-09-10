@@ -8,7 +8,7 @@ right.
 
 ---
 
-## The five decisions everything else follows from
+## The six decisions everything else follows from
 
 **1. The AI reads. The code counts.** The model reports what the document says, in the
 supplier's own unit and currency. It never multiplies, converts, discounts, or adds.
@@ -25,11 +25,21 @@ exactly that to me, in 43 seconds, reporting no problem at all.
 **3. Provenance is a NOT NULL column, not a convention.** A number that can't say where
 it came from physically cannot be stored.
 
-**4. Five kinds of nothing, not one dash.** Declined, never mentioned, can't read it,
+**4. Both readers report; code decides.** The same split runs twice. On a quotation the
+model gives the number in the supplier's own unit and code computes landed cost. On a
+questionnaire the model gives the answer, what they attached, and what the attachment
+*says*, and code decides whether that satisfies the question. A supplier answers *"Yes,
+we are ISO 27001 certified"* and attaches a certificate that expired and names the
+withdrawn 2013 revision; a model asked "did they pass?" says yes, because they said yes.
+Comparing a date to today is not a judgement call. Three qualification states, not two:
+passed, failed, and **not read** — and the third is the one that stops a screen claiming
+a failure it has no evidence for.
+
+**5. Five kinds of nothing, not one dash.** Declined, never mentioned, can't read it,
 not a price, needs your call. Five different next actions, so five different marks. My
 first build rendered all five identically, which turned five decisions into one shrug.
 
-**5. Two correct numbers can still mislead.** One award scenario looks ₹30 lakh cheaper
+**6. Two correct numbers can still mislead.** One award scenario looks ₹30 lakh cheaper
 and is ₹1 lakh *dearer* like-for-like, because it awards fewer lines. Both numbers are
 right, which is exactly why a careful person misses it. Whenever two scenarios don't
 cover the same set of lines, the system says so and restates both on the common basis.
@@ -50,6 +60,10 @@ supplier who gets a link on their phone is the one who replies with a photograph
 
 **Multi-tenancy.** Supplier codes are globally unique, not per enquiry. Fine for one
 buyer; wrong for a real tenant model.
+
+**A real mailbox.** Replies arrive because you invited a supplier whose document is on
+file, not because anything was emailed or polled. The reading is real; the transport is
+the stub the brief permits.
 
 **Auto-closing a chase.** When a supplier answers, nothing marks it answered
 automatically. The buyer closes it with a reason. Matching a later upload to an open

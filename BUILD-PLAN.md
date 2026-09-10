@@ -425,3 +425,37 @@ arithmetic, it is the defensibility trail eight months later. That points at the
 audit persona and the JSON audit bundle being the actual product, with the
 comparison grid as its most useful view. That is a positioning question rather
 than a build question, so I have listed it rather than acted on it.
+
+---
+
+## Addendum: what changed against this plan
+
+Written after the build. The plan held on its spine and moved in five places, each
+because something in the build or a reviewer's question said it had to.
+
+**Two extraction loops, not one.** The plan had a reader for quotations. Questionnaire
+verdicts were a table in the dataset, and a reviewer asked where that data came from: a
+supplier's row said "nothing read" beside "FAILED 6", and only one of those could be
+true. A questionnaire response now has its own reader, and every verdict is derived from
+what was read, with the sentence that produced it. `lib/questionnaire.ts`.
+
+**Qualification has three states.** Passed, failed, and NOT READ. The plan had two, and
+its absence is exactly what let a screen assert a failure it had no evidence for.
+
+**Going back and asking is a step, not an afterthought.** The commonest reply in
+procurement is a spreadsheet and nothing else. The system works out what each supplier
+still owes, splits "never sent" from "sent something we cannot use", asks for only that
+with a deadline, and records it, so an award note can say "asked on the 10th, no reply by
+the 16th" rather than "missing". `lib/chase.ts`.
+
+**Replies arrive rather than being dragged in.** A roster of ten, five with a response on
+file. The transport is stubbed, the reading is not, and the screen says which. The
+asymmetry is the decision: you invite ten and five answer.
+
+**Nothing is keyed to the shipped data.** The calculator took an enquiry context instead
+of closing over the seeded catalog; the warranty rule stopped branching on a vendor code;
+an unrecognised filename gets a supplier picker rather than a dead end. The plan assumed
+its own dataset more than it should have.
+
+**The one-page note the brief asks for is `THE-NOTE.md`.** This document is the working,
+`DECISIONS-v2.md` is every decision with its cost, and `WORKFLOW.md` is the flow.
