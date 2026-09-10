@@ -23,6 +23,22 @@ export async function GET(
   const url = new URL(request.url);
   const qualifiedOnly = url.searchParams.get("all") !== "true";
 
+  /**
+   * Is this even an export we have? Checked BEFORE the empty-data check.
+   *
+   * The order was the other way round, so `/api/export/nonsense` with nothing
+   * read reported "nothing has been read yet" and a caller went looking for
+   * data rather than for their typo. Two true statements, and the less useful
+   * one first.
+   */
+  const KINDS = ["comparison", "comparison-csv", "award-note", "audit"];
+  if (!KINDS.includes(kind)) {
+    return Response.json(
+      { error: `Unknown export '${kind}'. Try ${KINDS.join(", ")}.` },
+      { status: 404 },
+    );
+  }
+
   try {
     const payload = await buildComparisonPayload();
 

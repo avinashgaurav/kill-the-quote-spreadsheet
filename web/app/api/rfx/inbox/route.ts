@@ -38,6 +38,7 @@ import {
   activeRfx, storeExtraction, storeQuestionnaireAnswers,
 } from "@/lib/store";
 import catalog from "@/lib/data/catalog.json";
+import { providerSentence } from "@/lib/provider-error";
 
 export const maxDuration = 300;
 
@@ -202,6 +203,25 @@ export async function POST(request: Request) {
         : []),
     ];
 
+    /**
+     * Is this even a supplier on the enquiry?
+     *
+     * Without this, `{"supplierCode": "../../etc/passwd"}` came back ok:true
+     * with "they were invited and have not sent anything", which is a
+     * confident factual claim about a supplier that does not exist. The
+     * roster is the authority on who was invited, so ask it.
+     */
+    const onRoster = (catalog.roster ?? []) as Array<{ code: string }>;
+    if (!onRoster.some((r) => r.code === code)) {
+      return Response.json({
+        ok: false,
+        error:
+          `'${code}' is not a supplier on this enquiry. Nothing was sent and ` +
+          `nothing is claimed about them: a supplier who was never invited is ` +
+          `not the same as one who was invited and did not reply.`,
+      }, { status: 404 });
+    }
+
     if (!files.length) {
       // Not an error. They were invited and chose not to bid, which is a fact
       // the buyer needs rather than a failure to report.
@@ -310,7 +330,15 @@ export async function POST(request: Request) {
       } catch (e) {
         // A failed read stays a gap. Nothing partial is stored, because a
         // half-read document is worse than an unread one: it looks complete.
-        results.push({ filename: name, ok: false, error: String(e) });
+        //
+        // And the reason is a SENTENCE, not the provider's payload. This used
+        // to be `String(e)`, so an out-of-credit key put Google's billing
+        // console URL into a per-file result that the UI renders directly.
+        results.push({
+          filename: name, ok: false,
+          error: providerSentence(e, `${name} was not read`),
+          detail: String(e).replace(/\s+/g, " ").slice(0, 300),
+        });
       }
     }
 
@@ -321,10 +349,25 @@ export async function POST(request: Request) {
       results,
       channel,
       carriesAttachments,
+      /**
+       * The note has to match what actually happened.
+       *
+       * It asserted "the reading is not simulated, each document above went
+       * through the same model call" while sitting beside a results array in
+       * which every entry had ok:false. Both halves were true in isolation and
+       * the pair was misleading, which is the exact failure this product is
+       * built to catch, in its own API response.
+       */
       note:
+        (results.some((r) => (r as { ok?: boolean }).ok === false)
+          ? "Some documents were NOT read: see the error on each. Nothing " +
+            "partial was stored, so those stay gaps rather than becoming " +
+            "half-filled columns. "
+          : "") +
         "Delivery is simulated: nothing was emailed and no mailbox was polled. " +
-        "The reading is not simulated. Each document above went through the same " +
-        "model call, schema and provenance checks as a file dragged in by hand." +
+        "The reading is not simulated. Every document that WAS read above went " +
+        "through the same model call, schema and provenance checks as a file " +
+        "dragged in by hand." +
         (carriesAttachments
           ? ""
           : ` You chose ${channel}, which cannot carry an attachment, so any ` +

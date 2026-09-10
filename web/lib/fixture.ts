@@ -95,6 +95,9 @@ export async function clearAllResponses() {
   const n = await query<{ count: string }>(
     `select count(*)::text as count from responses where rfx_id = $1`, [RFX_ID],
   );
+  const c = await query<{ count: string }>(
+    `select count(*)::text as count from chases where rfx_id = $1`, [RFX_ID],
+  );
   await query(`delete from responses where rfx_id = $1`, [RFX_ID]);
   await query(
     `update vendors set read_answers = null, answers_provenance = null,
@@ -102,7 +105,23 @@ export async function clearAllResponses() {
       where rfx_id = $1`,
     [RFX_ID],
   );
-  return { responsesRemoved: Number(n.rows[0]?.count ?? 0) };
+  /**
+   * Chases and attachments too, which nothing could clear.
+   *
+   * A chase is a record that the buyer asked a supplier for something, and it
+   * appears in the award note's "what we asked for and did not get" table. So
+   * any exploratory click during a rehearsal was permanent: short of deleting
+   * the database there was no way to remove it, and the award note would tell
+   * an interviewer that the buyer had chased Vector for thirteen items.
+   *
+   * Attachments are keyed to a response, and every response is going.
+   */
+  await query(`delete from chases where rfx_id = $1`, [RFX_ID]);
+  await query(`delete from attachments where rfx_id = $1`, [RFX_ID]);
+  return {
+    responsesRemoved: Number(n.rows[0]?.count ?? 0),
+    chasesRemoved: Number(c.rows[0]?.count ?? 0),
+  };
 }
 
 export async function wipeFixture() {

@@ -7,6 +7,7 @@ import {
   extractQuestionnaire, looksLikeQuestionnaire,
 } from "@/lib/extract/questionnaire";
 import { dbCache } from "@/lib/extract/cache";
+import { providerSentence, providerErrorResponse } from "@/lib/provider-error";
 
 /**
  * Upload vendor documents and read them.
@@ -192,7 +193,9 @@ export async function POST(request: Request) {
         } catch (e) {
           results.push({
             filename: file.name, ok: false, vendorId, kind: "questionnaire",
-            error: String(e),
+            // A sentence, not the provider's payload. See lib/provider-error.
+            error: providerSentence(e, `${file.name} was not read`),
+            detail: String(e).replace(/\s+/g, " ").slice(0, 300),
           });
         }
         continue;
@@ -293,7 +296,11 @@ export async function POST(request: Request) {
       } catch (e) {
         // A failed read stays a gap. Nothing partial is stored, because a
         // half-read document is worse than an unread one: it looks complete.
-        results.push({ filename: file.name, ok: false, vendorId, error: String(e) });
+        results.push({
+          filename: file.name, ok: false, vendorId,
+          error: providerSentence(e, `${file.name} was not read`),
+          detail: String(e).replace(/\s+/g, " ").slice(0, 300),
+        });
       }
     }
 
@@ -305,6 +312,8 @@ export async function POST(request: Request) {
       results,
     });
   } catch (e) {
-    return Response.json({ ok: false, error: String(e) }, { status: 500 });
+    return providerErrorResponse(e, {
+      action: "Nothing was read from this upload",
+    });
   }
 }

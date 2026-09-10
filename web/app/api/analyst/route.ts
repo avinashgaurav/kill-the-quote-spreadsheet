@@ -9,6 +9,7 @@ import {
 } from "@/lib/analyst";
 import { buildComparisonPayload, RFX_ID } from "@/lib/store";
 import { getQuery } from "@/lib/db/client";
+import { providerErrorResponse } from "@/lib/provider-error";
 
 /**
  * The analyst turn.
@@ -193,32 +194,13 @@ export async function POST(request: Request) {
     // tells a buyer nothing and looks like the tool is broken.
     //
     // Found by the end-to-end suite, running against a key whose daily quota
-    // was exhausted: exactly the state a live demo can land in.
-    const raw = String(e);
-    const rateLimited = /\b429\b|rate.?limit|quota|RESOURCE_EXHAUSTED/i.test(raw);
-    const overloaded = /\b5\d\d\b|overloaded|unavailable|timeout|ETIMEDOUT|ECONNRESET/i.test(raw);
-    if (rateLimited || overloaded) {
-      return Response.json({
-        ok: false,
-        refused: true,
-        refusalReason: rateLimited ? "provider rate limit" : "provider unavailable",
-        error: rateLimited
-          ? "The model provider is rate limiting or out of quota, so this question " +
-            "was not answered. Nothing has been guessed and nothing on the " +
-            "comparison has changed. Wait a moment and ask again, or switch " +
-            "provider."
-          : "The model provider did not respond, so this question was not " +
-            "answered. Nothing has been guessed and nothing on the comparison " +
-            "has changed. Try again.",
-        detail: raw.slice(0, 400),
-      }, { status: 503 });
-    }
-    return Response.json({
-      ok: false,
-      error:
-        "The analyst could not complete this question. Nothing has been guessed " +
-        "and nothing on the comparison has changed.",
-      detail: raw.slice(0, 400),
-    }, { status: 500 });
+    // was exhausted: exactly the state a live demo can land in. The logic now
+    // lives in lib/provider-error.ts, because the copilot and both ingest
+    // routes had the old behaviour and one fix between them was no use.
+    // No tool calls or charts here: this catch sits outside the loop's scope,
+    // and an answer that failed has nothing partial worth reporting anyway.
+    return providerErrorResponse(e, {
+      action: "This question was not answered",
+    });
   }
 }

@@ -23,7 +23,16 @@ export const maxDuration = 120;
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // A malformed or absent body is a 400 with a sentence. It used to be a
+    // 500 carrying a raw SyntaxError, which tells a caller nothing and
+    // looks like the route is broken rather than the request.
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return Response.json(
+        { ok: false, error: "The request body was not readable JSON." },
+        { status: 400 },
+      );
+    }
     const draft = body.draft as DraftedRfx | undefined;
     const rfxId = String(body.rfxId ?? "").trim() || null;
 

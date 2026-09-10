@@ -88,8 +88,24 @@ export async function GET(
       );
     }
 
-    // The bytes live in the database. Older rows written before that change
-    // carry a filesystem path, so those still resolve from disk.
+    /**
+     * The bytes live in the database. Older rows written before that change
+     * carry a filesystem path, so those still resolve from disk.
+     *
+     * A fixture row carries neither: `lib/fixture.ts` stores the sentinel
+     * "(fixture, no file on disk)" in storage_path, and handing that to
+     * readFile produced a 500 with an ENOENT and the sentinel in the body.
+     * There is no original to show for a harness cell, and saying so is the
+     * answer.
+     */
+    if (!row.file_base64 && /^\(fixture|^db:/.test(String(row.storage_path))) {
+      return new Response(
+        "This value came from the test harness, not from reading a document, so " +
+        "there is no original to open. The banner on the comparison says which " +
+        "suppliers are affected.",
+        { status: 404 },
+      );
+    }
     const buf = row.file_base64
       ? Buffer.from(String(row.file_base64), "base64")
       : await readFile(String(row.storage_path));
@@ -100,6 +116,14 @@ export async function GET(
       },
     });
   } catch (e) {
-    return new Response(String(e), { status: 500 });
+    // A sentence, not a Postgres error. A missing table or column here used to
+    // come back as `relation "attachments" does not exist` in the response
+    // body, which is a database's problem stated in a database's words.
+    console.error("[source] could not serve a document:", e);
+    return new Response(
+      "That document could not be served. Nothing is missing from the " +
+      "comparison as a result: the figures on screen do not come from this route.",
+      { status: 500 },
+    );
   }
 }

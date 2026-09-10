@@ -93,7 +93,17 @@ ${bodyHtml}
 // ===========================================================================
 
 export function scopeDocument(draft: DraftedRfx, rfxId: string): string {
-  const s = draft.scope as {
+  /**
+   * Defaulted, because the draft comes from a model tool call.
+   *
+   * Every sibling field here already used `?? []`, and `background` did not,
+   * so a draft that arrived without a `scope` object at all threw
+   * "Cannot read properties of undefined (reading 'background')" as a 500. The
+   * route's own guard only checks that lines exist. A model omitting one
+   * optional object is not an exceptional event, and the right response is a
+   * document that says the section is missing rather than a stack trace.
+   */
+  const s = (draft.scope ?? {}) as {
     background?: string; included?: string[]; excluded?: string[];
     deliveryLocations?: Array<{ site: string; share: string }>;
     timeline?: Array<{ milestone: string; when: string }>;
@@ -109,7 +119,7 @@ export function scopeDocument(draft: DraftedRfx, rfxId: string): string {
     `${rfxId} — Scope of Work`,
     `${draft.title} · ${draft.lines.length} line items`,
     `
-<h2>1. Background</h2><p>${esc(s.background)}</p>
+<h2>1. Background</h2><p>${s.background ? esc(s.background) : '<em>Not stated in the draft.</em>'}</p>
 
 <h2>2. Scope</h2>
 <p>Supply, delivery and commissioning of ${draft.lines.length} line items across
@@ -284,13 +294,26 @@ export function comparisonCsv(p: ComparisonPayload): string {
     return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
   };
 
+  /**
+   * The preamble is QUOTED, so this is still CSV.
+   *
+   * It used to be five bare `#` lines of prose, and prose contains commas, so
+   * every one of them looked like a row with a different field count. Excel
+   * shrugged and scattered the fragments across spare columns; `read_csv`
+   * refused the file outright with "Expected 3 fields in line 7, saw 17".
+   *
+   * A malformed export is a peculiar thing to ship from a tool whose argument
+   * is that other people's malformed spreadsheets are the problem. Each line
+   * is one quoted field in its own row now, so a parser sees a valid file with
+   * a five-row header it can skip, and a human still sees the notes.
+   */
   const rows: string[] = [
-    `# ${(p.rfx as { id: string }).id} comparison, normalised`,
-    `# Every rate is ex-GST, in INR, per the unit the enquiry asked for.`,
-    `# ${p.trust.usable} of ${p.trust.total} cells are usable in a total. ` +
-    `${p.trust.excluded} are excluded and carry a status rather than a blank.`,
-    `# A blank rate with a status is NOT a zero. Read the status column.`,
-    `# Provenance per cell is in the xlsx export and the JSON audit bundle.`,
+    q(`# ${(p.rfx as { id: string }).id} comparison, normalised`),
+    q(`# Every rate is ex-GST, in INR, per the unit the enquiry asked for.`),
+    q(`# ${p.trust.usable} of ${p.trust.total} cells are usable in a total. ` +
+      `${p.trust.excluded} are excluded and carry a status rather than a blank.`),
+    q(`# A blank rate with a status is NOT a zero. Read the status column.`),
+    q(`# Provenance per cell is in the xlsx export and the JSON audit bundle.`),
     "",
     [
       "Line", "SKU", "Group", "Description", "UoM", "UnitsPerUoM", "Qty",

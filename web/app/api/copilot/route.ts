@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { callLlm, activeModel, activeProvider, toolResultPart, type Part } from "@/lib/llm";
+import { providerErrorResponse } from "@/lib/provider-error";
 import { COPILOT_SYSTEM, COPILOT_TOOLS, sendBlockers, type DraftedRfx } from "@/lib/copilot";
 
 /**
@@ -21,7 +22,14 @@ export const maxDuration = 300;
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // A malformed body is a 400 with a sentence, not a 500 with a SyntaxError.
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return Response.json(
+        { ok: false, error: "The request body was not readable JSON." },
+        { status: 400 },
+      );
+    }
     const message = String(body.message ?? "").trim();
     const history = (body.history ?? []) as Array<{
       role: "user" | "assistant"; parts: Part[]; raw?: unknown;
@@ -164,6 +172,19 @@ export async function POST(request: Request) {
       history: turns,
     });
   } catch (e) {
-    return Response.json({ ok: false, error: String(e) }, { status: 500 });
+    /**
+     * The commonest failure this route will ever have, and it is not a bug.
+     *
+     * This used to be `error: String(e)` with a 500, so a rate-limited or
+     * out-of-credit provider printed its entire JSON payload, billing console
+     * URL included, in red, in the drafting box. Which is the FIRST thing
+     * anybody does with this product.
+     *
+     * The analyst route has handled this properly for a while. Nothing carried
+     * it here until a QA pass looked.
+     */
+    return providerErrorResponse(e, {
+      action: "The co-pilot could not draft this",
+    });
   }
 }

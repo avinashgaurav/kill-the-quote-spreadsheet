@@ -115,14 +115,27 @@ async function main() {
   );
 
   // ---- 3. A provider rate limit returned a raw 500 ---------------------
+  //
+  // The check used to grep this route for a 429 branch. That logic now lives
+  // in lib/provider-error.ts, shared, because three of the four model-backed
+  // routes never had it (see regression 30) and one fix between four routes is
+  // no use. So the assertion follows the behaviour rather than the file: the
+  // route must delegate, and the shared module must do the classifying.
   const analyst = readFileSync(resolve(process.cwd(), "app/api/analyst/route.ts"), "utf8");
-  const handles429 = /429|rate.\?limit|RESOURCE_EXHAUSTED/i.test(analyst) &&
-    analyst.includes("status: 503");
+  const providerModule = readFileSync(
+    resolve(process.cwd(), "lib/provider-error.ts"), "utf8",
+  );
+  const handles429 =
+    /429|rate.\?limit|RESOURCE_EXHAUSTED/i.test(providerModule) &&
+    providerModule.includes("503") &&
+    /providerErrorResponse/.test(analyst);
   // The tool-call catch legitimately puts String(e) into a TOOL RESULT, which
   // the model reads and reasons about. The bug was the HTTP response body
   // carrying it, so that is what this looks at.
   const outerCatch = analyst.slice(analyst.lastIndexOf("} catch (e) {"));
-  const leaks = /error:\s*String\(e\)/.test(outerCatch);
+  const leaks = /error:\s*String\(e\)/.test(outerCatch)
+    // The shared module must confine the raw payload to `detail`, never `error`.
+    || /error:\s*raw/.test(providerModule);
   check(
     "3. A rate-limited provider returned a raw 500 with a JSON blob",
     "provider failures return 503 with a sentence, and never the raw payload",
@@ -891,6 +904,90 @@ async function main() {
         && /Do not act on these numbers/.test(shellSrc),
       "set only when the DB actually failed, never on a normal cold start, so " +
       "the two states are no longer indistinguishable from the outside",
+    );
+  }
+
+  // ---- 29..35: what a QA pass found that I had not ---------------------
+  {
+    const clientSrc = readFileSync(resolve(process.cwd(), "lib/db/client.ts"), "utf8");
+    check(
+      "29. A schema change never ran against a warm process",
+      "the schema-init memo is keyed on the schema, so an edit re-applies it",
+      /__quoteKillerSchema/.test(clientSrc) && /schemaKey/.test(clientSrc),
+      "adding a column and then querying it gave `column does not exist` on " +
+      "every request, because the promise that would have run the migration " +
+      "had already resolved. activeRfx caught it and fell back to the shipped " +
+      "example WITH its hand-typed qualification table, so three suppliers were " +
+      "excluded from a Rs 4.07 cr recommendation by a verdict nobody computed",
+    );
+
+    const provider = readFileSync(
+      resolve(process.cwd(), "lib/provider-error.ts"), "utf8",
+    );
+    const copilotRoute = readFileSync(
+      resolve(process.cwd(), "app/api/copilot/route.ts"), "utf8",
+    );
+    const inboxRoute = readFileSync(
+      resolve(process.cwd(), "app/api/rfx/inbox/route.ts"), "utf8",
+    );
+    const extractRoute = readFileSync(
+      resolve(process.cwd(), "app/api/extract/route.ts"), "utf8",
+    );
+    check(
+      "30. Three of four model routes leaked the provider's raw payload",
+      "every model-backed route answers with a sentence, detail behind a field",
+      /classifyProviderError/.test(provider)
+        && /providerErrorResponse/.test(copilotRoute)
+        && /providerSentence/.test(inboxRoute)
+        && /providerSentence/.test(extractRoute)
+        && !/error: String\(e\) \}, \{ status: 500 \}/.test(copilotRoute),
+      "the analyst had this right and nothing carried it across, so typing into " +
+      "the Draft box printed Google's billing console URL in red as the first " +
+      "thing anybody sees",
+    );
+    check(
+      "31. A malformed scope widened a chase instead of refusing it",
+      "a scope that is present but not an array is a 400, never ignored",
+      /must be an array/.test(
+        readFileSync(resolve(process.cwd(), "app/api/rfx/chase/route.ts"), "utf8"),
+      ),
+      "`lineNos: \"15\"` instead of `[15]` failed Array.isArray, became " +
+      "undefined, and the guard saw an UNSCOPED ask: a buyer querying one line " +
+      "sent that supplier sixteen items, and the record says they asked for all",
+    );
+    check(
+      "32. The inbox asserted a fact about a supplier who does not exist",
+      "a code that is not on the roster is a 404, not a claim",
+      /is not a supplier on this enquiry/.test(inboxRoute),
+      "any string came back ok:true with \"they were invited and have not sent " +
+      "anything\", which is a confident statement about a supplier nobody invited",
+    );
+
+    const docsSrc2 = readFileSync(resolve(process.cwd(), "lib/documents.ts"), "utf8");
+    check(
+      "33. The CSV export was not valid CSV",
+      "the prose preamble is quoted, so a parser sees a header it can skip",
+      /const rows: string\[\] = \[\s*q\(/.test(docsSrc2),
+      "five bare # lines of prose, and prose contains commas, so every one " +
+      "looked like a row with a different field count and read_csv refused the " +
+      "file. A malformed export is a peculiar thing to ship from this tool",
+    );
+    check(
+      "34. A draft with no scope object crashed the pack",
+      "an absent optional section renders as absent, not as a 500",
+      /const s = \(draft\.scope \?\? \{\}\)/.test(docsSrc2),
+      "every sibling field used `?? []` and background did not, and the draft " +
+      "comes from a model tool call, so an omitted object is not exceptional",
+    );
+
+    const fixtureSrc = readFileSync(resolve(process.cwd(), "lib/fixture.ts"), "utf8");
+    check(
+      "35. Nothing could clear a chase",
+      "clearing responses clears the chase record and attachments too",
+      /delete from chases where rfx_id/.test(fixtureSrc)
+        && /delete from attachments where rfx_id/.test(fixtureSrc),
+      "a chase appears in the award note's \"what we asked for and did not get\" " +
+      "table, so any exploratory click during a rehearsal was permanent",
     );
   }
 

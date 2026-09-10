@@ -45,6 +45,28 @@ const globalForDb = globalThis as unknown as {
   __quoteKillerDb?: Db;
   __quoteKillerQuery?: Query;
   __quoteKillerReady?: Promise<void>;
+  /**
+   * Which schema the memoised init above actually applied.
+   *
+   * `__quoteKillerReady` is memoised for the lifetime of the process, which is
+   * correct for a warm server and wrong the moment the schema CHANGES under a
+   * running one. Adding a column to MIGRATIONS and then querying it produced
+   * `column "questionnaire" does not exist` on every request: Next's hot
+   * reload picked up the new QUERY and not the new MIGRATION, because the
+   * promise that would have run it had already resolved.
+   *
+   * The consequence was not a crash. `activeRfx()` caught the error and fell
+   * back to the shipped example WITH ITS HAND-TYPED QUALIFICATION TABLE, so
+   * three suppliers were excluded from a Rs 4.07 crore recommendation by a
+   * verdict nobody had computed, on the exact screen built to make that
+   * impossible. It took a QA pass to notice, because the only visible symptom
+   * was a banner I had added an hour earlier for a different reason.
+   *
+   * So the memo is keyed on the schema itself. Edit the DDL or a migration and
+   * the key changes, so the next request re-applies it. Every statement is
+   * IF NOT EXISTS, so re-applying costs one round trip and changes nothing.
+   */
+  __quoteKillerSchema?: string;
 };
 
 /**
@@ -412,6 +434,16 @@ async function connect(): Promise<{ db: Db; query: Query }> {
   }
   const db = globalForDb.__quoteKillerDb;
   const query = globalForDb.__quoteKillerQuery;
+
+  // A fingerprint of the schema this process would apply. Cheap: the DDL and
+  // the migrations are string constants in this module.
+  const schemaKey = String(DDL.length) + ":" + String(MIGRATIONS.length) + ":" +
+    String(MIGRATIONS.join("|").length);
+
+  if (globalForDb.__quoteKillerSchema !== schemaKey) {
+    globalForDb.__quoteKillerReady = undefined;
+    globalForDb.__quoteKillerSchema = schemaKey;
+  }
 
   if (!globalForDb.__quoteKillerReady) {
     globalForDb.__quoteKillerReady = (async () => {
