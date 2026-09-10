@@ -1,4 +1,4 @@
-import { extractDocument, fileHash, type ExtractionCache } from "@/lib/extract/run";
+import { extractDocument, fileHash } from "@/lib/extract/run";
 import {
   activeRfx, guessVendor, seedRfx, storeExtraction, ensureVendor,
   storeQuestionnaireAnswers,
@@ -8,7 +8,7 @@ import {
 } from "@/lib/extract/questionnaire";
 import catalog from "@/lib/data/catalog.json";
 import type { QuestionSpec } from "@/lib/questionnaire";
-import { getQuery } from "@/lib/db/client";
+import { dbCache } from "@/lib/extract/cache";
 
 /**
  * Upload vendor documents and read them.
@@ -29,33 +29,6 @@ import { getQuery } from "@/lib/db/client";
 // Reading five documents with vision and adaptive thinking takes longer than a
 // default serverless window allows.
 export const maxDuration = 300;
-
-/** Cache backed by the responses table, so it survives a restart. */
-async function dbCache(): Promise<ExtractionCache> {
-  const query = await getQuery();
-
-  return {
-    async get(key) {
-      const r = await query(
-        `select extraction_meta from responses
-          where extraction_meta->>'cacheKey' = $1 and extraction_status = 'extracted'
-          limit 1`,
-        [key],
-      );
-      const meta = r.rows?.[0]?.extraction_meta as Record<string, unknown> | undefined;
-      if (!meta?.extraction) return null;
-      return {
-        key,
-        extraction: meta.extraction as never,
-        meta: meta.meta as never,
-      };
-    },
-    async set() {
-      // Written as part of storeExtraction's response row instead, so the cache
-      // and the audit record cannot drift apart.
-    },
-  };
-}
 
 export async function POST(request: Request) {
   try {
@@ -174,6 +147,7 @@ export async function POST(request: Request) {
             mimeType: file.type || "application/octet-stream",
             questions: catalog.questionnaire as unknown as QuestionSpec[],
             attachments: uploaded.filter((u) => u.filename !== file.name),
+            cache,
           });
           await storeQuestionnaireAnswers({
             rfxId: rfx.rfxId,

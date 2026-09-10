@@ -110,7 +110,14 @@ export interface ToolCall {
 export interface LlmResult {
   text: string;
   toolCalls: ToolCall[];
-  usage: { input: number; output: number; cacheRead?: number };
+  usage: {
+    input: number;
+    /** Includes thinking, because that is how it is billed. */
+    output: number;
+    /** The thinking share of `output`, so a runaway prompt is visible. */
+    thinking?: number;
+    cacheRead?: number;
+  };
   /** API-provided citations. Anthropic PDFs only; empty elsewhere. */
   citations: unknown[];
   stopReason: string | null;
@@ -348,6 +355,35 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
     generationConfig: {
       maxOutputTokens: req.maxTokens ?? 16000,
       temperature: 0,
+      /**
+       * Bound the thinking, because nothing else did.
+       *
+       * `effort` has been in LlmRequest since the seam was written, and the
+       * Anthropic path honours it. This path built its body with
+       * maxOutputTokens and temperature and nothing else, so the flag was
+       * accepted and silently discarded on the provider that is actually
+       * configured. Every call ran at the model's default thinking level,
+       * including the one-number crop re-read that asks for at most six
+       * tokens back and passes effort "low".
+       *
+       * Thinking bills as OUTPUT, which is six times the input rate on this
+       * model, and it was invisible: the usage below read promptTokenCount and
+       * candidatesTokenCount and never thoughtsTokenCount, so the figure shown
+       * in the UI and written to analyst_turns understated the real bill by the
+       * entire thinking component. That is most of where the money went, and
+       * why it went without a trace.
+       *
+       * Mapped rather than passed through, because "how hard should you think"
+       * is a budget here and a level on Anthropic.
+       */
+      thinkingConfig: {
+        thinkingBudget:
+          req.effort === "low" ? 0
+          : req.effort === "medium" ? 2048
+          : 8192,
+        // Thought summaries are not needed and would be billed.
+        includeThoughts: false,
+      },
     },
   };
 
@@ -411,13 +447,41 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
 
     lastDetail = await res.text();
 
-    // A hard quota ceiling (limit: 0) never clears by waiting.
-    const hardQuota = res.status === 429 && /limit:\s*0/.test(lastDetail);
+    /**
+     * Two 429s that mean completely different things.
+     *
+     *   rate limited     you are going too fast. Waiting fixes it, and the
+     *                    provider usually tells you how long to wait.
+     *   out of money     the project's prepaid credit is spent, or the model
+     *                    has no free quota at all. Waiting fixes nothing.
+     *
+     * Only `limit: 0` was recognised, which covers a model with no free tier
+     * and NOT the commonest case in practice: a paid key whose balance has run
+     * out. That returns a plain 429 saying "Your prepayment credits are
+     * depleted", so it was retried five times, honouring hints of up to
+     * seventy seconds each. Every call in a demo would hang for the full
+     * retry budget before failing, and the message a buyer saw said the
+     * provider was busy when in truth somebody needed to top up an account.
+     *
+     * Both are terminal, and the error says which one it is, because only one
+     * of the two remedies is yours to apply.
+     */
+    const noQuota = res.status === 429 && /limit:\s*0/.test(lastDetail);
+    const noCredit = res.status === 429
+      && /credits? are depleted|prepayment|billing|exceeded your current quota/i
+        .test(lastDetail);
+    const terminal = noQuota || noCredit;
 
-    if (!RETRYABLE.has(res.status) || hardQuota || attempt === MAX_ATTEMPTS) {
+    if (!RETRYABLE.has(res.status) || terminal || attempt === MAX_ATTEMPTS) {
       throw new Error(
-        `Gemini ${res.status}${hardQuota ? " (no free quota for this model)" : ""}: ` +
-        `${lastDetail.slice(0, 500)}`,
+        `Gemini ${res.status}` +
+        (noCredit
+          ? " (OUT OF CREDIT: the key is valid and the project's balance is spent. " +
+            "Retrying will not help; top up the project)"
+          : noQuota
+            ? " (no free quota for this model)"
+            : "") +
+        `: ${lastDetail.slice(0, 500)}`,
       );
     }
 
@@ -454,7 +518,13 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
       content?: { parts?: GeminiPart[] };
       finishReason?: string;
     }>;
-    usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number };
+    usageMetadata?: {
+      promptTokenCount?: number;
+      candidatesTokenCount?: number;
+      /** Thinking. Billed at the output rate, and previously not read. */
+      thoughtsTokenCount?: number;
+      cachedContentTokenCount?: number;
+    };
   };
 
   const cand = json.candidates?.[0];
@@ -471,7 +541,15 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
       })),
     usage: {
       input: json.usageMetadata?.promptTokenCount ?? 0,
-      output: json.usageMetadata?.candidatesTokenCount ?? 0,
+      // Thinking is billed at the output rate and was not being counted, so
+      // every figure this seam reported was an understatement. Reported inside
+      // `output` because that is where it lands on the invoice, and separately
+      // as `thinking` so a prompt that starts thinking too hard is visible.
+      output:
+        (json.usageMetadata?.candidatesTokenCount ?? 0) +
+        (json.usageMetadata?.thoughtsTokenCount ?? 0),
+      thinking: json.usageMetadata?.thoughtsTokenCount ?? 0,
+      cacheRead: json.usageMetadata?.cachedContentTokenCount ?? 0,
     },
     // No citations feature. PDF provenance falls back to a model-reported
     // locator, which is weaker and is flagged as such in the UI.

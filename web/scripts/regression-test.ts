@@ -573,6 +573,94 @@ async function main() {
     "each row is scored, and any row wrong at high confidence fails the run",
   );
 
+  // ---- 20. Money spent invisibly, on the provider that is configured ----
+  //
+  // Three separate defects that all shared one property: the code READ as
+  // though the thing were handled, so nothing ever looked again.
+  const llm = readFileSync(resolve(process.cwd(), "lib/llm.ts"), "utf8");
+  const gemini = llm.slice(llm.indexOf("async function callGemini"));
+
+  check(
+    "20a. effort was accepted and silently dropped on Gemini",
+    "how hard to think is bounded on both providers, not just Anthropic",
+    /thinkingConfig/.test(gemini) && /thinkingBudget/.test(gemini),
+    "effort now maps to a thinking budget. Every call used to run at the " +
+    "model's default, including a crop re-read that wants six tokens back",
+  );
+  check(
+    "20b. Thinking tokens were billed and never counted",
+    "reported usage includes thinking, so the meter cannot understate the bill",
+    /thoughtsTokenCount/.test(gemini),
+    "thinking bills at the output rate, 6x input on this model, and the UI " +
+    "and analyst_turns were both reporting a figure that excluded all of it",
+  );
+  check(
+    "20c. An out-of-credit key was retried five times",
+    "a 429 that means 'out of money' is terminal, not backed off",
+    /credits\? are depleted|prepayment/i.test(gemini),
+    "only `limit: 0` was treated as terminal, so a spent balance was retried " +
+    "honouring hints of up to 70s each and every call hung for the full budget",
+  );
+
+  const extractRoute = readFileSync(
+    resolve(process.cwd(), "app/api/extract/route.ts"), "utf8",
+  );
+  check(
+    "20d. The database cache never returned a hit",
+    "both ingest routes share one cache whose writer and reader agree",
+    /from "@\/lib\/extract\/cache"/.test(extractRoute)
+      && /from "@\/lib\/extract\/cache"/.test(
+        readFileSync(resolve(process.cwd(), "app/api/rfx/inbox/route.ts"), "utf8"),
+      ),
+    "the old one selected on a JSON field nothing wrote and its set() was " +
+    "empty, so every re-read of an identical file was paid for again",
+  );
+
+  const analystRoute = readFileSync(
+    resolve(process.cwd(), "app/api/analyst/route.ts"), "utf8",
+  );
+  check(
+    "20e. A truncated answer was returned as an answer",
+    "a reply that ran out of room is an error, not an empty answer",
+    /stopReason/.test(analystRoute) && /max_tokens|MAX_TOKENS/.test(analystRoute),
+    "the loop ignored stopReason, so a truncated reply came back ok:true with " +
+    "an empty string after a paid call, and the buyer saw a blank panel",
+  );
+
+  // ---- 21. The analyst answered from the answer key -------------------
+  const analystLib = readFileSync(resolve(process.cwd(), "lib/analyst.ts"), "utf8");
+  check(
+    "21. The analyst read qualification from a hand-typed table",
+    "no analyst tool reads catalog qualification or typed findings",
+    !/QUALIFICATION\[/.test(analystLib)
+      && /suppliersOf\(payload\)/.test(analystLib)
+      && /a\?\.why/.test(analystLib),
+    "check_questionnaire returned `passed: a.ok` and `finding: a.note` out of " +
+    "catalog.json, so a suggested demo question was answered from a sentence " +
+    "somebody had typed. Verdicts and findings are derived per request now",
+  );
+  check(
+    "21b. Every analyst tool was bound to the shipped enquiry",
+    "tools take their lines, suppliers and vendor enum from the payload",
+    /analystTools = \(payload/.test(analystLib) && /linesOf\(payload\)/.test(analystLib),
+    "a supplier who arrived by upload had a column in the grid and was " +
+    "invisible to every tool, and on a self-drafted enquiry query_lines " +
+    "returned nothing while the analyst reported there was nothing there",
+  );
+
+  const qn = readFileSync(
+    resolve(process.cwd(), "lib/extract/questionnaire.ts"), "utf8",
+  );
+  check(
+    "21c. The expired certificate was never actually opened",
+    "a document an answer cites is read as a document in its own right",
+    /extractEvidence/.test(qn) && /EVIDENCE_TOOL/.test(qn)
+      && /matchAttachment/.test(qn),
+    "the questionnaire FORM names a filename and nothing more. The revision " +
+    "year and the expiry live inside the PDF, so a real read found nothing " +
+    "contradicting the answer and six mandatory failures became five",
+  );
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

@@ -43,10 +43,28 @@ async function main() {
       const r = await callLlm({
         system: "Reply with one word.",
         parts: [{ kind: "text", text: "Say OK." }],
-        maxTokens: 16, kind: tier, retryBudgetMs: 8000,
+        // 16 was wrong and would have made this script lie. On a thinking
+        // model maxOutputTokens covers thinking, so a 16-token ceiling
+        // truncates inside the thinking and returns no text at all, and the
+        // old check only asked whether the call threw. The one script whose
+        // job is proving the model generates would have printed WORKS while
+        // generating nothing. effort "low" turns thinking off for this.
+        maxTokens: 256, effort: "low", kind: tier, retryBudgetMs: 8000,
       });
+
+      if (!r.text.trim() && !r.toolCalls.length) {
+        console.log(
+          `${label} NO OUTPUT   the call succeeded and produced nothing. ` +
+          `stop reason: ${r.stopReason}`,
+        );
+        dead += 1;
+        continue;
+      }
+
       console.log(
-        `${label} WORKS   in=${r.usage?.input ?? "?"} out=${r.usage?.output ?? "?"}`,
+        `${label} WORKS   in=${r.usage.input} out=${r.usage.output}` +
+        (r.usage.thinking ? ` (${r.usage.thinking} thinking)` : "") +
+        `  said ${JSON.stringify(r.text.trim().slice(0, 24))}`,
       );
     } catch (e) {
       const msg = String(e).replace(/\s+/g, " ");

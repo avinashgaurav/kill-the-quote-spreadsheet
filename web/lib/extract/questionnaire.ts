@@ -20,6 +20,7 @@ import { z } from "zod";
 
 import { callLlm, type Part } from "../llm";
 import { readFileParts } from "./readers";
+import { cacheKey, fileHash, type ExtractionCache } from "./run";
 import type { QuestionSpec, ReadAnswer } from "../questionnaire";
 
 const maybe = <T extends z.ZodTypeAny>(t: T) => t.nullish().transform((v) => v ?? null);
@@ -305,8 +306,26 @@ export interface AttachedDocument {
   buf: Buffer;
 }
 
-/** Read one attached document for what it states about itself. */
-export async function extractEvidence(doc: AttachedDocument) {
+/**
+ * Read one attached document for what it states about itself.
+ *
+ * Cached on the file's own bytes, which matters more here than anywhere else:
+ * one certificate is commonly cited against three questions, and several
+ * suppliers in a category attach the same auditor's boilerplate. Without this,
+ * a re-read of one questionnaire pays for every attachment again.
+ */
+export async function extractEvidence(doc: AttachedDocument, cache?: ExtractionCache) {
+  const fh = fileHash(doc.buf);
+  const key = `evidence:${cacheKey(fh, "evidence")}`;
+  const hit = await cache?.get(key);
+  if (hit) {
+    return {
+      ...evidenceSchema.parse(hit.extraction),
+      filename: doc.filename,
+      cached: true,
+    };
+  }
+
   const { parts: docParts, guidance } = await readFileParts(
     doc.buf, doc.filename, doc.mimeType,
   );
@@ -335,7 +354,11 @@ export async function extractEvidence(doc: AttachedDocument) {
       `(stop reason: ${response.stopReason}).`,
     );
   }
-  return { ...evidenceSchema.parse(call.input), filename: doc.filename };
+  const parsed = evidenceSchema.parse(call.input);
+  await cache?.set({ key, extraction: parsed as never, meta: {
+    model: response.model, fileHash: fh,
+  } as never });
+  return { ...parsed, filename: doc.filename, cached: false };
 }
 
 /**
@@ -419,6 +442,8 @@ export async function extractQuestionnaire(opts: {
    * assessment reports rather than guessing at.
    */
   attachments?: AttachedDocument[];
+  /** Shared with the quotation reader, so a re-read of a file costs nothing. */
+  cache?: ExtractionCache;
 }): Promise<QuestionnaireReadResult> {
   const started = Date.now();
   const validNos = new Set(opts.questions.map((q) => q.no));
@@ -434,25 +459,46 @@ export async function extractQuestionnaire(opts: {
     ...docParts,
   ];
 
-  const response = await callLlm({
-    system: SYSTEM,
-    parts,
-    tools: [QUESTIONNAIRE_TOOL],
-    forceTool: QUESTIONNAIRE_TOOL.name,
-    maxTokens: 12000,
-    effort: "high",
-    retryBudgetMs: 120_000,
-  });
+  // Cached on the response document's own bytes. A questionnaire read is
+  // cheap next to a rate card and it was being paid for on every demo run.
+  const fh = fileHash(opts.buf);
+  const key = `questionnaire:${cacheKey(fh, "questionnaire")}`;
+  const cached = await opts.cache?.get(key);
 
-  const call = response.toolCalls.find((c) => c.name === QUESTIONNAIRE_TOOL.name);
-  if (!call) {
+  const response = cached
+    ? null
+    : await callLlm({
+        system: SYSTEM,
+        parts,
+        tools: [QUESTIONNAIRE_TOOL],
+        forceTool: QUESTIONNAIRE_TOOL.name,
+        // Ten answers with their citations. 12000 was a budget rather than a
+        // margin: on a thinking model this covers thinking, which bills at the
+        // output rate, so an over-set ceiling is money the model may spend.
+        maxTokens: 6000,
+        effort: "high",
+        retryBudgetMs: 120_000,
+      });
+
+  const call = response?.toolCalls.find((c) => c.name === QUESTIONNAIRE_TOOL.name);
+  if (!cached && !call) {
     throw new Error(
       `The reader did not report a questionnaire for ${opts.filename} ` +
-      `(stop reason: ${response.stopReason}). Nothing has been stored.`,
+      `(stop reason: ${response?.stopReason}). Nothing has been stored.`,
     );
   }
 
-  const parsed = questionnaireExtractionSchema.parse(call.input);
+  const parsed = questionnaireExtractionSchema.parse(
+    cached ? cached.extraction : call!.input,
+  );
+  // Stored before the attachments are read, because the two are cached
+  // separately: an attachment that fails to read must not cost the answers
+  // their cache entry.
+  if (!cached) {
+    await opts.cache?.set({ key, extraction: parsed as never, meta: {
+      model: response!.model, fileHash: fh,
+    } as never });
+  }
 
   // A question number the catalog does not contain is dropped, not trusted. The
   // same closed-world rule as the line catalog: an invented reference would
@@ -502,7 +548,7 @@ export async function extractQuestionnaire(opts: {
     let ev = readByFile.get(file.filename);
     if (!ev) {
       try {
-        ev = await extractEvidence(file);
+        ev = await extractEvidence(file, opts.cache);
         readByFile.set(file.filename, ev);
       } catch {
         continue;
@@ -545,7 +591,7 @@ export async function extractQuestionnaire(opts: {
     answers,
     supplierRef: parsed.supplierRef,
     unreadableRegions: parsed.unreadableRegions,
-    model: response.model,
+    model: response?.model ?? String((cached?.meta as { model?: string })?.model ?? "cached"),
     ms: Date.now() - started,
     provenance,
     evidenceRead,

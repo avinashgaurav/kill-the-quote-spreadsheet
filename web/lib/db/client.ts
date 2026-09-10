@@ -254,6 +254,40 @@ CREATE TABLE IF NOT EXISTS chases (
 );
 CREATE INDEX IF NOT EXISTS chases_vendor_idx ON chases (rfx_id, vendor_id);
 
+/*
+ * Extraction results, keyed on (model, prompt hash, file hash).
+ *
+ * A table of its own rather than a field on the response row. A response is an
+ * audit record of one document arriving from one supplier on one enquiry, and
+ * the same bytes read again are the same read. Burying a full extraction
+ * inside the meta of an audit row would conflate "what we hold" with "what we
+ * already paid to compute".
+ *
+ * There was a dbCache before this and it never once returned a hit. Its get
+ * looked up a JSON field nothing wrote, for two keys nothing wrote either, and
+ * its set was an empty function whose comment claimed the write happened in
+ * storeExtraction. It did not. So every upload of a file already read was paid
+ * for again at full price, on a route whose own header promised the opposite.
+ *
+ * NOTE for the next person editing this comment: no semicolons. The DDL is
+ * split on semicolons before execution, so one in here cuts the comment in
+ * half and leaves the rest of it as SQL.
+ *
+ * The key contains the prompt hash, so improving a prompt correctly misses
+ * every entry rather than serving a stale reading produced by an old one.
+ */
+CREATE TABLE IF NOT EXISTS extraction_cache (
+  cache_key text PRIMARY KEY,
+  file_hash text NOT NULL,
+  model_id text NOT NULL,
+  kind text NOT NULL DEFAULT 'quotation',
+  extraction jsonb NOT NULL,
+  meta jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS extraction_cache_file_idx ON extraction_cache (file_hash);
+
 CREATE TABLE IF NOT EXISTS analyst_turns (
   id text PRIMARY KEY,
   rfx_id text NOT NULL REFERENCES rfx(id) ON DELETE CASCADE,

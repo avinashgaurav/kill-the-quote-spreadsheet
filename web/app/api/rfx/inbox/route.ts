@@ -32,6 +32,7 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 
 import { extractDocument, fileHash } from "@/lib/extract/run";
+import { dbCache } from "@/lib/extract/cache";
 import { extractQuestionnaire, looksLikeQuestionnaire } from "@/lib/extract/questionnaire";
 import {
   activeRfx, storeExtraction, storeQuestionnaireAnswers,
@@ -193,6 +194,11 @@ export async function POST(request: Request) {
     }
 
     const rfx = await activeRfx();
+    // The SAME cache the upload route uses. These two routes read the same
+    // corpus, and until now they did not even share a broken cache: this one
+    // fell through to a module-level Map that is empty on every cold start, so
+    // pressing Send and then dragging the same files in paid twice.
+    const cache = await dbCache();
     const results: unknown[] = [];
 
     for (const arriving of files) {
@@ -230,6 +236,7 @@ export async function POST(request: Request) {
             buf, filename: name, mimeType,
             questions: catalog.questionnaire as unknown as QuestionSpec[],
             attachments,
+            cache,
           });
           await storeQuestionnaireAnswers({
             rfxId: rfx.rfxId, vendorId: code,
@@ -250,7 +257,7 @@ export async function POST(request: Request) {
         }
 
         const { extraction, rows, meta, nestedFiles } = await extractDocument({
-          buf, filename: name, mimeType, lines: rfx.ctx.lines,
+          buf, filename: name, mimeType, lines: rfx.ctx.lines, cache,
         });
 
         const stored = await storeExtraction({
