@@ -1,0 +1,28 @@
+# Dependencies and build output
+node_modules/
+.next/
+# Anchored. An unanchored "out/" also matched dataset/out, which is the
+# fabricated corpus the whole demo runs on, and silently excluded all of it.
+/web/out/
+/build/
+
+# Secrets. Never commit a key.
+.env
+.env.*
+!.env.example
+
+# Embedded Postgres data directory, recreated on first run
+.pglite/
+
+# Uploaded vendor documents at runtime
+.uploads/
+
+# OS and editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*

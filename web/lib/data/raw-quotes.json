@@ -1,0 +1,784 @@
+{
+  "warning": "TEST FIXTURE. The running app must never read this. It is the input the extractor is expected to produce, used to test the calculator in isolation from the extractor.",
+  "quotes": {
+    "V1": {
+      "1": {
+        "status": "quoted",
+        "price": 62800,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "2": {
+        "status": "substituted",
+        "price": 104500,
+        "uom": "nos",
+        "ccy": "INR",
+        "offered": "HP ProBook 445 G11, Ryzen 7 7735U, 32GB, 1TB",
+        "note": "Equivalent offered. i7-1365U variant on 10-12 wk lead time."
+      },
+      "3": {
+        "status": "quoted",
+        "price": 91200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "4": {
+        "status": "quoted",
+        "price": 39800,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 9450,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "quoted",
+        "price": 20900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "7": {
+        "status": "quoted",
+        "price": 13100,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1390,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1780,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "10": {
+        "status": "quoted",
+        "price": 3080,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "11": {
+        "status": "quoted",
+        "price": 2760,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "12": {
+        "status": "substituted",
+        "price": 548000,
+        "uom": "nos",
+        "ccy": "INR",
+        "offered": "Lenovo ThinkSystem SR630 V3, 2x Xeon Silver 4410Y, 128GB",
+        "note": "Lenovo offered in place of the referenced OEM."
+      },
+      "13": {
+        "status": "quoted",
+        "price": 18900,
+        "uom": "kit",
+        "ccy": "INR",
+        "note": "Kit of 2x16GB as specified."
+      },
+      "14": {
+        "status": "quoted",
+        "price": 66500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "15": {
+        "status": "quoted",
+        "price": 838000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "16": {
+        "status": "quoted",
+        "price": 402000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "17": {
+        "status": "quoted",
+        "price": 21400,
+        "uom": "pack of 5",
+        "ccy": "INR"
+      },
+      "18": {
+        "status": "quoted",
+        "price": 191500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "19": {
+        "status": "substituted",
+        "price": 438000,
+        "uom": "nos",
+        "ccy": "INR",
+        "offered": "Aruba CX 8325-32C, 32x 100G (down-linked to 10G)",
+        "note": "Higher port class offered; commercially closest available."
+      },
+      "20": {
+        "status": "quoted",
+        "price": 41200,
+        "uom": "box of 10",
+        "ccy": "INR"
+      },
+      "21": {
+        "status": "quoted",
+        "price": 27900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "22": {
+        "status": "moq_adjusted",
+        "price": 14200,
+        "uom": "box of 50",
+        "ccy": "INR",
+        "qty_override": 20,
+        "note": "MOQ 20 boxes on Cat6A. Quoting 20 against 14 asked."
+      },
+      "23": {
+        "status": "quoted",
+        "price": 76500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "24": {
+        "status": "quoted",
+        "price": 309000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "25": {
+        "status": "quoted",
+        "price": 66200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "26": {
+        "status": "substituted",
+        "price": 139000,
+        "uom": "nos",
+        "ccy": "INR",
+        "offered": "Kyocera TASKalfa 4004i, A3 mono, 40ppm",
+        "note": "40ppm offered against 50ppm asked."
+      },
+      "27": {
+        "status": "quoted",
+        "price": 9150,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "28": {
+        "status": "quoted",
+        "price": 50400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "29": {
+        "status": "quoted",
+        "price": 45800,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "30": {
+        "status": "quoted",
+        "price": 6650,
+        "uom": "nos",
+        "ccy": "INR"
+      }
+    },
+    "V2": {
+      "1": {
+        "status": "downgraded",
+        "price": 59900,
+        "uom": "nos",
+        "ccy": "INR",
+        "note": "1-year standard warranty only. 3-year onsite uplift quoted at line 30A.",
+        "scope_uplift_ref": "30A",
+        "scope_uplift_note": "years 1-3 onsite cover, to match the 3-year term asked"
+      },
+      "2": {
+        "status": "downgraded",
+        "price": 105800,
+        "uom": "nos",
+        "ccy": "INR",
+        "note": "1-year standard warranty only. See line 30A.",
+        "scope_uplift_ref": "30A",
+        "scope_uplift_note": "years 1-3 onsite cover, to match the 3-year term asked"
+      },
+      "3": {
+        "status": "downgraded",
+        "price": 86400,
+        "uom": "nos",
+        "ccy": "INR",
+        "note": "1-year standard warranty only. See line 30A.",
+        "scope_uplift_ref": "30A",
+        "scope_uplift_note": "years 1-3 onsite cover, to match the 3-year term asked"
+      },
+      "4": {
+        "status": "quoted",
+        "price": 40200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 9700,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "quoted",
+        "price": 20400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "7": {
+        "status": "quoted",
+        "price": 12850,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1520,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1910,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "10": {
+        "status": "quoted",
+        "price": 3040,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "11": {
+        "status": "quoted",
+        "price": 2820,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "12": {
+        "status": "quoted",
+        "price": 6180,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "Ex-works Singapore. Duty and freight to buyer's account."
+      },
+      "13": {
+        "status": "quoted",
+        "price": 198,
+        "uom": "kit",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "14": {
+        "status": "quoted",
+        "price": 735,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "15": {
+        "status": "quoted",
+        "price": 8840,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "16": {
+        "status": "quoted",
+        "price": 4420,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "17": {
+        "status": "quoted",
+        "price": 232,
+        "uom": "pack of 5",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "18": {
+        "status": "quoted",
+        "price": 2090,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "19": {
+        "status": "quoted",
+        "price": 4980,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "20": {
+        "status": "quoted",
+        "price": 452,
+        "uom": "box of 10",
+        "ccy": "USD",
+        "note": "Ex-works Singapore."
+      },
+      "21": {
+        "status": "quoted",
+        "price": 29400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "22": {
+        "status": "quoted",
+        "price": 15100,
+        "uom": "box of 50",
+        "ccy": "INR"
+      },
+      "23": {
+        "status": "quoted",
+        "price": 81000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "24": {
+        "status": "not_quoted",
+        "note": "Not our line of business - regret."
+      },
+      "25": {
+        "status": "not_quoted",
+        "note": "Not our line of business - regret."
+      },
+      "26": {
+        "status": "quoted",
+        "price": 151000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "27": {
+        "status": "quoted",
+        "price": 9600,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "28": {
+        "status": "quoted",
+        "price": 53500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "29": {
+        "status": "not_quoted",
+        "note": "Not our line of business - regret."
+      },
+      "30": {
+        "status": "quoted",
+        "price": 4200,
+        "uom": "nos",
+        "ccy": "INR",
+        "note": "Years 4-5 only, as asked."
+      },
+      "30A": {
+        "status": "unmapped",
+        "price": 7900,
+        "uom": "nos",
+        "ccy": "INR",
+        "qty": 175,
+        "desc": "Warranty uplift years 1-3, onsite NBD, laptop lines 1-3",
+        "note": "Not an RFx line. Vendor-created. Without it, lines 1-3 are 1-year cover and are not comparable to other bids."
+      }
+    },
+    "V3": {
+      "1": {
+        "status": "downgraded",
+        "price": 58200,
+        "uom": "nos",
+        "ccy": "INR",
+        "offered": "8GB DDR5 as standard, upgradeable to 16GB",
+        "note": "8GB against 16GB asked. Upgrade to 16GB quoted at Rs 3,400 per unit."
+      },
+      "2": {
+        "status": "quoted",
+        "price": 109500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "3": {
+        "status": "quoted",
+        "price": 92400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "4": {
+        "status": "quoted",
+        "price": 38900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 9250,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "quoted",
+        "price": 21100,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "7": {
+        "status": "bundled",
+        "price": 13400,
+        "uom": "nos",
+        "ccy": "INR",
+        "qty_override": 128,
+        "note": "One docking station free with every ten laptops. 12 free against 120 business laptops, so 128 chargeable against 140 asked."
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1320,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1690,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "10": {
+        "status": "quoted",
+        "price": 2950,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "11": {
+        "status": "quoted",
+        "price": 2680,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "12": {
+        "status": "quoted",
+        "price": 571000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "13": {
+        "status": "quoted",
+        "price": 19200,
+        "uom": "kit",
+        "ccy": "INR"
+      },
+      "14": {
+        "status": "quoted",
+        "price": 69500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "15": {
+        "status": "omitted"
+      },
+      "16": {
+        "status": "omitted"
+      },
+      "17": {
+        "status": "omitted"
+      },
+      "18": {
+        "status": "quoted",
+        "price": 197000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "19": {
+        "status": "quoted",
+        "price": 471000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "20": {
+        "status": "quoted",
+        "price": 43500,
+        "uom": "box of 10",
+        "ccy": "INR"
+      },
+      "21": {
+        "status": "quoted",
+        "price": 27200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "22": {
+        "status": "quoted",
+        "price": 13900,
+        "uom": "box of 50",
+        "ccy": "INR"
+      },
+      "23": {
+        "status": "quoted",
+        "price": 74000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "24": {
+        "status": "quoted",
+        "price": 298000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "25": {
+        "status": "quoted",
+        "price": 64500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "26": {
+        "status": "quoted",
+        "price": 142000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "27": {
+        "status": "quoted",
+        "price": 8850,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "28": {
+        "status": "quoted",
+        "price": 49800,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "29": {
+        "status": "quoted",
+        "price": 44200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "30": {
+        "status": "quoted",
+        "price": 0,
+        "uom": "nos",
+        "ccy": "INR",
+        "note": "'Extended cover to five years is included in our laptop prices at no additional charge.' Zero-price line, not a missing line."
+      }
+    },
+    "V4": {
+      "1": {
+        "status": "quoted",
+        "price": 57900,
+        "uom": "nos",
+        "ccy": "INR",
+        "handwritten": true,
+        "printed_price": 59500,
+        "note": "Printed 59,500 struck through, 57,900 written in pen."
+      },
+      "2": {
+        "status": "quoted",
+        "price": 99500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "3": {
+        "status": "quoted",
+        "price": 84000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "4": {
+        "status": "quoted",
+        "price": 37200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 8950,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "illegible",
+        "printed_price": 19800,
+        "note": "Glare across the cell. A price is clearly present and cannot be read."
+      },
+      "7": {
+        "status": "quoted",
+        "price": 12400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1180,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1540,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "10": {
+        "status": "quoted",
+        "price": 2870,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "11": {
+        "status": "quoted",
+        "price": 2490,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "12": {
+        "status": "quoted",
+        "price": 524000,
+        "uom": "nos",
+        "ccy": "INR",
+        "handwritten": true,
+        "printed_price": 536000,
+        "note": "Printed 5,36,000 struck through, 5,24,000 written in pen."
+      },
+      "13": {
+        "status": "uom_mismatch",
+        "price": 9600,
+        "uom": "per DIMM",
+        "ccy": "INR",
+        "note": "Quoted per 16GB DIMM. Two DIMMs make the asked kit."
+      },
+      "14": {
+        "status": "quoted",
+        "price": 63500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "15": {
+        "status": "omitted"
+      },
+      "16": {
+        "status": "omitted"
+      },
+      "17": {
+        "status": "omitted"
+      },
+      "18": {
+        "status": "quoted",
+        "price": 184000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "19": {
+        "status": "omitted"
+      },
+      "20": {
+        "status": "uom_mismatch",
+        "price": 4150,
+        "uom": "per pc",
+        "ccy": "INR",
+        "note": "Quoted per transceiver. Ten make the asked box."
+      },
+      "21": {
+        "status": "quoted",
+        "price": 26400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "22": {
+        "status": "uom_mismatch",
+        "price": 268,
+        "uom": "per pc",
+        "ccy": "INR",
+        "note": "Quoted per patch cord. Fifty make the asked box."
+      },
+      "23": {
+        "status": "omitted"
+      },
+      "24": {
+        "status": "omitted"
+      },
+      "25": {
+        "status": "quoted",
+        "price": 61800,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "26": {
+        "status": "omitted"
+      },
+      "27": {
+        "status": "quoted",
+        "price": 8400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "28": {
+        "status": "quoted",
+        "price": 47500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "29": {
+        "status": "quoted",
+        "price": 41900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "30": {
+        "status": "omitted"
+      }
+    },
+    "V5": {
+      "1": {
+        "status": "quoted",
+        "price": 61200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "2": {
+        "status": "quoted",
+        "price": 107500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "relative",
+        "basis": "prior_po",
+        "ref_sku": "MON-24",
+        "note": "'monitors and docks same as our March PO rates'"
+      },
+      "7": {
+        "status": "relative",
+        "basis": "prior_po",
+        "ref_sku": "DOCK-USBC",
+        "note": "'monitors and docks same as our March PO rates'"
+      },
+      "18": {
+        "status": "relative",
+        "basis": "prior_po_uplift",
+        "ref_sku": "SW-48P",
+        "uplift_pct": 6.0,
+        "note": "'switches +6% over last year'"
+      },
+      "_default": {
+        "status": "match_rival",
+        "rival": "V1",
+        "note": "'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+      }
+    }
+  }
+}

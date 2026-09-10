@@ -1,0 +1,305 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  /* 0.556 cleared 4.5:1 on pure white and failed on every tinted surface in
+     the grid (4.28 to 4.46). Secondary text on this screen is where the
+     caveats live, so it is darkened until it passes on the tints too. */
+  --muted-foreground: oklch(0.52 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+/* ---------------------------------------------------------------------------
+   Cell states.
+
+   Three states, never two, and they must be distinguishable without relying on
+   colour alone: a buyer scanning 150 cells has to be able to read the grid's
+   trustworthiness from across the room, and roughly one man in twelve cannot
+   separate the red from the green.
+
+     trusted   solid, normal weight, plain background
+     review    amber left rule + tint      -> a person is needed here
+     empty     diagonal hatch, no number   -> no number exists to show
+
+   Statuses collapse onto those three for display only. The underlying status
+   stays specific (omitted vs declined vs unreadable) because they lead to
+   different actions.
+--------------------------------------------------------------------------- */
+
+:root {
+  /* Text weight, not just a stripe. This colour is used for the "?" and "!"
+     glyphs, which are the marks that say the system is NOT SURE. At
+     oklch(0.72 ...) they measured 2.34:1 on their own tint, i.e. the least
+     legible thing on a screen whose whole claim is that it shows you what it
+     does not know. Darkened to clear 4.5:1 as text; the stripe and the fill
+     below are unchanged, so the grid's colour temperature is the same. */
+  --cell-review: oklch(0.53 0.14 60);
+  --cell-review-stripe: oklch(0.72 0.15 70);
+  --cell-review-bg: oklch(0.97 0.03 85);
+  --cell-caveat: oklch(0.58 0.19 25);
+  --cell-caveat-bg: oklch(0.97 0.02 25);
+  --cell-empty: oklch(0.92 0 0);
+  --grid-line: oklch(0.91 0 0);
+  --grid-head: oklch(0.975 0 0);
+}
+
+.dark {
+  --cell-review: oklch(0.84 0.13 78);
+  --cell-review-stripe: oklch(0.78 0.14 75);
+  --cell-review-bg: oklch(0.27 0.04 75);
+  --cell-caveat: oklch(0.68 0.17 25);
+  --cell-caveat-bg: oklch(0.26 0.04 25);
+  --cell-empty: oklch(0.28 0 0);
+  --grid-line: oklch(0.28 0 0);
+  --grid-head: oklch(0.19 0 0);
+}
+
+/* Tabular numerals so digits line up column-wise. Non-negotiable in a price
+   grid: proportional figures make 41,200 and 11,900 impossible to compare by
+   eye. */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+
+.cell-review {
+  background: var(--cell-review-bg);
+  box-shadow: inset 2px 0 0 var(--cell-review-stripe);
+}
+
+.cell-caveat {
+  background: var(--cell-caveat-bg);
+  box-shadow: inset 2px 0 0 var(--cell-caveat);
+}
+
+.cell-empty {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--cell-empty) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+/* The dense half of the mix: tight rows, hairline rules, sticky header and
+   first column so line identity survives a horizontal scroll. */
+.grid-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+.grid-table th,
+.grid-table td {
+  border-bottom: 1px solid var(--grid-line);
+  padding: 0 8px;
+  height: 30px;
+  white-space: nowrap;
+}
+
+.grid-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--grid-head);
+  border-bottom: 1px solid var(--grid-line);
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Hover must not erase the cell state.
+   Painting an opaque accent over every cell in the row wiped the amber and red
+   tints exactly when the buyer was pointing at them. A translucent overlay
+   keeps the state visible underneath. */
+.grid-table tbody tr:hover td {
+  box-shadow: inset 0 0 0 999px color-mix(in oklch, var(--accent) 32%, transparent);
+}
+
+.grid-table tbody tr:hover td.cell-review {
+  box-shadow:
+    inset 2px 0 0 var(--cell-review-stripe),
+    inset 0 0 0 999px color-mix(in oklch, var(--accent) 32%, transparent);
+}
+
+.grid-table tbody tr:hover td.cell-caveat {
+  box-shadow:
+    inset 2px 0 0 var(--cell-caveat),
+    inset 0 0 0 999px color-mix(in oklch, var(--accent) 32%, transparent);
+}
+
+/* A value the calculator changed: quiet, but never invisible. The unit traps
+   are the most important thing on this grid and they were rendering as
+   ordinary numbers. */
+.cell-normalised {
+  background-image: linear-gradient(
+    to top,
+    color-mix(in oklch, var(--cell-review) 22%, transparent) 0 2px,
+    transparent 2px
+  );
+}
+
+.col-sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--background);
+  border-right: 1px solid var(--grid-line);
+}
+
+.grid-table thead .col-sticky {
+  z-index: 4;
+  background: var(--grid-head);
+}
+
+.grid-table tbody tr:hover .col-sticky {
+  background-color: color-mix(in oklch, var(--accent) 55%, var(--background));
+}
+
+.group-row td {
+  background: color-mix(in oklch, var(--muted) 70%, transparent);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  height: 24px;
+  color: var(--muted-foreground);
+}
+
+/*
+ * A visible focus indicator on everything focusable, by default.
+ *
+ * Eight controls on the trust bar and the tab strip had none: keyboard users
+ * could reach them and could not see where they were. Fixed here rather than on
+ * each button, because the per-component version is a rule somebody forgets on
+ * the ninth button. Anything that sets its own ring still wins, since this only
+ * applies where no outline has been declared.
+ *
+ * :focus-visible, not :focus, so a mouse click does not leave a ring behind.
+ */
+:where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"]), [role="button"]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

@@ -1,0 +1,2418 @@
+{
+  "generated": "2026-09-10",
+  "warning": "ORACLE FILE. The prototype must never read this at runtime. It exists to score extraction accuracy and to prove the demo is not scripted.",
+  "basis": "Computed over the FIRST quotation on file from each supplier. Zenith later sent a revised quotation (ZIS/NBR/2026/1184-R2) which is also in the corpus and which sharpens lines 1, 5 and 7. Loading it is a deliberate demo step, and the app is expected to move the headline when it lands: qualified-only Rs 4.07 cr -> Rs 4.04 cr, cost of compliance Rs 18.6 L (4.8%) -> Rs 15.7 L (4.0%). Deciding which quotation counts is the system's problem, so the answer key is deliberately pinned to Rev 1 and the movement is the thing being demonstrated.",
+  "rfx": "RFX-2026-0142",
+  "baseline_total_inr": 42740500,
+  "assumptions": {
+    "fx_usd_inr": {
+      "value": 88.4,
+      "source": "Vendor V2's own stated reference rate, quote page 1",
+      "alternative": "RBI reference rate on bid-due date",
+      "note": "V2's terms say conversion happens at the rate on the INVOICE date, not the bid date. Any INR total for V2 is therefore an estimate, not an offer. The buyer sees this wherever a V2 total is shown.",
+      "confidence": "stated by vendor, not independently verified"
+    },
+    "compare_qty": {
+      "value": "RFx asked quantity",
+      "source": "RFx line table",
+      "note": "Where a vendor quoted a different quantity (V1 MOQ 20 boxes, V3 128 docks), the unit rate is applied to the ASKED quantity so lines stay comparable. The quantity difference is carried as a separate flag, not silently absorbed."
+    },
+    "v2_warranty_basis": {
+      "value": "include line 30A uplift in lines 1-3",
+      "source": "V2 quote note on lines 1-3 plus vendor-created line 30A",
+      "alternative": "exclude 30A and compare 1-year cover against 3-year cover",
+      "note": "V2's laptops carry 1-year cover. Every other bid carries 3-year. Comparing them without the uplift understates V2 by Rs 7,900 per laptop."
+    },
+    "v2_footnote_discount": {
+      "value": "EXCLUDED from the ranked comparison",
+      "source": "V2 quote, footnote 3, page 2",
+      "alternative": "include 4.5% on OEM-branded lines",
+      "note": "Conditional on a deal-registration approval V2 does not hold yet. Shown to the buyer as a named upside scenario, never folded into the headline number."
+    },
+    "v4_early_po_discount": {
+      "value": "EXCLUDED from the ranked comparison",
+      "source": "V4 rate card, handwritten and circled",
+      "note": "Conditional on a PO by 25 Sep, which is before the internal approval cycle can close. Treated as unavailable rather than as a price."
+    },
+    "v1_total_discount": {
+      "value": "APPLIED at total level only",
+      "source": "V1 quote, grand total block",
+      "note": "2.5% on order value, not attributable to any line. It cannot be used in per-line ranking. It is applied only to a whole-of-V1 award total, and the system says so wherever the two disagree."
+    },
+    "tax_basis": {
+      "value": "ex-GST throughout",
+      "source": "RFx tax instruction",
+      "note": "V3 said 'taxes as applicable' and V4 wrote '+ GST' with no rate. Both are READ AS ex-GST. That is an assumption, not a finding, and it is flagged on both vendors.",
+      "confidence": "assumed - vendor did not state a rate"
+    },
+    "freight_duty": {
+      "value": "EXCLUDED from all totals",
+      "source": "RFx asked FOR destination; V2 quoted ex-works Singapore",
+      "note": "V2's imported lines exclude customs duty and freight, which the buyer bears. No duty rate is assumed. V2's datacentre lines are therefore NOT directly comparable and are marked as such rather than silently ranked.",
+      "confidence": "known gap - deliberately not estimated"
+    }
+  },
+  "uom_conversions": {
+    "per DIMM -> kit": {
+      "factor": 2,
+      "basis": "One asked kit = 2x 16GB DIMMs, from the RFx line spec"
+    },
+    "per pc -> box of 10": {
+      "factor": 10,
+      "basis": "One asked box = 10 transceivers, from the RFx line spec"
+    },
+    "per pc -> box of 50": {
+      "factor": 50,
+      "basis": "One asked box = 50 patch cords, from the RFx line spec"
+    }
+  },
+  "qualification": {
+    "V1": {
+      "qualified": true,
+      "failed_mandatory": []
+    },
+    "V2": {
+      "qualified": true,
+      "failed_mandatory": []
+    },
+    "V3": {
+      "qualified": false,
+      "failed_mandatory": [
+        "Q5",
+        "Q6",
+        "Q7"
+      ]
+    },
+    "V4": {
+      "qualified": false,
+      "failed_mandatory": [
+        "Q1",
+        "Q2",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7"
+      ]
+    },
+    "V5": {
+      "qualified": false,
+      "failed_mandatory": [
+        "Q1",
+        "Q2",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7"
+      ]
+    }
+  },
+  "cells": {
+    "V1": {
+      "1": {
+        "status": "comparable",
+        "unit_inr": 62800,
+        "flags": [],
+        "trace": [
+          "raw: INR 62,800 per nos",
+          "landed: Rs 62,800 per nos, ex-GST"
+        ],
+        "extended_inr": 7536000
+      },
+      "2": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 104500,
+        "flags": [
+          "substitution: HP ProBook 445 G11, Ryzen 7 7735U, 32GB, 1TB"
+        ],
+        "trace": [
+          "raw: INR 104,500 per nos",
+          "landed: Rs 104,500 per nos, ex-GST"
+        ],
+        "extended_inr": 3135000
+      },
+      "3": {
+        "status": "comparable",
+        "unit_inr": 91200,
+        "flags": [],
+        "trace": [
+          "raw: INR 91,200 per nos",
+          "landed: Rs 91,200 per nos, ex-GST"
+        ],
+        "extended_inr": 2280000
+      },
+      "4": {
+        "status": "comparable",
+        "unit_inr": 39800,
+        "flags": [],
+        "trace": [
+          "raw: INR 39,800 per nos",
+          "landed: Rs 39,800 per nos, ex-GST"
+        ],
+        "extended_inr": 1592000
+      },
+      "5": {
+        "status": "comparable",
+        "unit_inr": 9450,
+        "flags": [],
+        "trace": [
+          "raw: INR 9,450 per nos",
+          "landed: Rs 9,450 per nos, ex-GST"
+        ],
+        "extended_inr": 1512000
+      },
+      "6": {
+        "status": "comparable",
+        "unit_inr": 20900,
+        "flags": [],
+        "trace": [
+          "raw: INR 20,900 per nos",
+          "landed: Rs 20,900 per nos, ex-GST"
+        ],
+        "extended_inr": 940500
+      },
+      "7": {
+        "status": "comparable",
+        "unit_inr": 13100,
+        "flags": [],
+        "trace": [
+          "raw: INR 13,100 per nos",
+          "landed: Rs 13,100 per nos, ex-GST"
+        ],
+        "extended_inr": 1834000
+      },
+      "8": {
+        "status": "comparable",
+        "unit_inr": 1390,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,390 per nos",
+          "landed: Rs 1,390 per nos, ex-GST"
+        ],
+        "extended_inr": 236300
+      },
+      "9": {
+        "status": "comparable",
+        "unit_inr": 1780,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,780 per nos",
+          "landed: Rs 1,780 per nos, ex-GST"
+        ],
+        "extended_inr": 356000
+      },
+      "10": {
+        "status": "comparable",
+        "unit_inr": 3080,
+        "flags": [],
+        "trace": [
+          "raw: INR 3,080 per nos",
+          "landed: Rs 3,080 per nos, ex-GST"
+        ],
+        "extended_inr": 523600
+      },
+      "11": {
+        "status": "comparable",
+        "unit_inr": 2760,
+        "flags": [],
+        "trace": [
+          "raw: INR 2,760 per nos",
+          "landed: Rs 2,760 per nos, ex-GST"
+        ],
+        "extended_inr": 220800
+      },
+      "12": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 548000,
+        "flags": [
+          "substitution: Lenovo ThinkSystem SR630 V3, 2x Xeon Silver 4410Y, 128GB"
+        ],
+        "trace": [
+          "raw: INR 548,000 per nos",
+          "landed: Rs 548,000 per nos, ex-GST"
+        ],
+        "extended_inr": 3288000
+      },
+      "13": {
+        "status": "comparable",
+        "unit_inr": 18900,
+        "flags": [
+          "Kit of 2x16GB as specified."
+        ],
+        "trace": [
+          "raw: INR 18,900 per kit",
+          "landed: Rs 18,900 per kit, ex-GST"
+        ],
+        "extended_inr": 453600
+      },
+      "14": {
+        "status": "comparable",
+        "unit_inr": 66500,
+        "flags": [],
+        "trace": [
+          "raw: INR 66,500 per nos",
+          "landed: Rs 66,500 per nos, ex-GST"
+        ],
+        "extended_inr": 1596000
+      },
+      "15": {
+        "status": "comparable",
+        "unit_inr": 838000,
+        "flags": [],
+        "trace": [
+          "raw: INR 838,000 per nos",
+          "landed: Rs 838,000 per nos, ex-GST"
+        ],
+        "extended_inr": 1676000
+      },
+      "16": {
+        "status": "comparable",
+        "unit_inr": 402000,
+        "flags": [],
+        "trace": [
+          "raw: INR 402,000 per nos",
+          "landed: Rs 402,000 per nos, ex-GST"
+        ],
+        "extended_inr": 804000
+      },
+      "17": {
+        "status": "comparable",
+        "unit_inr": 21400,
+        "flags": [],
+        "trace": [
+          "raw: INR 21,400 per pack of 5",
+          "landed: Rs 21,400 per pack of 5, ex-GST"
+        ],
+        "extended_inr": 256800
+      },
+      "18": {
+        "status": "comparable",
+        "unit_inr": 191500,
+        "flags": [],
+        "trace": [
+          "raw: INR 191,500 per nos",
+          "landed: Rs 191,500 per nos, ex-GST"
+        ],
+        "extended_inr": 2681000
+      },
+      "19": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 438000,
+        "flags": [
+          "substitution: Aruba CX 8325-32C, 32x 100G (down-linked to 10G)"
+        ],
+        "trace": [
+          "raw: INR 438,000 per nos",
+          "landed: Rs 438,000 per nos, ex-GST"
+        ],
+        "extended_inr": 1752000
+      },
+      "20": {
+        "status": "comparable",
+        "unit_inr": 41200,
+        "flags": [],
+        "trace": [
+          "raw: INR 41,200 per box of 10",
+          "landed: Rs 41,200 per box of 10, ex-GST"
+        ],
+        "extended_inr": 247200
+      },
+      "21": {
+        "status": "comparable",
+        "unit_inr": 27900,
+        "flags": [],
+        "trace": [
+          "raw: INR 27,900 per nos",
+          "landed: Rs 27,900 per nos, ex-GST"
+        ],
+        "extended_inr": 1534500
+      },
+      "22": {
+        "status": "comparable",
+        "unit_inr": 14200,
+        "flags": [
+          "vendor quoted 20 box of 50 against 14 asked; rate applied to asked quantity",
+          "MOQ 20 boxes on Cat6A. Quoting 20 against 14 asked."
+        ],
+        "trace": [
+          "raw: INR 14,200 per box of 50",
+          "landed: Rs 14,200 per box of 50, ex-GST"
+        ],
+        "extended_inr": 198800
+      },
+      "23": {
+        "status": "comparable",
+        "unit_inr": 76500,
+        "flags": [],
+        "trace": [
+          "raw: INR 76,500 per nos",
+          "landed: Rs 76,500 per nos, ex-GST"
+        ],
+        "extended_inr": 229500
+      },
+      "24": {
+        "status": "comparable",
+        "unit_inr": 309000,
+        "flags": [],
+        "trace": [
+          "raw: INR 309,000 per nos",
+          "landed: Rs 309,000 per nos, ex-GST"
+        ],
+        "extended_inr": 927000
+      },
+      "25": {
+        "status": "comparable",
+        "unit_inr": 66200,
+        "flags": [],
+        "trace": [
+          "raw: INR 66,200 per nos",
+          "landed: Rs 66,200 per nos, ex-GST"
+        ],
+        "extended_inr": 529600
+      },
+      "26": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 139000,
+        "flags": [
+          "substitution: Kyocera TASKalfa 4004i, A3 mono, 40ppm"
+        ],
+        "trace": [
+          "raw: INR 139,000 per nos",
+          "landed: Rs 139,000 per nos, ex-GST"
+        ],
+        "extended_inr": 1112000
+      },
+      "27": {
+        "status": "comparable",
+        "unit_inr": 9150,
+        "flags": [],
+        "trace": [
+          "raw: INR 9,150 per nos",
+          "landed: Rs 9,150 per nos, ex-GST"
+        ],
+        "extended_inr": 823500
+      },
+      "28": {
+        "status": "comparable",
+        "unit_inr": 50400,
+        "flags": [],
+        "trace": [
+          "raw: INR 50,400 per nos",
+          "landed: Rs 50,400 per nos, ex-GST"
+        ],
+        "extended_inr": 1260000
+      },
+      "29": {
+        "status": "comparable",
+        "unit_inr": 45800,
+        "flags": [],
+        "trace": [
+          "raw: INR 45,800 per nos",
+          "landed: Rs 45,800 per nos, ex-GST"
+        ],
+        "extended_inr": 824400
+      },
+      "30": {
+        "status": "comparable",
+        "unit_inr": 6650,
+        "flags": [],
+        "trace": [
+          "raw: INR 6,650 per nos",
+          "landed: Rs 6,650 per nos, ex-GST"
+        ],
+        "extended_inr": 1130500
+      }
+    },
+    "V2": {
+      "1": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 67800,
+        "flags": [
+          "scope: +Rs 7,900 for years 1-3 onsite cover, to match the 3-year term asked (supplier's own line 30A), added so this is comparable with bids that include it",
+          "1-year standard warranty only. 3-year onsite uplift quoted at line 30A."
+        ],
+        "trace": [
+          "raw: INR 59,900 per nos",
+          "scope: +Rs 7,900 (line 30A) -> Rs 67,800",
+          "landed: Rs 67,800 per nos, ex-GST"
+        ],
+        "extended_inr": 8136000
+      },
+      "2": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 113700,
+        "flags": [
+          "scope: +Rs 7,900 for years 1-3 onsite cover, to match the 3-year term asked (supplier's own line 30A), added so this is comparable with bids that include it",
+          "1-year standard warranty only. See line 30A."
+        ],
+        "trace": [
+          "raw: INR 105,800 per nos",
+          "scope: +Rs 7,900 (line 30A) -> Rs 113,700",
+          "landed: Rs 113,700 per nos, ex-GST"
+        ],
+        "extended_inr": 3411000
+      },
+      "3": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 94300,
+        "flags": [
+          "scope: +Rs 7,900 for years 1-3 onsite cover, to match the 3-year term asked (supplier's own line 30A), added so this is comparable with bids that include it",
+          "1-year standard warranty only. See line 30A."
+        ],
+        "trace": [
+          "raw: INR 86,400 per nos",
+          "scope: +Rs 7,900 (line 30A) -> Rs 94,300",
+          "landed: Rs 94,300 per nos, ex-GST"
+        ],
+        "extended_inr": 2357500
+      },
+      "4": {
+        "status": "comparable",
+        "unit_inr": 40200,
+        "flags": [],
+        "trace": [
+          "raw: INR 40,200 per nos",
+          "landed: Rs 40,200 per nos, ex-GST"
+        ],
+        "extended_inr": 1608000
+      },
+      "5": {
+        "status": "comparable",
+        "unit_inr": 9700,
+        "flags": [],
+        "trace": [
+          "raw: INR 9,700 per nos",
+          "landed: Rs 9,700 per nos, ex-GST"
+        ],
+        "extended_inr": 1552000
+      },
+      "6": {
+        "status": "comparable",
+        "unit_inr": 20400,
+        "flags": [],
+        "trace": [
+          "raw: INR 20,400 per nos",
+          "landed: Rs 20,400 per nos, ex-GST"
+        ],
+        "extended_inr": 918000
+      },
+      "7": {
+        "status": "comparable",
+        "unit_inr": 12850,
+        "flags": [],
+        "trace": [
+          "raw: INR 12,850 per nos",
+          "landed: Rs 12,850 per nos, ex-GST"
+        ],
+        "extended_inr": 1799000
+      },
+      "8": {
+        "status": "comparable",
+        "unit_inr": 1520,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,520 per nos",
+          "landed: Rs 1,520 per nos, ex-GST"
+        ],
+        "extended_inr": 258400
+      },
+      "9": {
+        "status": "comparable",
+        "unit_inr": 1910,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,910 per nos",
+          "landed: Rs 1,910 per nos, ex-GST"
+        ],
+        "extended_inr": 382000
+      },
+      "10": {
+        "status": "comparable",
+        "unit_inr": 3040,
+        "flags": [],
+        "trace": [
+          "raw: INR 3,040 per nos",
+          "landed: Rs 3,040 per nos, ex-GST"
+        ],
+        "extended_inr": 516800
+      },
+      "11": {
+        "status": "comparable",
+        "unit_inr": 2820,
+        "flags": [],
+        "trace": [
+          "raw: INR 2,820 per nos",
+          "landed: Rs 2,820 per nos, ex-GST"
+        ],
+        "extended_inr": 225600
+      },
+      "12": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 546312,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore. Duty and freight to buyer's account."
+        ],
+        "trace": [
+          "raw: USD 6,180 per nos",
+          "FX: x88.4 -> INR 546,312  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 546,312 per nos, ex-GST"
+        ],
+        "extended_inr": 3277872
+      },
+      "13": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 17503,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 198 per kit",
+          "FX: x88.4 -> INR 17,503  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 17,503 per kit, ex-GST"
+        ],
+        "extended_inr": 420072
+      },
+      "14": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 64974,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 735 per nos",
+          "FX: x88.4 -> INR 64,974  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 64,974 per nos, ex-GST"
+        ],
+        "extended_inr": 1559376
+      },
+      "15": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 781456,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 8,840 per nos",
+          "FX: x88.4 -> INR 781,456  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 781,456 per nos, ex-GST"
+        ],
+        "extended_inr": 1562912
+      },
+      "16": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 390728,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 4,420 per nos",
+          "FX: x88.4 -> INR 390,728  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 390,728 per nos, ex-GST"
+        ],
+        "extended_inr": 781456
+      },
+      "17": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 20509,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 232 per pack of 5",
+          "FX: x88.4 -> INR 20,509  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 20,509 per pack of 5, ex-GST"
+        ],
+        "extended_inr": 246108
+      },
+      "18": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 184756,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 2,090 per nos",
+          "FX: x88.4 -> INR 184,756  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 184,756 per nos, ex-GST"
+        ],
+        "extended_inr": 2586584
+      },
+      "19": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 440232,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 4,980 per nos",
+          "FX: x88.4 -> INR 440,232  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 440,232 per nos, ex-GST"
+        ],
+        "extended_inr": 1760928
+      },
+      "20": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 39957,
+        "flags": [
+          "ex-works: customs duty and inbound freight are excluded and fall on you, so this is NOT a delivered cost and is not directly comparable with a FOR-destination price",
+          "converted from USD at 88.4 (vendor's own stated reference rate)",
+          "Ex-works Singapore."
+        ],
+        "trace": [
+          "raw: USD 452 per box of 10",
+          "FX: x88.4 -> INR 39,957  [Vendor V2's own stated reference rate, quote page 1]",
+          "landed: Rs 39,957 per box of 10, ex-GST"
+        ],
+        "extended_inr": 239742
+      },
+      "21": {
+        "status": "comparable",
+        "unit_inr": 29400,
+        "flags": [],
+        "trace": [
+          "raw: INR 29,400 per nos",
+          "landed: Rs 29,400 per nos, ex-GST"
+        ],
+        "extended_inr": 1617000
+      },
+      "22": {
+        "status": "comparable",
+        "unit_inr": 15100,
+        "flags": [],
+        "trace": [
+          "raw: INR 15,100 per box of 50",
+          "landed: Rs 15,100 per box of 50, ex-GST"
+        ],
+        "extended_inr": 211400
+      },
+      "23": {
+        "status": "comparable",
+        "unit_inr": 81000,
+        "flags": [],
+        "trace": [
+          "raw: INR 81,000 per nos",
+          "landed: Rs 81,000 per nos, ex-GST"
+        ],
+        "extended_inr": 243000
+      },
+      "24": {
+        "status": "declined",
+        "unit_inr": null,
+        "flags": [
+          "vendor explicitly declined this line"
+        ],
+        "trace": [
+          "Not our line of business - regret."
+        ]
+      },
+      "25": {
+        "status": "declined",
+        "unit_inr": null,
+        "flags": [
+          "vendor explicitly declined this line"
+        ],
+        "trace": [
+          "Not our line of business - regret."
+        ]
+      },
+      "26": {
+        "status": "comparable",
+        "unit_inr": 151000,
+        "flags": [],
+        "trace": [
+          "raw: INR 151,000 per nos",
+          "landed: Rs 151,000 per nos, ex-GST"
+        ],
+        "extended_inr": 1208000
+      },
+      "27": {
+        "status": "comparable",
+        "unit_inr": 9600,
+        "flags": [],
+        "trace": [
+          "raw: INR 9,600 per nos",
+          "landed: Rs 9,600 per nos, ex-GST"
+        ],
+        "extended_inr": 864000
+      },
+      "28": {
+        "status": "comparable",
+        "unit_inr": 53500,
+        "flags": [],
+        "trace": [
+          "raw: INR 53,500 per nos",
+          "landed: Rs 53,500 per nos, ex-GST"
+        ],
+        "extended_inr": 1337500
+      },
+      "29": {
+        "status": "declined",
+        "unit_inr": null,
+        "flags": [
+          "vendor explicitly declined this line"
+        ],
+        "trace": [
+          "Not our line of business - regret."
+        ]
+      },
+      "30": {
+        "status": "comparable",
+        "unit_inr": 4200,
+        "flags": [
+          "Years 4-5 only, as asked."
+        ],
+        "trace": [
+          "raw: INR 4,200 per nos",
+          "landed: Rs 4,200 per nos, ex-GST"
+        ],
+        "extended_inr": 714000
+      }
+    },
+    "V3": {
+      "1": {
+        "status": "comparable_with_caveat",
+        "unit_inr": 58200,
+        "flags": [
+          "below spec: 8GB DDR5 as standard, upgradeable to 16GB",
+          "8GB against 16GB asked. Upgrade to 16GB quoted at Rs 3,400 per unit."
+        ],
+        "trace": [
+          "raw: INR 58,200 per nos",
+          "landed: Rs 58,200 per nos, ex-GST"
+        ],
+        "extended_inr": 6984000
+      },
+      "2": {
+        "status": "comparable",
+        "unit_inr": 109500,
+        "flags": [],
+        "trace": [
+          "raw: INR 109,500 per nos",
+          "landed: Rs 109,500 per nos, ex-GST"
+        ],
+        "extended_inr": 3285000
+      },
+      "3": {
+        "status": "comparable",
+        "unit_inr": 92400,
+        "flags": [],
+        "trace": [
+          "raw: INR 92,400 per nos",
+          "landed: Rs 92,400 per nos, ex-GST"
+        ],
+        "extended_inr": 2310000
+      },
+      "4": {
+        "status": "comparable",
+        "unit_inr": 38900,
+        "flags": [],
+        "trace": [
+          "raw: INR 38,900 per nos",
+          "landed: Rs 38,900 per nos, ex-GST"
+        ],
+        "extended_inr": 1556000
+      },
+      "5": {
+        "status": "comparable",
+        "unit_inr": 9250,
+        "flags": [],
+        "trace": [
+          "raw: INR 9,250 per nos",
+          "landed: Rs 9,250 per nos, ex-GST"
+        ],
+        "extended_inr": 1480000
+      },
+      "6": {
+        "status": "comparable",
+        "unit_inr": 21100,
+        "flags": [],
+        "trace": [
+          "raw: INR 21,100 per nos",
+          "landed: Rs 21,100 per nos, ex-GST"
+        ],
+        "extended_inr": 949500
+      },
+      "7": {
+        "status": "comparable",
+        "unit_inr": 13400,
+        "flags": [
+          "vendor quoted 128 nos against 140 asked; rate applied to asked quantity",
+          "One docking station free with every ten laptops. 12 free against 120 business laptops, so 128 chargeable against 140 asked."
+        ],
+        "trace": [
+          "raw: INR 13,400 per nos",
+          "landed: Rs 13,400 per nos, ex-GST"
+        ],
+        "extended_inr": 1876000
+      },
+      "8": {
+        "status": "comparable",
+        "unit_inr": 1320,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,320 per nos",
+          "landed: Rs 1,320 per nos, ex-GST"
+        ],
+        "extended_inr": 224400
+      },
+      "9": {
+        "status": "comparable",
+        "unit_inr": 1690,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,690 per nos",
+          "landed: Rs 1,690 per nos, ex-GST"
+        ],
+        "extended_inr": 338000
+      },
+      "10": {
+        "status": "comparable",
+        "unit_inr": 2950,
+        "flags": [],
+        "trace": [
+          "raw: INR 2,950 per nos",
+          "landed: Rs 2,950 per nos, ex-GST"
+        ],
+        "extended_inr": 501500
+      },
+      "11": {
+        "status": "comparable",
+        "unit_inr": 2680,
+        "flags": [],
+        "trace": [
+          "raw: INR 2,680 per nos",
+          "landed: Rs 2,680 per nos, ex-GST"
+        ],
+        "extended_inr": 214400
+      },
+      "12": {
+        "status": "comparable",
+        "unit_inr": 571000,
+        "flags": [],
+        "trace": [
+          "raw: INR 571,000 per nos",
+          "landed: Rs 571,000 per nos, ex-GST"
+        ],
+        "extended_inr": 3426000
+      },
+      "13": {
+        "status": "comparable",
+        "unit_inr": 19200,
+        "flags": [],
+        "trace": [
+          "raw: INR 19,200 per kit",
+          "landed: Rs 19,200 per kit, ex-GST"
+        ],
+        "extended_inr": 460800
+      },
+      "14": {
+        "status": "comparable",
+        "unit_inr": 69500,
+        "flags": [],
+        "trace": [
+          "raw: INR 69,500 per nos",
+          "landed: Rs 69,500 per nos, ex-GST"
+        ],
+        "extended_inr": 1668000
+      },
+      "15": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "16": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "17": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "18": {
+        "status": "comparable",
+        "unit_inr": 197000,
+        "flags": [],
+        "trace": [
+          "raw: INR 197,000 per nos",
+          "landed: Rs 197,000 per nos, ex-GST"
+        ],
+        "extended_inr": 2758000
+      },
+      "19": {
+        "status": "comparable",
+        "unit_inr": 471000,
+        "flags": [],
+        "trace": [
+          "raw: INR 471,000 per nos",
+          "landed: Rs 471,000 per nos, ex-GST"
+        ],
+        "extended_inr": 1884000
+      },
+      "20": {
+        "status": "comparable",
+        "unit_inr": 43500,
+        "flags": [],
+        "trace": [
+          "raw: INR 43,500 per box of 10",
+          "landed: Rs 43,500 per box of 10, ex-GST"
+        ],
+        "extended_inr": 261000
+      },
+      "21": {
+        "status": "comparable",
+        "unit_inr": 27200,
+        "flags": [],
+        "trace": [
+          "raw: INR 27,200 per nos",
+          "landed: Rs 27,200 per nos, ex-GST"
+        ],
+        "extended_inr": 1496000
+      },
+      "22": {
+        "status": "comparable",
+        "unit_inr": 13900,
+        "flags": [],
+        "trace": [
+          "raw: INR 13,900 per box of 50",
+          "landed: Rs 13,900 per box of 50, ex-GST"
+        ],
+        "extended_inr": 194600
+      },
+      "23": {
+        "status": "comparable",
+        "unit_inr": 74000,
+        "flags": [],
+        "trace": [
+          "raw: INR 74,000 per nos",
+          "landed: Rs 74,000 per nos, ex-GST"
+        ],
+        "extended_inr": 222000
+      },
+      "24": {
+        "status": "comparable",
+        "unit_inr": 298000,
+        "flags": [],
+        "trace": [
+          "raw: INR 298,000 per nos",
+          "landed: Rs 298,000 per nos, ex-GST"
+        ],
+        "extended_inr": 894000
+      },
+      "25": {
+        "status": "comparable",
+        "unit_inr": 64500,
+        "flags": [],
+        "trace": [
+          "raw: INR 64,500 per nos",
+          "landed: Rs 64,500 per nos, ex-GST"
+        ],
+        "extended_inr": 516000
+      },
+      "26": {
+        "status": "comparable",
+        "unit_inr": 142000,
+        "flags": [],
+        "trace": [
+          "raw: INR 142,000 per nos",
+          "landed: Rs 142,000 per nos, ex-GST"
+        ],
+        "extended_inr": 1136000
+      },
+      "27": {
+        "status": "comparable",
+        "unit_inr": 8850,
+        "flags": [],
+        "trace": [
+          "raw: INR 8,850 per nos",
+          "landed: Rs 8,850 per nos, ex-GST"
+        ],
+        "extended_inr": 796500
+      },
+      "28": {
+        "status": "comparable",
+        "unit_inr": 49800,
+        "flags": [],
+        "trace": [
+          "raw: INR 49,800 per nos",
+          "landed: Rs 49,800 per nos, ex-GST"
+        ],
+        "extended_inr": 1245000
+      },
+      "29": {
+        "status": "comparable",
+        "unit_inr": 44200,
+        "flags": [],
+        "trace": [
+          "raw: INR 44,200 per nos",
+          "landed: Rs 44,200 per nos, ex-GST"
+        ],
+        "extended_inr": 795600
+      },
+      "30": {
+        "status": "needs_review",
+        "unit_inr": null,
+        "flags": [
+          "the supplier addressed this line but gave no usable rate; a zero would otherwise win it automatically"
+        ],
+        "trace": [
+          {
+            "rule": "no usable rate",
+            "basis": "reported as 'quoted' with no comparable number",
+            "result": "excluded from every total pending a decision"
+          }
+        ]
+      }
+    },
+    "V4": {
+      "1": {
+        "status": "comparable",
+        "unit_inr": 57900,
+        "flags": [
+          "handwritten override beats the printed price",
+          "Printed 59,500 struck through, 57,900 written in pen."
+        ],
+        "trace": [
+          "raw: INR 57,900 per nos",
+          "printed Rs 59,500 struck through, Rs 57,900 written in pen",
+          "landed: Rs 57,900 per nos, ex-GST"
+        ],
+        "extended_inr": 6948000
+      },
+      "2": {
+        "status": "comparable",
+        "unit_inr": 99500,
+        "flags": [],
+        "trace": [
+          "raw: INR 99,500 per nos",
+          "landed: Rs 99,500 per nos, ex-GST"
+        ],
+        "extended_inr": 2985000
+      },
+      "3": {
+        "status": "comparable",
+        "unit_inr": 84000,
+        "flags": [],
+        "trace": [
+          "raw: INR 84,000 per nos",
+          "landed: Rs 84,000 per nos, ex-GST"
+        ],
+        "extended_inr": 2100000
+      },
+      "4": {
+        "status": "comparable",
+        "unit_inr": 37200,
+        "flags": [],
+        "trace": [
+          "raw: INR 37,200 per nos",
+          "landed: Rs 37,200 per nos, ex-GST"
+        ],
+        "extended_inr": 1488000
+      },
+      "5": {
+        "status": "comparable",
+        "unit_inr": 8950,
+        "flags": [],
+        "trace": [
+          "raw: INR 8,950 per nos",
+          "landed: Rs 8,950 per nos, ex-GST"
+        ],
+        "extended_inr": 1432000
+      },
+      "6": {
+        "status": "unreadable",
+        "unit_inr": null,
+        "flags": [
+          "a price is present on the source and cannot be read",
+          "buyer action required"
+        ],
+        "trace": [
+          "Glare across the cell. A price is clearly present and cannot be read.",
+          "not guessed, not interpolated"
+        ]
+      },
+      "7": {
+        "status": "comparable",
+        "unit_inr": 12400,
+        "flags": [],
+        "trace": [
+          "raw: INR 12,400 per nos",
+          "landed: Rs 12,400 per nos, ex-GST"
+        ],
+        "extended_inr": 1736000
+      },
+      "8": {
+        "status": "comparable",
+        "unit_inr": 1180,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,180 per nos",
+          "landed: Rs 1,180 per nos, ex-GST"
+        ],
+        "extended_inr": 200600
+      },
+      "9": {
+        "status": "comparable",
+        "unit_inr": 1540,
+        "flags": [],
+        "trace": [
+          "raw: INR 1,540 per nos",
+          "landed: Rs 1,540 per nos, ex-GST"
+        ],
+        "extended_inr": 308000
+      },
+      "10": {
+        "status": "comparable",
+        "unit_inr": 2870,
+        "flags": [],
+        "trace": [
+          "raw: INR 2,870 per nos",
+          "landed: Rs 2,870 per nos, ex-GST"
+        ],
+        "extended_inr": 487900
+      },
+      "11": {
+        "status": "comparable",
+        "unit_inr": 2490,
+        "flags": [],
+        "trace": [
+          "raw: INR 2,490 per nos",
+          "landed: Rs 2,490 per nos, ex-GST"
+        ],
+        "extended_inr": 199200
+      },
+      "12": {
+        "status": "comparable",
+        "unit_inr": 524000,
+        "flags": [
+          "handwritten override beats the printed price",
+          "Printed 5,36,000 struck through, 5,24,000 written in pen."
+        ],
+        "trace": [
+          "raw: INR 524,000 per nos",
+          "printed Rs 536,000 struck through, Rs 524,000 written in pen",
+          "landed: Rs 524,000 per nos, ex-GST"
+        ],
+        "extended_inr": 3144000
+      },
+      "13": {
+        "status": "comparable",
+        "unit_inr": 19200,
+        "flags": [
+          "unit mismatch: quoted per 'per DIMM', normalised to 'kit' (x2)"
+        ],
+        "trace": [
+          "raw: INR 9,600 per per DIMM",
+          "UoM: x2 -> INR 19,200 per kit  [One asked kit = 2x 16GB DIMMs, from the RFx line spec]",
+          "landed: Rs 19,200 per kit, ex-GST"
+        ],
+        "extended_inr": 460800
+      },
+      "14": {
+        "status": "comparable",
+        "unit_inr": 63500,
+        "flags": [],
+        "trace": [
+          "raw: INR 63,500 per nos",
+          "landed: Rs 63,500 per nos, ex-GST"
+        ],
+        "extended_inr": 1524000
+      },
+      "15": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "16": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "17": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "18": {
+        "status": "comparable",
+        "unit_inr": 184000,
+        "flags": [],
+        "trace": [
+          "raw: INR 184,000 per nos",
+          "landed: Rs 184,000 per nos, ex-GST"
+        ],
+        "extended_inr": 2576000
+      },
+      "19": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "20": {
+        "status": "comparable",
+        "unit_inr": 41500,
+        "flags": [
+          "unit mismatch: quoted per 'per pc', normalised to 'box of 10' (x10)"
+        ],
+        "trace": [
+          "raw: INR 4,150 per per pc",
+          "UoM: x10 -> INR 41,500 per box of 10  [One asked box = 10 transceivers, from the RFx line spec]",
+          "landed: Rs 41,500 per box of 10, ex-GST"
+        ],
+        "extended_inr": 249000
+      },
+      "21": {
+        "status": "comparable",
+        "unit_inr": 26400,
+        "flags": [],
+        "trace": [
+          "raw: INR 26,400 per nos",
+          "landed: Rs 26,400 per nos, ex-GST"
+        ],
+        "extended_inr": 1452000
+      },
+      "22": {
+        "status": "comparable",
+        "unit_inr": 13400,
+        "flags": [
+          "unit mismatch: quoted per 'per pc', normalised to 'box of 50' (x50)"
+        ],
+        "trace": [
+          "raw: INR 268 per per pc",
+          "UoM: x50 -> INR 13,400 per box of 50  [One asked box = 50 patch cords, from the RFx line spec]",
+          "landed: Rs 13,400 per box of 50, ex-GST"
+        ],
+        "extended_inr": 187600
+      },
+      "23": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "24": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "25": {
+        "status": "comparable",
+        "unit_inr": 61800,
+        "flags": [],
+        "trace": [
+          "raw: INR 61,800 per nos",
+          "landed: Rs 61,800 per nos, ex-GST"
+        ],
+        "extended_inr": 494400
+      },
+      "26": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      },
+      "27": {
+        "status": "comparable",
+        "unit_inr": 8400,
+        "flags": [],
+        "trace": [
+          "raw: INR 8,400 per nos",
+          "landed: Rs 8,400 per nos, ex-GST"
+        ],
+        "extended_inr": 756000
+      },
+      "28": {
+        "status": "comparable",
+        "unit_inr": 47500,
+        "flags": [],
+        "trace": [
+          "raw: INR 47,500 per nos",
+          "landed: Rs 47,500 per nos, ex-GST"
+        ],
+        "extended_inr": 1187500
+      },
+      "29": {
+        "status": "comparable",
+        "unit_inr": 41900,
+        "flags": [],
+        "trace": [
+          "raw: INR 41,900 per nos",
+          "landed: Rs 41,900 per nos, ex-GST"
+        ],
+        "extended_inr": 754200
+      },
+      "30": {
+        "status": "omitted",
+        "unit_inr": null,
+        "flags": [
+          "silently missing: no price, no decline, no mention"
+        ],
+        "trace": [
+          "the line simply is not in the response",
+          "absence is reported as absence, never as zero"
+        ]
+      }
+    },
+    "V5": {
+      "1": {
+        "status": "comparable",
+        "unit_inr": 61200,
+        "flags": [],
+        "trace": [
+          "raw: INR 61,200 per nos",
+          "landed: Rs 61,200 per nos, ex-GST"
+        ],
+        "extended_inr": 7344000
+      },
+      "2": {
+        "status": "comparable",
+        "unit_inr": 107500,
+        "flags": [],
+        "trace": [
+          "raw: INR 107,500 per nos",
+          "landed: Rs 107,500 per nos, ex-GST"
+        ],
+        "extended_inr": 3225000
+      },
+      "3": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "4": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "5": {
+        "status": "resolved_from_reference",
+        "unit_inr": 10100,
+        "flags": [
+          "price derived from a prior PO, not quoted directly",
+          "vendor must confirm before award"
+        ],
+        "trace": [
+          "vendor said: 'monitors and docks same as our March PO rates'",
+          "prior PO NBR/PO/2026/00317 dated 2026-03-21: Rs 10,100 per nos",
+          "resolved to Rs 10,100"
+        ],
+        "needs_confirmation": true,
+        "extended_inr": 1616000
+      },
+      "6": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "7": {
+        "status": "resolved_from_reference",
+        "unit_inr": 13900,
+        "flags": [
+          "price derived from a prior PO, not quoted directly",
+          "vendor must confirm before award"
+        ],
+        "trace": [
+          "vendor said: 'monitors and docks same as our March PO rates'",
+          "prior PO NBR/PO/2026/00317 dated 2026-03-21: Rs 13,900 per nos",
+          "resolved to Rs 13,900"
+        ],
+        "needs_confirmation": true,
+        "extended_inr": 1946000
+      },
+      "8": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "9": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "10": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "11": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "12": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "13": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "14": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "15": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "16": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "17": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "18": {
+        "status": "resolved_from_reference",
+        "unit_inr": 199280,
+        "flags": [
+          "price derived from a prior PO, not quoted directly",
+          "vendor must confirm before award"
+        ],
+        "trace": [
+          "vendor said: 'switches +6% over last year'",
+          "prior PO NBR/PO/2026/00317: Rs 188,000",
+          "+6.0% uplift -> Rs 199,280"
+        ],
+        "needs_confirmation": true,
+        "extended_inr": 2789920
+      },
+      "19": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "20": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "21": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "22": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "23": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "24": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "25": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "26": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "27": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "28": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "29": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      },
+      "30": {
+        "status": "non_comparable",
+        "unit_inr": null,
+        "flags": [
+          "offer is conditional on another bidder's price",
+          "cannot be ranked, cannot be awarded"
+        ],
+        "trace": [
+          "vendor said: 'rest we'll match Zenith' - conditional on a competitor's bid. Not an offer this system can score."
+        ]
+      }
+    }
+  },
+  "scenarios": {
+    "single_vendor": {
+      "V1": {
+        "vendor": "V1",
+        "total_inr": 41490600,
+        "total_after_stated_discount_inr": 40453335,
+        "total_level_discount_pct": 2.5,
+        "total_level_discount_applied": true,
+        "total_level_discount_withheld_reason": null,
+        "lines_priced": 30,
+        "missing_lines": [],
+        "complete": true,
+        "comparable_to_other_vendors": true
+      },
+      "V2": {
+        "vendor": "V2",
+        "total_inr": 39794250,
+        "total_after_stated_discount_inr": 39794250,
+        "total_level_discount_pct": null,
+        "total_level_discount_applied": false,
+        "total_level_discount_withheld_reason": null,
+        "lines_priced": 27,
+        "missing_lines": [
+          24,
+          25,
+          29
+        ],
+        "complete": false,
+        "comparable_to_other_vendors": false
+      },
+      "V3": {
+        "vendor": "V3",
+        "total_inr": 37472300,
+        "total_after_stated_discount_inr": 37472300,
+        "total_level_discount_pct": null,
+        "total_level_discount_applied": false,
+        "total_level_discount_withheld_reason": null,
+        "lines_priced": 26,
+        "missing_lines": [
+          15,
+          16,
+          17,
+          30
+        ],
+        "complete": false,
+        "comparable_to_other_vendors": false
+      },
+      "V4": {
+        "vendor": "V4",
+        "total_inr": 30670200,
+        "total_after_stated_discount_inr": 30670200,
+        "total_level_discount_pct": null,
+        "total_level_discount_applied": false,
+        "total_level_discount_withheld_reason": null,
+        "lines_priced": 21,
+        "missing_lines": [
+          6,
+          15,
+          16,
+          17,
+          19,
+          23,
+          24,
+          26,
+          30
+        ],
+        "complete": false,
+        "comparable_to_other_vendors": false
+      },
+      "V5": {
+        "vendor": "V5",
+        "total_inr": 10569000,
+        "total_after_stated_discount_inr": 10569000,
+        "total_level_discount_pct": null,
+        "total_level_discount_applied": false,
+        "total_level_discount_withheld_reason": null,
+        "lines_priced": 2,
+        "missing_lines": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "complete": false,
+        "comparable_to_other_vendors": false
+      }
+    },
+    "split_all_vendors": {
+      "picks": {
+        "1": {
+          "vendor": "V4",
+          "unit_inr": 57900,
+          "extended_inr": 6948000
+        },
+        "2": {
+          "vendor": "V4",
+          "unit_inr": 99500,
+          "extended_inr": 2985000
+        },
+        "3": {
+          "vendor": "V4",
+          "unit_inr": 84000,
+          "extended_inr": 2100000
+        },
+        "4": {
+          "vendor": "V4",
+          "unit_inr": 37200,
+          "extended_inr": 1488000
+        },
+        "5": {
+          "vendor": "V4",
+          "unit_inr": 8950,
+          "extended_inr": 1432000
+        },
+        "6": {
+          "vendor": "V2",
+          "unit_inr": 20400,
+          "extended_inr": 918000
+        },
+        "7": {
+          "vendor": "V4",
+          "unit_inr": 12400,
+          "extended_inr": 1736000
+        },
+        "8": {
+          "vendor": "V4",
+          "unit_inr": 1180,
+          "extended_inr": 200600
+        },
+        "9": {
+          "vendor": "V4",
+          "unit_inr": 1540,
+          "extended_inr": 308000
+        },
+        "10": {
+          "vendor": "V4",
+          "unit_inr": 2870,
+          "extended_inr": 487900
+        },
+        "11": {
+          "vendor": "V4",
+          "unit_inr": 2490,
+          "extended_inr": 199200
+        },
+        "12": {
+          "vendor": "V4",
+          "unit_inr": 524000,
+          "extended_inr": 3144000
+        },
+        "13": {
+          "vendor": "V2",
+          "unit_inr": 17503,
+          "extended_inr": 420072
+        },
+        "14": {
+          "vendor": "V4",
+          "unit_inr": 63500,
+          "extended_inr": 1524000
+        },
+        "15": {
+          "vendor": "V2",
+          "unit_inr": 781456,
+          "extended_inr": 1562912
+        },
+        "16": {
+          "vendor": "V2",
+          "unit_inr": 390728,
+          "extended_inr": 781456
+        },
+        "17": {
+          "vendor": "V2",
+          "unit_inr": 20509,
+          "extended_inr": 246108
+        },
+        "18": {
+          "vendor": "V4",
+          "unit_inr": 184000,
+          "extended_inr": 2576000
+        },
+        "19": {
+          "vendor": "V1",
+          "unit_inr": 438000,
+          "extended_inr": 1752000
+        },
+        "20": {
+          "vendor": "V2",
+          "unit_inr": 39957,
+          "extended_inr": 239742
+        },
+        "21": {
+          "vendor": "V4",
+          "unit_inr": 26400,
+          "extended_inr": 1452000
+        },
+        "22": {
+          "vendor": "V4",
+          "unit_inr": 13400,
+          "extended_inr": 187600
+        },
+        "23": {
+          "vendor": "V3",
+          "unit_inr": 74000,
+          "extended_inr": 222000
+        },
+        "24": {
+          "vendor": "V3",
+          "unit_inr": 298000,
+          "extended_inr": 894000
+        },
+        "25": {
+          "vendor": "V4",
+          "unit_inr": 61800,
+          "extended_inr": 494400
+        },
+        "26": {
+          "vendor": "V1",
+          "unit_inr": 139000,
+          "extended_inr": 1112000
+        },
+        "27": {
+          "vendor": "V4",
+          "unit_inr": 8400,
+          "extended_inr": 756000
+        },
+        "28": {
+          "vendor": "V4",
+          "unit_inr": 47500,
+          "extended_inr": 1187500
+        },
+        "29": {
+          "vendor": "V4",
+          "unit_inr": 41900,
+          "extended_inr": 754200
+        },
+        "30": {
+          "vendor": "V2",
+          "unit_inr": 4200,
+          "extended_inr": 714000
+        }
+      },
+      "total_inr": 38822690,
+      "unfilled_lines": [],
+      "lines_awarded": 30
+    },
+    "split_qualified_only": {
+      "picks": {
+        "1": {
+          "vendor": "V1",
+          "unit_inr": 62800,
+          "extended_inr": 7536000
+        },
+        "2": {
+          "vendor": "V1",
+          "unit_inr": 104500,
+          "extended_inr": 3135000
+        },
+        "3": {
+          "vendor": "V1",
+          "unit_inr": 91200,
+          "extended_inr": 2280000
+        },
+        "4": {
+          "vendor": "V1",
+          "unit_inr": 39800,
+          "extended_inr": 1592000
+        },
+        "5": {
+          "vendor": "V1",
+          "unit_inr": 9450,
+          "extended_inr": 1512000
+        },
+        "6": {
+          "vendor": "V2",
+          "unit_inr": 20400,
+          "extended_inr": 918000
+        },
+        "7": {
+          "vendor": "V2",
+          "unit_inr": 12850,
+          "extended_inr": 1799000
+        },
+        "8": {
+          "vendor": "V1",
+          "unit_inr": 1390,
+          "extended_inr": 236300
+        },
+        "9": {
+          "vendor": "V1",
+          "unit_inr": 1780,
+          "extended_inr": 356000
+        },
+        "10": {
+          "vendor": "V2",
+          "unit_inr": 3040,
+          "extended_inr": 516800
+        },
+        "11": {
+          "vendor": "V1",
+          "unit_inr": 2760,
+          "extended_inr": 220800
+        },
+        "12": {
+          "vendor": "V2",
+          "unit_inr": 546312,
+          "extended_inr": 3277872
+        },
+        "13": {
+          "vendor": "V2",
+          "unit_inr": 17503,
+          "extended_inr": 420072
+        },
+        "14": {
+          "vendor": "V2",
+          "unit_inr": 64974,
+          "extended_inr": 1559376
+        },
+        "15": {
+          "vendor": "V2",
+          "unit_inr": 781456,
+          "extended_inr": 1562912
+        },
+        "16": {
+          "vendor": "V2",
+          "unit_inr": 390728,
+          "extended_inr": 781456
+        },
+        "17": {
+          "vendor": "V2",
+          "unit_inr": 20509,
+          "extended_inr": 246108
+        },
+        "18": {
+          "vendor": "V2",
+          "unit_inr": 184756,
+          "extended_inr": 2586584
+        },
+        "19": {
+          "vendor": "V1",
+          "unit_inr": 438000,
+          "extended_inr": 1752000
+        },
+        "20": {
+          "vendor": "V2",
+          "unit_inr": 39957,
+          "extended_inr": 239742
+        },
+        "21": {
+          "vendor": "V1",
+          "unit_inr": 27900,
+          "extended_inr": 1534500
+        },
+        "22": {
+          "vendor": "V1",
+          "unit_inr": 14200,
+          "extended_inr": 198800
+        },
+        "23": {
+          "vendor": "V1",
+          "unit_inr": 76500,
+          "extended_inr": 229500
+        },
+        "24": {
+          "vendor": "V1",
+          "unit_inr": 309000,
+          "extended_inr": 927000
+        },
+        "25": {
+          "vendor": "V1",
+          "unit_inr": 66200,
+          "extended_inr": 529600
+        },
+        "26": {
+          "vendor": "V1",
+          "unit_inr": 139000,
+          "extended_inr": 1112000
+        },
+        "27": {
+          "vendor": "V1",
+          "unit_inr": 9150,
+          "extended_inr": 823500
+        },
+        "28": {
+          "vendor": "V1",
+          "unit_inr": 50400,
+          "extended_inr": 1260000
+        },
+        "29": {
+          "vendor": "V1",
+          "unit_inr": 45800,
+          "extended_inr": 824400
+        },
+        "30": {
+          "vendor": "V2",
+          "unit_inr": 4200,
+          "extended_inr": 714000
+        }
+      },
+      "total_inr": 40681322,
+      "unfilled_lines": [],
+      "lines_awarded": 30
+    },
+    "split_qualified_no_caveats": {
+      "picks": {
+        "1": {
+          "vendor": "V1",
+          "unit_inr": 62800,
+          "extended_inr": 7536000
+        },
+        "3": {
+          "vendor": "V1",
+          "unit_inr": 91200,
+          "extended_inr": 2280000
+        },
+        "4": {
+          "vendor": "V1",
+          "unit_inr": 39800,
+          "extended_inr": 1592000
+        },
+        "5": {
+          "vendor": "V1",
+          "unit_inr": 9450,
+          "extended_inr": 1512000
+        },
+        "6": {
+          "vendor": "V2",
+          "unit_inr": 20400,
+          "extended_inr": 918000
+        },
+        "7": {
+          "vendor": "V2",
+          "unit_inr": 12850,
+          "extended_inr": 1799000
+        },
+        "8": {
+          "vendor": "V1",
+          "unit_inr": 1390,
+          "extended_inr": 236300
+        },
+        "9": {
+          "vendor": "V1",
+          "unit_inr": 1780,
+          "extended_inr": 356000
+        },
+        "10": {
+          "vendor": "V2",
+          "unit_inr": 3040,
+          "extended_inr": 516800
+        },
+        "11": {
+          "vendor": "V1",
+          "unit_inr": 2760,
+          "extended_inr": 220800
+        },
+        "13": {
+          "vendor": "V1",
+          "unit_inr": 18900,
+          "extended_inr": 453600
+        },
+        "14": {
+          "vendor": "V1",
+          "unit_inr": 66500,
+          "extended_inr": 1596000
+        },
+        "15": {
+          "vendor": "V1",
+          "unit_inr": 838000,
+          "extended_inr": 1676000
+        },
+        "16": {
+          "vendor": "V1",
+          "unit_inr": 402000,
+          "extended_inr": 804000
+        },
+        "17": {
+          "vendor": "V1",
+          "unit_inr": 21400,
+          "extended_inr": 256800
+        },
+        "18": {
+          "vendor": "V1",
+          "unit_inr": 191500,
+          "extended_inr": 2681000
+        },
+        "20": {
+          "vendor": "V1",
+          "unit_inr": 41200,
+          "extended_inr": 247200
+        },
+        "21": {
+          "vendor": "V1",
+          "unit_inr": 27900,
+          "extended_inr": 1534500
+        },
+        "22": {
+          "vendor": "V1",
+          "unit_inr": 14200,
+          "extended_inr": 198800
+        },
+        "23": {
+          "vendor": "V1",
+          "unit_inr": 76500,
+          "extended_inr": 229500
+        },
+        "24": {
+          "vendor": "V1",
+          "unit_inr": 309000,
+          "extended_inr": 927000
+        },
+        "25": {
+          "vendor": "V1",
+          "unit_inr": 66200,
+          "extended_inr": 529600
+        },
+        "26": {
+          "vendor": "V2",
+          "unit_inr": 151000,
+          "extended_inr": 1208000
+        },
+        "27": {
+          "vendor": "V1",
+          "unit_inr": 9150,
+          "extended_inr": 823500
+        },
+        "28": {
+          "vendor": "V1",
+          "unit_inr": 50400,
+          "extended_inr": 1260000
+        },
+        "29": {
+          "vendor": "V1",
+          "unit_inr": 45800,
+          "extended_inr": 824400
+        },
+        "30": {
+          "vendor": "V2",
+          "unit_inr": 4200,
+          "extended_inr": 714000
+        }
+      },
+      "total_inr": 32930800,
+      "unfilled_lines": [
+        2,
+        12,
+        19
+      ],
+      "lines_awarded": 27
+    },
+    "cost_of_compliance_inr": 1858632,
+    "like_for_like": {
+      "common_lines": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ],
+      "coverage_differs": true,
+      "lines_in_any_scenario": 30,
+      "lines_in_every_scenario": 27,
+      "common_basis_share": 0.9,
+      "scenarios": {
+        "a_all_vendors": {
+          "headline_total_inr": 38822690,
+          "lines_awarded": 30,
+          "like_for_like_total_inr": 30941690,
+          "lines_in_common_basis": 27,
+          "lines_this_scenario_could_not_fill": []
+        },
+        "b_qualified": {
+          "headline_total_inr": 40681322,
+          "lines_awarded": 30,
+          "like_for_like_total_inr": 32516450,
+          "lines_in_common_basis": 27,
+          "lines_this_scenario_could_not_fill": []
+        },
+        "c_qualified_no_caveats": {
+          "headline_total_inr": 32930800,
+          "lines_awarded": 27,
+          "like_for_like_total_inr": 32930800,
+          "lines_in_common_basis": 27,
+          "lines_this_scenario_could_not_fill": [
+            2,
+            12,
+            19
+          ]
+        }
+      }
+    }
+  },
+  "cell_status_counts": {
+    "comparable": 89,
+    "comparable_with_caveat": 17,
+    "declined": 3,
+    "omitted": 11,
+    "needs_review": 1,
+    "unreadable": 1,
+    "non_comparable": 25,
+    "resolved_from_reference": 3
+  }
+}

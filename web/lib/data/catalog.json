@@ -1,0 +1,1181 @@
+{
+  "buyer": {
+    "legal_name": "Northbridge Retail India Pvt Ltd",
+    "short_name": "Northbridge Retail",
+    "cin": "U52190KA2011PTC058842",
+    "gstin": "29AACCN4471K1ZP",
+    "hq": "Prestige Tech Park, Outer Ring Road, Bengaluru 560103",
+    "sites": [
+      "Bengaluru (HQ)",
+      "Pune (DC-West)",
+      "Gurugram (DC-North)"
+    ],
+    "headcount": 1420
+  },
+  "rfx": {
+    "id": "RFX-2026-0142",
+    "title": "FY27 IT Hardware Refresh - Enduser Compute, Datacentre & Network",
+    "issued": "2026-09-04",
+    "due": "2026-09-18",
+    "buyer_contact": {
+      "name": "Ananya Kulkarni",
+      "title": "Category Manager - IT & Telecom",
+      "email": "ananya.kulkarni@northbridgeretail.in",
+      "phone": "+91 80 4718 2290"
+    },
+    "approver": {
+      "name": "Rajat Menon",
+      "title": "VP - Procurement",
+      "email": "rajat.menon@northbridgeretail.in"
+    },
+    "incoterm_asked": "FOR destination, all three sites",
+    "tax_basis_asked": "Quote ex-GST. State GST rate and HSN per line.",
+    "payment_asked": "Net 30 from delivery and acceptance",
+    "validity_asked": "90 days from bid due date",
+    "currency_asked": "INR"
+  },
+  "lines": [
+    {
+      "no": 1,
+      "sku": "LT-BUS-14",
+      "group": "Enduser Compute",
+      "desc": "Laptop, business, 14in FHD, Core i5 13th gen, 16GB DDR5, 512GB NVMe SSD, Win 11 Pro, 3yr onsite NBD warranty",
+      "spec": {
+        "cpu": "Core i5-1345U or equivalent",
+        "ram_gb": 16,
+        "storage": "512GB NVMe",
+        "display": "14in FHD IPS",
+        "os": "Win 11 Pro",
+        "warranty": "3yr onsite NBD"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 120,
+      "hsn": "8471",
+      "baseline_inr": 64500,
+      "trap": "config downgrade (V3 quotes 8GB); warranty bundling (V2 quotes 1yr + separate uplift)"
+    },
+    {
+      "no": 2,
+      "sku": "LT-DEV-14",
+      "group": "Enduser Compute",
+      "desc": "Laptop, developer, 14in QHD, Core i7 13th gen, 32GB DDR5, 1TB NVMe SSD, Win 11 Pro, 3yr onsite NBD warranty",
+      "spec": {
+        "cpu": "Core i7-1365U or equivalent",
+        "ram_gb": 32,
+        "storage": "1TB NVMe",
+        "display": "14in QHD",
+        "os": "Win 11 Pro",
+        "warranty": "3yr onsite NBD"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 30,
+      "hsn": "8471",
+      "baseline_inr": 112000,
+      "trap": "OEM substitution (V1 offers previous-gen equivalent)"
+    },
+    {
+      "no": 3,
+      "sku": "LT-ULT-13",
+      "group": "Enduser Compute",
+      "desc": "Laptop, ultraportable, 13.3in FHD, Core i5 13th gen, 16GB, 512GB NVMe SSD, sub-1.1kg, 3yr onsite NBD",
+      "spec": {
+        "cpu": "Core i5 13th gen",
+        "ram_gb": 16,
+        "storage": "512GB NVMe",
+        "weight": "<1.1 kg",
+        "warranty": "3yr onsite NBD"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 25,
+      "hsn": "8471",
+      "baseline_inr": 89000,
+      "trap": null
+    },
+    {
+      "no": 4,
+      "sku": "DT-SFF",
+      "group": "Enduser Compute",
+      "desc": "Desktop, small form factor, Core i5 13th gen, 8GB DDR5, 512GB NVMe SSD, Win 11 Pro, 3yr onsite NBD",
+      "spec": {
+        "cpu": "Core i5 13th gen",
+        "ram_gb": 8,
+        "storage": "512GB NVMe",
+        "os": "Win 11 Pro",
+        "warranty": "3yr onsite NBD"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 40,
+      "hsn": "8471",
+      "baseline_inr": 41000,
+      "trap": null
+    },
+    {
+      "no": 5,
+      "sku": "MON-24",
+      "group": "Enduser Compute",
+      "desc": "Monitor, 23.8in FHD IPS, height-adjustable stand, DisplayPort + HDMI, 3yr warranty",
+      "spec": {
+        "size": "23.8in",
+        "res": "1920x1080",
+        "panel": "IPS",
+        "stand": "height adjustable"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 160,
+      "hsn": "8528",
+      "baseline_inr": 9800,
+      "trap": "V5 prices by reference to a prior PO ('same as our March PO rates')"
+    },
+    {
+      "no": 6,
+      "sku": "MON-27",
+      "group": "Enduser Compute",
+      "desc": "Monitor, 27in QHD IPS, USB-C 65W power delivery, RJ45 passthrough, 3yr warranty",
+      "spec": {
+        "size": "27in",
+        "res": "2560x1440",
+        "panel": "IPS",
+        "usb_c_pd_w": 65
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 45,
+      "hsn": "8528",
+      "baseline_inr": 21500,
+      "trap": null
+    },
+    {
+      "no": 7,
+      "sku": "DOCK-USBC",
+      "group": "Enduser Compute",
+      "desc": "Docking station, USB-C, dual 4K@60Hz, 100W power delivery, 2x RJ45, 3yr warranty",
+      "spec": {
+        "displays": "dual 4K@60",
+        "pd_w": 100
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 140,
+      "hsn": "8473",
+      "baseline_inr": 13500,
+      "trap": "V3 bundles 12 free units, so quoted qty (128) != asked qty (140)"
+    },
+    {
+      "no": 8,
+      "sku": "BAG-15",
+      "group": "Enduser Compute",
+      "desc": "Laptop backpack, fits 15.6in, water resistant, padded sleeve",
+      "spec": {
+        "fits": "15.6in"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 170,
+      "hsn": "4202",
+      "baseline_inr": 1450,
+      "trap": null
+    },
+    {
+      "no": 9,
+      "sku": "KBM-WL",
+      "group": "Enduser Compute",
+      "desc": "Wireless keyboard and mouse combo, 2.4GHz unifying receiver, Indian layout",
+      "spec": {
+        "layout": "Indian"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 200,
+      "hsn": "8471",
+      "baseline_inr": 1850,
+      "trap": null
+    },
+    {
+      "no": 10,
+      "sku": "HDST-UC",
+      "group": "Enduser Compute",
+      "desc": "USB headset, UC-certified (Teams), active noise cancelling, in-line controls",
+      "spec": {
+        "cert": "Microsoft Teams certified",
+        "anc": true
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 170,
+      "hsn": "8518",
+      "baseline_inr": 3200,
+      "trap": null
+    },
+    {
+      "no": 11,
+      "sku": "CAM-1080",
+      "group": "Enduser Compute",
+      "desc": "Webcam, 1080p30, autofocus, dual mic, mechanical privacy shutter",
+      "spec": {
+        "res": "1080p30",
+        "privacy_shutter": true
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 80,
+      "hsn": "8525",
+      "baseline_inr": 2900,
+      "trap": null
+    },
+    {
+      "no": 12,
+      "sku": "SRV-2U",
+      "group": "Datacentre",
+      "desc": "Rack server, 2U, 2x Xeon Silver 4410Y, 128GB DDR5 RDIMM, 8x 2.5in SFF bays, dual 1100W PSU, iDRAC/iLO equivalent, 3yr NBD onsite",
+      "spec": {
+        "cpu": "2x Xeon Silver 4410Y",
+        "ram_gb": 128,
+        "bays": 8,
+        "psu": "dual 1100W",
+        "warranty": "3yr NBD onsite"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 6,
+      "hsn": "8471",
+      "baseline_inr": 585000,
+      "trap": "V1 substitutes a different OEM; V2 quotes in USD ex-works Singapore"
+    },
+    {
+      "no": 13,
+      "sku": "RAM-32K",
+      "group": "Datacentre",
+      "desc": "Server memory upgrade, 32GB total as a matched kit of 2x 16GB DDR5-4800 RDIMM",
+      "spec": {
+        "total_gb": 32,
+        "form": "kit of 2x 16GB RDIMM",
+        "speed": "DDR5-4800"
+      },
+      "uom": "kit",
+      "pack_size": 2,
+      "qty": 24,
+      "hsn": "8473",
+      "baseline_inr": 18500,
+      "trap": "UoM: V4 quotes PER DIMM, not per kit. Looks ~half price until normalised."
+    },
+    {
+      "no": 14,
+      "sku": "SSD-192",
+      "group": "Datacentre",
+      "desc": "Enterprise SSD, 1.92TB, SAS 12Gbps, mixed-use endurance (>=3 DWPD), 2.5in SFF, OEM-certified caddy",
+      "spec": {
+        "capacity": "1.92TB",
+        "iface": "SAS 12G",
+        "endurance": ">=3 DWPD"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 24,
+      "hsn": "8471",
+      "baseline_inr": 68000,
+      "trap": "V2 quotes in USD ex-works"
+    },
+    {
+      "no": 15,
+      "sku": "NAS-60",
+      "group": "Datacentre",
+      "desc": "Backup storage appliance, 60TB raw, 12-bay, dual 10GbE, hardware RAID, 3yr NBD",
+      "spec": {
+        "raw_tb": 60,
+        "bays": 12,
+        "net": "dual 10GbE"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 2,
+      "hsn": "8471",
+      "baseline_inr": 820000,
+      "trap": "V3 silently omits this line (27 of 30)"
+    },
+    {
+      "no": 16,
+      "sku": "TAPE-LTO9",
+      "group": "Datacentre",
+      "desc": "LTO-9 tape drive, external, SAS HBA included, 18TB native per cartridge",
+      "spec": {
+        "gen": "LTO-9",
+        "iface": "external SAS"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 2,
+      "hsn": "8471",
+      "baseline_inr": 410000,
+      "trap": "V3 silently omits this line (27 of 30)"
+    },
+    {
+      "no": 17,
+      "sku": "MED-LTO9",
+      "group": "Datacentre",
+      "desc": "LTO-9 tape media, 18TB native, barcode-labelled, supplied as packs of 5 cartridges",
+      "spec": {
+        "gen": "LTO-9",
+        "pack": "5 cartridges"
+      },
+      "uom": "pack of 5",
+      "pack_size": 5,
+      "qty": 12,
+      "hsn": "8523",
+      "baseline_inr": 22000,
+      "trap": "UoM: pack of 5 vs per cartridge. V3 silently omits (27 of 30)"
+    },
+    {
+      "no": 18,
+      "sku": "SW-48P",
+      "group": "Network & Power",
+      "desc": "Access switch, 48-port GbE PoE+ (740W budget), 4x 10G SFP+ uplinks, L2 managed, stackable, lifetime hardware warranty",
+      "spec": {
+        "ports": 48,
+        "poe_budget_w": 740,
+        "uplinks": "4x 10G SFP+",
+        "layer": "L2"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 14,
+      "hsn": "8517",
+      "baseline_inr": 195000,
+      "trap": "V5 prices as '+6% over last year' - resolvable only against the prior PO table"
+    },
+    {
+      "no": 19,
+      "sku": "SW-24SFP",
+      "group": "Network & Power",
+      "desc": "Core switch, 24-port 10G SFP+, 2x 40G QSFP+ uplinks, L3 with OSPF/BGP, redundant PSU, 5yr warranty",
+      "spec": {
+        "ports": "24x 10G SFP+",
+        "uplinks": "2x 40G QSFP+",
+        "layer": "L3"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 4,
+      "hsn": "8517",
+      "baseline_inr": 460000,
+      "trap": "V1 substitutes a different OEM"
+    },
+    {
+      "no": 20,
+      "sku": "SFP-10G",
+      "group": "Network & Power",
+      "desc": "Transceiver, 10GBASE-SR SFP+, 850nm multimode, OEM-coded to the quoted switch, supplied in boxes of 10",
+      "spec": {
+        "type": "10GBASE-SR",
+        "pack": "box of 10"
+      },
+      "uom": "box of 10",
+      "pack_size": 10,
+      "qty": 6,
+      "hsn": "8517",
+      "baseline_inr": 42000,
+      "trap": "UoM: V4 quotes PER PIECE. Looks 1/10th price until normalised."
+    },
+    {
+      "no": 21,
+      "sku": "AP-WIFI6",
+      "group": "Network & Power",
+      "desc": "Wireless access point, Wi-Fi 6 (802.11ax), dual radio 2x2, indoor, PoE+ powered, incl. 3yr cloud management licence",
+      "spec": {
+        "std": "802.11ax",
+        "radios": "dual 2x2",
+        "licence": "3yr cloud mgmt"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 55,
+      "hsn": "8517",
+      "baseline_inr": 28500,
+      "trap": null
+    },
+    {
+      "no": 22,
+      "sku": "PC-CAT6A",
+      "group": "Network & Power",
+      "desc": "Patch cord, Cat6A, 2m, LSZH jacket, factory-terminated and tested, supplied in boxes of 50",
+      "spec": {
+        "cat": "6A",
+        "length": "2m",
+        "jacket": "LSZH",
+        "pack": "box of 50"
+      },
+      "uom": "box of 50",
+      "pack_size": 50,
+      "qty": 14,
+      "hsn": "8544",
+      "baseline_inr": 14500,
+      "trap": "UoM: V4 quotes PER PIECE. V1 raises qty to its MOQ of 20 boxes."
+    },
+    {
+      "no": 23,
+      "sku": "RACK-42U",
+      "group": "Network & Power",
+      "desc": "Server rack, 42U, 800mm deep, perforated front/rear doors, incl. pair of 32A vertical PDUs",
+      "spec": {
+        "height": "42U",
+        "depth": "800mm",
+        "pdu": "2x 32A vertical"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 3,
+      "hsn": "9403",
+      "baseline_inr": 78000,
+      "trap": null
+    },
+    {
+      "no": 24,
+      "sku": "UPS-10K",
+      "group": "Network & Power",
+      "desc": "Online UPS, 10kVA, 3-phase in / 1-phase out, incl. battery bank for 30 min at full load, SNMP card",
+      "spec": {
+        "kva": 10,
+        "topology": "online double conversion",
+        "backup": "30 min @ full load"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 3,
+      "hsn": "8504",
+      "baseline_inr": 315000,
+      "trap": "V2 declines to quote (not their line of business)"
+    },
+    {
+      "no": 25,
+      "sku": "UPS-3K",
+      "group": "Network & Power",
+      "desc": "Rack-mount online UPS, 3kVA, 2U, incl. battery for 15 min at full load, network management card",
+      "spec": {
+        "kva": 3,
+        "form": "2U rackmount",
+        "backup": "15 min @ full load"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 8,
+      "hsn": "8504",
+      "baseline_inr": 68000,
+      "trap": "V2 declines to quote (not their line of business)"
+    },
+    {
+      "no": 26,
+      "sku": "MFP-A3",
+      "group": "Retail & Peripherals",
+      "desc": "Multifunction printer, A3 mono laser, network, auto-duplex, 50ppm, ADF, incl. 3yr onsite AMC",
+      "spec": {
+        "format": "A3 mono laser",
+        "ppm": 50,
+        "amc": "3yr onsite"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 8,
+      "hsn": "8443",
+      "baseline_inr": 148000,
+      "trap": "V1 substitutes a different OEM"
+    },
+    {
+      "no": 27,
+      "sku": "SCAN-2D",
+      "group": "Retail & Peripherals",
+      "desc": "Barcode scanner, 2D imager, wireless (Bluetooth), incl. charging cradle, for DC use",
+      "spec": {
+        "type": "2D imager",
+        "link": "Bluetooth",
+        "cradle": true
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 90,
+      "hsn": "8471",
+      "baseline_inr": 9400,
+      "trap": null
+    },
+    {
+      "no": 28,
+      "sku": "HHT-AND",
+      "group": "Retail & Peripherals",
+      "desc": "Rugged handheld terminal, Android 13, 2D scanner, 4GB/64GB, hot-swap battery, IP65, 3yr comprehensive cover",
+      "spec": {
+        "os": "Android 13",
+        "rating": "IP65",
+        "warranty": "3yr comprehensive"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 25,
+      "hsn": "8471",
+      "baseline_inr": 52000,
+      "trap": null
+    },
+    {
+      "no": 29,
+      "sku": "DSP-55",
+      "group": "Retail & Peripherals",
+      "desc": "Digital signage display, 55in FHD, 24x7 rated, 500 nits, incl. tilt wall mount, 3yr onsite",
+      "spec": {
+        "size": "55in",
+        "duty": "24x7",
+        "brightness": "500 nits"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 18,
+      "hsn": "8528",
+      "baseline_inr": 47000,
+      "trap": "V2 declines to quote (not their line of business)"
+    },
+    {
+      "no": 30,
+      "sku": "WTY-EXT",
+      "group": "Retail & Peripherals",
+      "desc": "Warranty uplift for laptop lines 1-3: years 4 and 5, onsite next-business-day, per unit",
+      "spec": {
+        "scope": "lines 1-3",
+        "years": "4-5",
+        "sla": "onsite NBD"
+      },
+      "uom": "nos",
+      "pack_size": 1,
+      "qty": 170,
+      "hsn": "9983",
+      "baseline_inr": 6800,
+      "trap": "Comparability: V2 folds years 1-3 in here, V3 says 'included', V1 quotes as asked"
+    }
+  ],
+  "vendors": [
+    {
+      "code": "V1",
+      "slug": "zenith",
+      "name": "Zenith Infotech Solutions Pvt Ltd",
+      "city": "Bengaluru",
+      "gstin": "29AABCZ8812H1Z4",
+      "contact": "Prakash Iyer",
+      "role": "Key Account Manager",
+      "email": "prakash.iyer@zenithinfotech.co.in",
+      "phone": "+91 98450 21174",
+      "reply_format": "xlsx",
+      "reply_channel": "email attachment",
+      "received": "2026-09-11",
+      "revision_received": "2026-09-13",
+      "blurb": "Large national reseller, multi-OEM, strong on enduser compute."
+    },
+    {
+      "code": "V2",
+      "slug": "cygnus",
+      "name": "Cygnus Technologies India Pvt Ltd",
+      "city": "Mumbai",
+      "gstin": "27AADCC1190J1ZK",
+      "contact": "Farida Merchant",
+      "role": "Enterprise Sales Director",
+      "email": "farida.merchant@cygnustech.in",
+      "phone": "+91 98201 44903",
+      "reply_format": "pdf",
+      "reply_channel": "email attachment",
+      "received": "2026-09-15",
+      "blurb": "OEM-authorised partner, imports datacentre kit directly, quotes part USD."
+    },
+    {
+      "code": "V3",
+      "slug": "orbit",
+      "name": "Orbit Systems & Services",
+      "city": "Pune",
+      "gstin": "27AAGFO2246L1ZB",
+      "contact": "Sameer Deshpande",
+      "role": "Proprietor",
+      "email": "sameer@orbitsystems.co.in",
+      "phone": "+91 99225 61180",
+      "reply_format": "docx",
+      "reply_channel": "email attachment",
+      "received": "2026-09-16",
+      "blurb": "Mid-size partnership firm. Writes quotes as letters, not spreadsheets."
+    },
+    {
+      "code": "V4",
+      "slug": "vector",
+      "name": "Vector Digital Systems",
+      "city": "Chennai",
+      "gstin": "33AAMFV7731Q1ZG",
+      "contact": "R. Karthikeyan",
+      "role": "Partner",
+      "email": "karthik@vectordigital.in",
+      "phone": "+91 94440 78215",
+      "reply_format": "photo",
+      "reply_channel": "WhatsApp, forwarded to email",
+      "received": "2026-09-17",
+      "blurb": "Small channel partner. Sent a phone photo of a printed rate card, hand-annotated."
+    },
+    {
+      "code": "V5",
+      "slug": "helios",
+      "name": "Helios Enterprise Solutions Pvt Ltd",
+      "city": "Gurugram",
+      "gstin": "06AACCH5528M1Z9",
+      "contact": "Vikram Sethi",
+      "role": "Director - Sales",
+      "email": "vikram.sethi@helios-ent.com",
+      "phone": "+91 98111 30542",
+      "reply_format": "eml",
+      "reply_channel": "plain email body, no attachment",
+      "received": "2026-09-17",
+      "blurb": "Incumbent for peripherals. Replies in one paragraph and expects you to remember last year."
+    }
+  ],
+  "terms": {
+    "V1": {
+      "gst": "18% extra as applicable, HSN stated per line",
+      "freight": "FOR destination, included",
+      "payment": "Net 30",
+      "validity": "60 days",
+      "delivery": "4-6 weeks, ex-stock on lines 5 to 11",
+      "total_level_discount_pct": 2.5,
+      "total_level_discount_note": "A 2.5% 'order value discount' is applied only to the grand total and is not reflected in any line price. Sum of lines != stated total, on purpose."
+    },
+    "V2": {
+      "gst": "18% extra. IGST plus basic customs duty on ex-works lines, to buyer's account.",
+      "freight": "Ex-works Singapore on lines 12-20. FOR destination on INR lines.",
+      "payment": "50% advance, 50% against delivery",
+      "validity": "15 days",
+      "delivery": "8-10 weeks on imported lines",
+      "fx_reference": 88.4,
+      "fx_note": "Converted at the reference rate on the date of invoicing, not the date of bid.",
+      "footnote_discount_pct": 4.5,
+      "footnote_discount_scope": "OEM-branded lines only, subject to deal registration approval",
+      "footnote_discount_note": "Buried in footnote 3 on page 2. Not reflected in any unit price. Conditional on an approval the vendor does not yet hold."
+    },
+    "V3": {
+      "gst": "'Taxes as applicable' - rate and inclusive/exclusive both unstated",
+      "freight": "'Freight at actuals'",
+      "payment": "Net 45",
+      "validity": "30 days",
+      "delivery": "6-8 weeks",
+      "note": "Commercials written in prose. No line table for 19 of 27 quoted lines."
+    },
+    "V4": {
+      "gst": "'+ GST' handwritten at the foot of the card. Rate not stated.",
+      "freight": "Not stated anywhere",
+      "payment": "Not stated anywhere",
+      "validity": "Not stated anywhere",
+      "early_po_discount_pct": 5.0,
+      "early_po_discount_note": "Circled in pen: '5% if PO by 25 Sep'. Conditional on a date two days before the internal approval cycle can close."
+    },
+    "V5": {
+      "gst": "Not stated",
+      "freight": "'Freight extra'",
+      "payment": "45 days",
+      "validity": "Not stated",
+      "note": "Five lines of email. No attachment, no questionnaire."
+    }
+  },
+  "questionnaire": [
+    {
+      "no": "Q1",
+      "kind": "M",
+      "doc_required": true,
+      "q": "Do you hold current OEM authorisation for every brand you have quoted? Attach letters."
+    },
+    {
+      "no": "Q2",
+      "kind": "M",
+      "doc_required": true,
+      "q": "Are you certified to ISO/IEC 27001:2022? Attach the certificate showing validity."
+    },
+    {
+      "no": "Q3",
+      "kind": "D",
+      "doc_required": true,
+      "q": "Are you certified to ISO 9001:2015? Attach the certificate."
+    },
+    {
+      "no": "Q4",
+      "kind": "M",
+      "doc_required": true,
+      "q": "Do you have a tie-up with a CPCB-authorised e-waste recycler under the E-Waste (Management) Rules 2022? Attach the authorisation."
+    },
+    {
+      "no": "Q5",
+      "kind": "M",
+      "doc_required": false,
+      "q": "List your onsite support locations. Bengaluru, Pune and Gurugram are mandatory, plus a minimum of twelve tier-2 cities."
+    },
+    {
+      "no": "Q6",
+      "kind": "M",
+      "doc_required": false,
+      "q": "Confirm next-business-day onsite response for enduser hardware and 4-hour response for datacentre hardware, at all locations listed in Q5."
+    },
+    {
+      "no": "Q7",
+      "kind": "M",
+      "doc_required": true,
+      "q": "Was your audited annual turnover at least Rs 50 crore in each of the last two financial years? Attach audited statements."
+    },
+    {
+      "no": "Q8",
+      "kind": "D",
+      "doc_required": false,
+      "q": "Provide three enterprise references of 500 seats or more, deployed in the last 24 months, with contact details."
+    },
+    {
+      "no": "Q9",
+      "kind": "D",
+      "doc_required": false,
+      "q": "Name your dedicated account manager and attach a three-level escalation matrix."
+    },
+    {
+      "no": "Q10",
+      "kind": "D",
+      "doc_required": false,
+      "q": "Do you offer buyback and certified data destruction for the decommissioned fleet (approximately 300 laptops)?"
+    }
+  ],
+  "questionnaire_answers": {
+    "V1": {
+      "Q1": {
+        "answer": "Yes",
+        "doc": "OEM authorisation letters, Dell / HP / Lenovo, valid to 2027-03-31",
+        "ok": true
+      },
+      "Q2": {
+        "answer": "Yes",
+        "doc": "ISO/IEC 27001:2022, valid to 2028-01-14",
+        "ok": true
+      },
+      "Q3": {
+        "answer": "Yes",
+        "doc": "ISO 9001:2015, valid to 2027-06-30",
+        "ok": true
+      },
+      "Q4": {
+        "answer": "Yes",
+        "doc": "CPCB authorisation, E-Waste Rules 2022, valid to 2027-09-30",
+        "ok": true
+      },
+      "Q5": {
+        "answer": "Bengaluru, Pune, Gurugram plus 19 tier-2 cities",
+        "doc": null,
+        "ok": true
+      },
+      "Q6": {
+        "answer": "Confirmed, NBD enduser and 4-hour datacentre at all locations",
+        "doc": null,
+        "ok": true
+      },
+      "Q7": {
+        "answer": "Rs 412 crore FY25, Rs 468 crore FY26",
+        "doc": "Audited statements attached",
+        "ok": true
+      },
+      "Q8": {
+        "answer": "Three references provided with contacts",
+        "doc": null,
+        "ok": true
+      },
+      "Q9": {
+        "answer": "Prakash Iyer, 3-level matrix attached",
+        "doc": null,
+        "ok": true
+      },
+      "Q10": {
+        "answer": "Yes, buyback at assessed value plus NIST 800-88 erasure certificates",
+        "doc": null,
+        "ok": true
+      }
+    },
+    "V2": {
+      "Q1": {
+        "answer": "Yes",
+        "doc": "OEM authorisation letters, Dell / HPE / Cisco, valid to 2027-03-31",
+        "ok": true
+      },
+      "Q2": {
+        "answer": "Yes",
+        "doc": "ISO/IEC 27001:2022, valid to 2027-11-08",
+        "ok": true
+      },
+      "Q3": {
+        "answer": "Yes",
+        "doc": "ISO 9001:2015, valid to 2028-02-28",
+        "ok": true
+      },
+      "Q4": {
+        "answer": "Yes",
+        "doc": "CPCB authorisation, valid to 2028-03-31",
+        "ok": true
+      },
+      "Q5": {
+        "answer": "Bengaluru, Pune, Gurugram plus 14 tier-2 cities",
+        "doc": null,
+        "ok": true
+      },
+      "Q6": {
+        "answer": "Confirmed",
+        "doc": null,
+        "ok": true
+      },
+      "Q7": {
+        "answer": "Rs 288 crore FY25, Rs 341 crore FY26",
+        "doc": "Audited statements attached",
+        "ok": true
+      },
+      "Q8": {
+        "answer": "Two references provided",
+        "doc": null,
+        "ok": true,
+        "note": "Desirable, not mandatory. Two of three asked - scores below V1."
+      },
+      "Q9": {
+        "answer": "Farida Merchant, matrix attached",
+        "doc": null,
+        "ok": true
+      },
+      "Q10": {
+        "answer": "No",
+        "doc": null,
+        "ok": true,
+        "note": "Desirable. Scores zero, does not disqualify."
+      }
+    },
+    "V3": {
+      "Q1": {
+        "answer": "Yes",
+        "doc": "OEM authorisation, Dell and Kyocera, valid to 2027-01-31",
+        "ok": true
+      },
+      "Q2": {
+        "answer": "Yes",
+        "doc": "ISO/IEC 27001:2022, valid to 2027-04-22",
+        "ok": true
+      },
+      "Q3": {
+        "answer": "Yes",
+        "doc": "ISO 9001:2015, valid to 2027-08-15",
+        "ok": true
+      },
+      "Q4": {
+        "answer": "Yes",
+        "doc": "CPCB authorisation, valid to 2027-12-31",
+        "ok": true
+      },
+      "Q5": {
+        "answer": "Pune, Mumbai, Nashik, Nagpur, Bengaluru plus 6 others",
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY. Gurugram is absent, and 6 tier-2 cities against 12 asked."
+      },
+      "Q6": {
+        "answer": "Next business day on best-effort basis. 4-hour datacentre response available in Pune and Mumbai only.",
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY. Best-effort is not a commitment, and coverage is partial."
+      },
+      "Q7": {
+        "answer": "Rs 31.4 crore FY25, Rs 36.2 crore FY26",
+        "doc": "Audited statements attached",
+        "ok": false,
+        "note": "FAILS MANDATORY. Below the Rs 50 crore floor in both years. The attached statements agree with the stated answer."
+      },
+      "Q8": {
+        "answer": "One reference provided",
+        "doc": null,
+        "ok": true
+      },
+      "Q9": {
+        "answer": "Sameer Deshpande, no matrix attached",
+        "doc": null,
+        "ok": true
+      },
+      "Q10": {
+        "answer": "Yes, buyback only, no erasure certification",
+        "doc": null,
+        "ok": true
+      }
+    },
+    "V4": {
+      "Q1": {
+        "answer": "Yes",
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY on evidence. Answered Yes, no letter attached."
+      },
+      "Q2": {
+        "answer": "Yes",
+        "doc": "ISO/IEC 27001:2013, EXPIRED 2025-11-30",
+        "ok": false,
+        "note": "FAILS MANDATORY. The answer says Yes; the attached certificate is expired and is against the superseded 2013 standard. This is the case the system must catch: the document contradicts the answer."
+      },
+      "Q3": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "Left blank."
+      },
+      "Q4": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY. Left blank."
+      },
+      "Q5": {
+        "answer": "Chennai, Coimbatore, Madurai, Bengaluru, Hyderabad",
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY. Pune and Gurugram absent."
+      },
+      "Q6": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY. Left blank."
+      },
+      "Q7": {
+        "answer": "Rs 19 crore approx",
+        "doc": null,
+        "ok": false,
+        "note": "FAILS MANDATORY. Below floor, and 'approx' with no statements."
+      },
+      "Q8": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "Left blank."
+      },
+      "Q9": {
+        "answer": "R. Karthikeyan",
+        "doc": null,
+        "ok": true
+      },
+      "Q10": {
+        "answer": "Yes",
+        "doc": null,
+        "ok": true
+      }
+    },
+    "V5": {
+      "Q1": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q2": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q3": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q4": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q5": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q6": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q7": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q8": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q9": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      },
+      "Q10": {
+        "answer": null,
+        "doc": null,
+        "ok": false,
+        "note": "No questionnaire returned. Non-response on every question."
+      }
+    }
+  },
+  "qualification": {
+    "V1": {
+      "qualified": true,
+      "failed_mandatory": []
+    },
+    "V2": {
+      "qualified": true,
+      "failed_mandatory": []
+    },
+    "V3": {
+      "qualified": false,
+      "failed_mandatory": [
+        "Q5",
+        "Q6",
+        "Q7"
+      ]
+    },
+    "V4": {
+      "qualified": false,
+      "failed_mandatory": [
+        "Q1",
+        "Q2",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7"
+      ]
+    },
+    "V5": {
+      "qualified": false,
+      "failed_mandatory": [
+        "Q1",
+        "Q2",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7"
+      ]
+    }
+  },
+  "prior_po": {
+    "po_number": "NBR/PO/2026/00317",
+    "po_date": "2026-03-21",
+    "vendor": "Helios Enterprise Solutions Pvt Ltd",
+    "rates": {
+      "MON-24": 10100,
+      "DOCK-USBC": 13900,
+      "SW-48P": 188000,
+      "KBM-WL": 1920,
+      "BAG-15": 1500
+    }
+  },
+  "baseline_total_inr": 42740500,
+  "assumptions": {
+    "fx_usd_inr": {
+      "value": 88.4,
+      "source": "Vendor V2's own stated reference rate, quote page 1",
+      "alternative": "RBI reference rate on bid-due date",
+      "note": "V2's terms say conversion happens at the rate on the INVOICE date, not the bid date. Any INR total for V2 is therefore an estimate, not an offer. The buyer sees this wherever a V2 total is shown.",
+      "confidence": "stated by vendor, not independently verified"
+    },
+    "compare_qty": {
+      "value": "RFx asked quantity",
+      "source": "RFx line table",
+      "note": "Where a vendor quoted a different quantity (V1 MOQ 20 boxes, V3 128 docks), the unit rate is applied to the ASKED quantity so lines stay comparable. The quantity difference is carried as a separate flag, not silently absorbed."
+    },
+    "v2_warranty_basis": {
+      "value": "include line 30A uplift in lines 1-3",
+      "source": "V2 quote note on lines 1-3 plus vendor-created line 30A",
+      "alternative": "exclude 30A and compare 1-year cover against 3-year cover",
+      "note": "V2's laptops carry 1-year cover. Every other bid carries 3-year. Comparing them without the uplift understates V2 by Rs 7,900 per laptop."
+    },
+    "v2_footnote_discount": {
+      "value": "EXCLUDED from the ranked comparison",
+      "source": "V2 quote, footnote 3, page 2",
+      "alternative": "include 4.5% on OEM-branded lines",
+      "note": "Conditional on a deal-registration approval V2 does not hold yet. Shown to the buyer as a named upside scenario, never folded into the headline number."
+    },
+    "v4_early_po_discount": {
+      "value": "EXCLUDED from the ranked comparison",
+      "source": "V4 rate card, handwritten and circled",
+      "note": "Conditional on a PO by 25 Sep, which is before the internal approval cycle can close. Treated as unavailable rather than as a price."
+    },
+    "v1_total_discount": {
+      "value": "APPLIED at total level only",
+      "source": "V1 quote, grand total block",
+      "note": "2.5% on order value, not attributable to any line. It cannot be used in per-line ranking. It is applied only to a whole-of-V1 award total, and the system says so wherever the two disagree."
+    },
+    "tax_basis": {
+      "value": "ex-GST throughout",
+      "source": "RFx tax instruction",
+      "note": "V3 said 'taxes as applicable' and V4 wrote '+ GST' with no rate. Both are READ AS ex-GST. That is an assumption, not a finding, and it is flagged on both vendors.",
+      "confidence": "assumed - vendor did not state a rate"
+    },
+    "freight_duty": {
+      "value": "EXCLUDED from all totals",
+      "source": "RFx asked FOR destination; V2 quoted ex-works Singapore",
+      "note": "V2's imported lines exclude customs duty and freight, which the buyer bears. No duty rate is assumed. V2's datacentre lines are therefore NOT directly comparable and are marked as such rather than silently ranked.",
+      "confidence": "known gap - deliberately not estimated"
+    }
+  },
+  "uom_aliases": {
+    "pack of 5": [
+      "5-pack",
+      "box of 5",
+      "pack",
+      "pack (5 nos)",
+      "pkt of 5"
+    ],
+    "box of 10": [
+      "10-pack",
+      "box (10 nos)",
+      "pkt of 10"
+    ],
+    "box of 50": [
+      "50-pack",
+      "box (50 nos)",
+      "bundle of 50"
+    ],
+    "nos": [
+      "ea",
+      "each",
+      "no",
+      "pc",
+      "pcs",
+      "piece",
+      "unit",
+      "units"
+    ],
+    "kit": [
+      "kit of 2",
+      "matched kit",
+      "set"
+    ]
+  },
+  "uom_conversions": [
+    {
+      "from_uom": "per DIMM",
+      "to_uom": "kit",
+      "factor": 2,
+      "basis": "One asked kit = 2x 16GB DIMMs, from the RFx line spec"
+    },
+    {
+      "from_uom": "per pc",
+      "to_uom": "box of 10",
+      "factor": 10,
+      "basis": "One asked box = 10 transceivers, from the RFx line spec"
+    },
+    {
+      "from_uom": "per pc",
+      "to_uom": "box of 50",
+      "factor": 50,
+      "basis": "One asked box = 50 patch cords, from the RFx line spec"
+    }
+  ]
+}

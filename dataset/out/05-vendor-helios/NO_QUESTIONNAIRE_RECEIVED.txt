@@ -1,0 +1,10 @@
+Helios returned no questionnaire and no attachments.
+
+This is a non-response on all ten questions, six of which are mandatory.
+It is recorded as a non-response, not as a fail on the merits, and not as
+a blank the system may fill in later. The distinction matters: a vendor who
+answered and failed has told you something; a vendor who never answered has
+not.
+
+This file exists so the dataset is explicit about the absence. The pipeline
+does not read it.

@@ -1,0 +1,192 @@
+{
+  "note": "Every file in this directory encodes these same values. A reader test asserts that the mechanical layer surfaces them; an extraction test asserts the model reads them correctly.",
+  "source": "Zenith (V1) prices for a fixed 10-line subset",
+  "lines": [
+    {
+      "line": 1,
+      "price": 62800,
+      "uom": "nos",
+      "sku": "LT-BUS-14"
+    },
+    {
+      "line": 2,
+      "price": 104500,
+      "uom": "nos",
+      "sku": "LT-DEV-14"
+    },
+    {
+      "line": 5,
+      "price": 9450,
+      "uom": "nos",
+      "sku": "MON-24"
+    },
+    {
+      "line": 7,
+      "price": 13100,
+      "uom": "nos",
+      "sku": "DOCK-USBC"
+    },
+    {
+      "line": 12,
+      "price": 548000,
+      "uom": "nos",
+      "sku": "SRV-2U"
+    },
+    {
+      "line": 13,
+      "price": 18900,
+      "uom": "kit",
+      "sku": "RAM-32K"
+    },
+    {
+      "line": 18,
+      "price": 191500,
+      "uom": "nos",
+      "sku": "SW-48P"
+    },
+    {
+      "line": 20,
+      "price": 41200,
+      "uom": "box of 10",
+      "sku": "SFP-10G"
+    },
+    {
+      "line": 22,
+      "price": 14200,
+      "uom": "box of 50",
+      "sku": "PC-CAT6A"
+    },
+    {
+      "line": 27,
+      "price": 9150,
+      "uom": "nos",
+      "sku": "SCAN-2D"
+    }
+  ],
+  "files": [
+    {
+      "name": "xlsx_01_offset_table.xlsx",
+      "tests": "table starts at C12, with a totals block above it"
+    },
+    {
+      "name": "xlsx_02_merged_headers.xlsx",
+      "tests": "two-row merged header spanning columns"
+    },
+    {
+      "name": "xlsx_03_prices_as_text.xlsx",
+      "tests": "prices stored as text with a rupee glyph and Indian grouping"
+    },
+    {
+      "name": "xlsx_04_prices_on_third_sheet.xlsx",
+      "tests": "prices on the third sheet, cover letter on the first"
+    },
+    {
+      "name": "xlsx_05_banners_and_gaps.xlsx",
+      "tests": "section banners, blank spacer rows, notes below the table"
+    },
+    {
+      "name": "pdf_01_landscape.pdf",
+      "tests": "landscape page orientation"
+    },
+    {
+      "name": "pdf_02_two_column.pdf",
+      "tests": "two-column layout, non-linear reading order"
+    },
+    {
+      "name": "pdf_03_footnote_page4.pdf",
+      "tests": "conditional discount in a footnote on page 4, numbers on page 1"
+    },
+    {
+      "name": "pdf_04_image_only_scan.pdf",
+      "tests": "IMAGE-ONLY scanned PDF: no text layer, must go through vision"
+    },
+    {
+      "name": "docx_01_prose_only.docx",
+      "tests": "every price inside a prose sentence, no table at all"
+    },
+    {
+      "name": "docx_02_nested_table.docx",
+      "tests": "prices inside a table nested within another table"
+    },
+    {
+      "name": "docx_03_numbered_list.docx",
+      "tests": "commercials as a numbered list, not a table or prose"
+    },
+    {
+      "name": "eml_01_html_only.eml",
+      "tests": "HTML body with the rate table, plain-text part is a stub"
+    },
+    {
+      "name": "eml_02_forwarded_chain.eml",
+      "tests": "quote three levels deep in a forwarded chain"
+    },
+    {
+      "name": "eml_03_quoted_printable.eml",
+      "tests": "quoted-printable encoding with soft line breaks"
+    },
+    {
+      "name": "eml_04_rates_in_attachment.eml",
+      "tests": "one-line body, rates in an attached CSV"
+    },
+    {
+      "name": "misc_01_rate_sheet.csv",
+      "tests": "plain CSV rate sheet, the commonest real shape"
+    },
+    {
+      "name": "misc_02_rates.tsv",
+      "tests": "tab-separated rates"
+    },
+    {
+      "name": "misc_03_libreoffice.ods",
+      "tests": "LibreOffice .ods spreadsheet"
+    },
+    {
+      "name": "misc_04_libreoffice.odt",
+      "tests": "LibreOffice .odt letter, prices in prose"
+    },
+    {
+      "name": "misc_05_quote.txt",
+      "tests": "plain text quotation, fixed-width columns"
+    },
+    {
+      "name": "misc_06_quote.rtf",
+      "tests": "RTF quotation from a legacy system"
+    },
+    {
+      "name": "bad_01_empty.xlsx",
+      "tests": "MUST FAIL: zero bytes"
+    },
+    {
+      "name": "bad_02_pdf_renamed_to_xlsx.xlsx",
+      "tests": "MUST DETECT: a PDF renamed .xlsx, extension contradicts the bytes"
+    },
+    {
+      "name": "bad_03_truncated.pdf",
+      "tests": "truncated PDF: routed to vision, model must report what it cannot see"
+    },
+    {
+      "name": "bad_04_outlook.msg",
+      "tests": "MUST FAIL CLEARLY: Outlook .msg, binary compound file, told to export .eml"
+    },
+    {
+      "name": "jpg_01_flat_scan.jpg",
+      "tests": "flat, well lit, minimal skew"
+    },
+    {
+      "name": "jpg_02_steep_angle.jpg",
+      "tests": "steep angle, strong keystone"
+    },
+    {
+      "name": "jpg_03_low_light.jpg",
+      "tests": "low light, heavy sensor noise"
+    },
+    {
+      "name": "jpg_04_finger_occlusion.jpg",
+      "tests": "thumb covering the bottom-left corner"
+    },
+    {
+      "name": "jpg_05_photo_of_screen.jpg",
+      "tests": "photo of a monitor showing the sheet, with moire"
+    }
+  ]
+}

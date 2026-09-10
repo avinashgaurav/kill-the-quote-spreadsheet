@@ -1,0 +1,11 @@
+Line,SKU,Description,UOM,Qty,Rate
+1,LT-BUS-14,Laptop; business; 14in FHD; Core i5 13th gen; 16GB,nos,120,62800
+2,LT-DEV-14,Laptop; developer; 14in QHD; Core i7 13th gen; 32G,nos,30,104500
+5,MON-24,Monitor; 23.8in FHD IPS; height-adjustable stand; ,nos,160,9450
+7,DOCK-USBC,Docking station; USB-C; dual 4K@60Hz; 100W power d,nos,140,13100
+12,SRV-2U,Rack server; 2U; 2x Xeon Silver 4410Y; 128GB DDR5 ,nos,6,548000
+13,RAM-32K,Server memory upgrade; 32GB total as a matched kit,kit,24,18900
+18,SW-48P,Access switch; 48-port GbE PoE+ (740W budget); 4x ,nos,14,191500
+20,SFP-10G,Transceiver; 10GBASE-SR SFP+; 850nm multimode; OEM,box of 10,6,41200
+22,PC-CAT6A,Patch cord; Cat6A; 2m; LSZH jacket; factory-termin,box of 50,14,14200
+27,SCAN-2D,Barcode scanner; 2D imager; wireless (Bluetooth); ,nos,90,9150
