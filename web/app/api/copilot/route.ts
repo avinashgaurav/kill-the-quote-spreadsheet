@@ -62,6 +62,8 @@ export async function POST(request: Request) {
         tools: COPILOT_TOOLS as unknown as ToolSpec[],
         maxTokens: 16000,
         effort: "high",
+        // Drafting is a conversation. Nobody waits four minutes for a reply.
+        retryBudgetMs: 25_000,
       });
 
       usage = {

@@ -78,6 +78,10 @@ export async function POST(request: Request) {
         tools: ANALYST_TOOLS as unknown as ToolSpec[],
         maxTokens: 16000,
         effort: "high",
+        // Someone is watching a cursor blink. Twelve turns each waiting on a
+        // busy provider is how a question takes four minutes, so each turn
+        // gives up quickly and the route reports the provider as busy.
+        retryBudgetMs: 25_000,
       });
 
       usage = {

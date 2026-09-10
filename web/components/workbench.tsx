@@ -250,6 +250,9 @@ export function Workbench({
       <AppHeader
         rfxId={payload?.rfx.id ?? "—"}
         buyerName={payload?.buyer.short_name ?? ""}
+        rfxTitle={payload?.rfx.title}
+        issued={(payload?.rfx as { issued?: string } | undefined)?.issued}
+        due={payload?.rfx.due}
         lineCount={payload?.lines.length ?? 0}
         vendorCount={payload?.vendors.length ?? 0}
         tab={tab}

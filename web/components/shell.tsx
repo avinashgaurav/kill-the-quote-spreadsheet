@@ -21,10 +21,15 @@ import { inrShort } from "@/lib/ui";
 // ---------------------------------------------------------------------------
 
 export function AppHeader({
-  rfxId, buyerName, lineCount, vendorCount, tab, onTab, steps, right,
+  rfxId, buyerName, rfxTitle, issued, due, lineCount, vendorCount,
+  tab, onTab, steps, right,
 }: {
   rfxId: string;
   buyerName: string;
+  /** What this enquiry is for. The header used to omit it entirely. */
+  rfxTitle?: string;
+  issued?: string;
+  due?: string;
   lineCount: number;
   vendorCount: number;
   tab: string;
@@ -48,13 +53,37 @@ export function AppHeader({
           <h1 className="text-[13px] leading-tight font-semibold tracking-tight">
             {buyerName || "Quote Workbench"}
           </h1>
-          <p className="truncate text-[11px] leading-tight text-muted-foreground">
-            <span className="font-mono">{rfxId}</span>
-            <Dot />
-            <span className="num">{lineCount}</span> lines
-            <Dot />
-            <span className="num">{vendorCount}</span> suppliers
-          </p>
+          {/*
+            "30 lines · 5 suppliers" was true and told a first-time reader
+            nothing: lines of what, and five suppliers doing what? The enquiry
+            has a title and two dates and the header showed neither, so the one
+            line that establishes what you are looking at was the one line
+            missing.
+          */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="cursor-help truncate text-[11px] leading-tight text-muted-foreground">
+                <span className="font-mono">{rfxId}</span>
+                <Dot />
+                <span className="num">{lineCount}</span> line items out to{" "}
+                <span className="num">{vendorCount}</span> suppliers
+              </p>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-sm space-y-1 text-[11px]">
+              {rfxTitle && <p className="font-medium">{rfxTitle}</p>}
+              <p className="text-muted-foreground">
+                {buyerName} asked {vendorCount} suppliers to price {lineCount} line
+                items. Every price on this screen was read from what they sent back.
+              </p>
+              {(issued || due) && (
+                <p className="num text-muted-foreground">
+                  {issued && `issued ${issued}`}
+                  {issued && due && " · "}
+                  {due && `replies due ${due}`}
+                </p>
+              )}
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 

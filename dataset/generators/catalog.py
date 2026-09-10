@@ -5,7 +5,7 @@ Everything else in dataset/generators/ reads from here, so the RFx, the five
 vendor replies, the questionnaire results and the ground-truth answer key can
 never drift apart.
 
-Buyer:  Northbridge Retail India Pvt Ltd (fictional)
+Buyer:  Kaveri Retail India Pvt Ltd (fictional)
 RFx:    RFX-2026-0142, FY27 IT Hardware Refresh
 Scale:  30 line items, 5 vendors, ~Rs 4 crore at internal baseline
 
@@ -19,8 +19,8 @@ from datetime import date
 # ---------------------------------------------------------------------------
 
 BUYER = {
-    "legal_name": "Northbridge Retail India Pvt Ltd",
-    "short_name": "Northbridge Retail",
+    "legal_name": "Kaveri Retail India Pvt Ltd",
+    "short_name": "Kaveri Retail",
     "cin": "U52190KA2011PTC058842",
     "gstin": "29AACCN4471K1ZP",
     "hq": "Prestige Tech Park, Outer Ring Road, Bengaluru 560103",

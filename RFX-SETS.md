@@ -11,7 +11,7 @@ traps change. Read Set 3 last: it is the one where a "line item" is not a thing 
 
 ## Set 1: IT hardware refresh (BUILT, this is the live demo)
 
-**Buyer:** Northbridge Retail, 210 stores. **Value:** about Rs 4.27 crore at budget.
+**Buyer:** Kaveri Retail, 210 stores. **Value:** about Rs 4.27 crore at budget.
 
 ### Scope
 Supply, delivery and 3-year onsite warranty of end-user compute, networking and

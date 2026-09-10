@@ -560,7 +560,7 @@ def build_v3():
     doc.add_paragraph(
         "Thank you for the opportunity to quote. We have been supplying IT hardware to "
         "retail and manufacturing customers in western India since 2009 and would be "
-        "glad to be associated with Northbridge Retail. Our offer is set out below.")
+        "glad to be associated with Kaveri Retail. Our offer is set out below.")
 
     doc.add_paragraph()
     doc.add_paragraph().add_run("Enduser Computing").bold = True

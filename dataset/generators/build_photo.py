@@ -92,7 +92,7 @@ def render_page():
     # --- title block ------------------------------------------------------
     d.text((90, 292), "RATE CARD - CORPORATE SUPPLY", font=font("head", 38), fill=INK)
     d.text((90, 346), f"Ref: {RFX['id']}   Attn: {RFX['buyer_contact']['name']}, "
-                      f"Northbridge Retail", font=font("body", 26), fill=INK)
+                      f"Kaveri Retail", font=font("body", 26), fill=INK)
     d.text((90, 384), "Date: 17.09.2026", font=font("body", 26), fill=INK)
 
     # --- table ------------------------------------------------------------

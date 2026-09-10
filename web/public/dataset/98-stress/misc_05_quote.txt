@@ -1,0 +1,15 @@
+ZENITH INFOTECH - QUOTATION
+
+Line  UOM          Qty   Rate
+1     nos          120   62,800
+2     nos          30    104,500
+5     nos          160   9,450
+7     nos          140   13,100
+12    nos          6     548,000
+13    kit          24    18,900
+18    nos          14    191,500
+20    box of 10    6     41,200
+22    box of 50    14    14,200
+27    nos          90    9,150
+
+Freight included. Payment 30 days.

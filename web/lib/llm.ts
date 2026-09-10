@@ -171,6 +171,16 @@ export interface LlmRequest {
   maxTokens?: number;
   effort?: "low" | "medium" | "high";
   kind?: "main" | "cheap";
+  /**
+   * How long we are willing to spend RETRYING a busy provider, in milliseconds.
+   *
+   * Not a request timeout. It bounds the waiting between attempts, which is
+   * where the time actually goes on a rate-limited key. Defaults to 45s, which
+   * suits an interactive question; a document read passes something longer,
+   * because a minute of waiting for a page of prices is worth it and a minute
+   * of waiting for a sentence is not.
+   */
+  retryBudgetMs?: number;
 }
 
 export async function callLlm(req: LlmRequest): Promise<LlmResult> {
@@ -340,6 +350,24 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
   const RETRYABLE = new Set([429, 500, 502, 503, 504]);
   const MAX_ATTEMPTS = 5;
 
+  /**
+   * A wall-clock ceiling on retrying, separate from the attempt count.
+   *
+   * Five attempts honouring a provider hint of up to 70 seconds each is over
+   * four minutes of waiting. On a rate-limited key the analyst route sat there
+   * spending the whole serverless budget and the buyer watched a spinner, which
+   * is a worse failure than the rate limit: they cannot tell a busy provider
+   * from a broken product.
+   *
+   * Found by the end-to-end suite timing out on a quota-exhausted key, which is
+   * exactly the state a live demo can be in.
+   *
+   * Reading a document can legitimately take a minute and is worth waiting for,
+   * so the budget is a parameter. An interactive question is not.
+   */
+  const budgetMs = req.retryBudgetMs ?? 45_000;
+  const started = Date.now();
+
   let res!: Response;
   let lastDetail = "";
 
@@ -377,6 +405,19 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
     const waitMs = hinted
       ? Math.min(Number(hinted[1]) * 1000 + 1500, 70_000)
       : 1000 * 2 ** (attempt - 1) + Math.random() * 400;
+
+    // Give up rather than keep someone waiting past the budget. Reported as a
+    // wait we chose to stop, not as a mystery, so the message a buyer sees can
+    // say the provider is busy instead of implying the tool is broken.
+    const elapsed = Date.now() - started;
+    if (elapsed + waitMs > budgetMs) {
+      throw new Error(
+        `Gemini ${res.status}: gave up after ${Math.round(elapsed / 1000)}s rather ` +
+        `than wait a further ${Math.round(waitMs / 1000)}s. The provider asked us to ` +
+        `retry later, which means it is rate limiting or out of quota, not that the ` +
+        `request was wrong. ${lastDetail.slice(0, 300)}`,
+      );
+    }
 
     await new Promise((r) => setTimeout(r, waitMs));
   }

@@ -1,0 +1,60 @@
+==============================================================================
+RFX-2026-0142  30 lines  5 vendors
+Internal baseline                    Rs    42,740,500   (4.27 cr)
+==============================================================================
+
+CELL STATUS COUNTS  (5 vendors x 30 lines = 150 cells)
+  comparable                    99
+  non_comparable                25
+  omitted                       11
+  comparable_with_caveat         8
+  declined                       3
+  resolved_from_reference        3
+  unreadable                     1
+  -> usable in award math      107  of 150
+
+SINGLE-VENDOR AWARD
+  V1 QUALIFIED   Rs    41,490,600  (30/30 priced)  after 2.5% total discount: Rs 40,453,335
+  V2 QUALIFIED   Rs    39,794,250  (27/30 priced)  incomplete, 3 lines unpriced
+  V3 DISQUALIFIED  Rs    37,472,300  (27/30 priced)  incomplete, 3 lines unpriced
+  V4 DISQUALIFIED  Rs    30,670,200  (21/30 priced)  incomplete, 9 lines unpriced
+  V5 DISQUALIFIED  Rs    16,920,920  ( 5/30 priced)  incomplete, 25 lines unpriced
+
+SPLIT AWARD, CHEAPEST PER LINE
+  a) all five vendors, ignoring the questionnaire
+       Rs 38,108,690   (30/30 lines fillable)
+  b) only vendors that cleared every mandatory question (V1, V2)
+       Rs 40,681,322   (30/30 lines fillable)
+  c) as (b), also excluding substitutions and below-spec offers
+       Rs 37,651,250   (29/30 lines fillable)
+
+  LIKE-FOR-LIKE, restated on the 29 lines all three scenarios can fill
+    a_all_vendors            headline Rs   38,108,690 over 30 lines   |  like-for-like Rs   35,123,690
+    b_qualified              headline Rs   40,681,322 over 30 lines   |  like-for-like Rs   37,546,322
+    c_qualified_no_caveats   headline Rs   37,651,250 over 29 lines   |  like-for-like Rs   37,651,250
+  Scenario (c)'s headline is LOWER than (b)'s only because it awards one
+  fewer line. On a common basis it is higher, which is the true direction.
+
+  COST OF COMPLIANCE  (b) - (a) = Rs 2,572,632  (6.8% more)
+  This is the demo's money moment. The apparent saving in (a) is not
+  available: it is concentrated in V4, which failed six mandatory questions,
+  and V4's cheapest-looking lines are the two UoM traps.
+
+UOM TRAPS: what V4 looks like before and after normalisation
+  L13 RAM-32K    asked per 'kit'
+       V4 raw    Rs     9,600 per per DIMM     looks  49.2% under V1
+       V4 landed Rs    19,200 per kit          actually  +1.6% vs V1 (Rs 18,900)
+  L20 SFP-10G    asked per 'box of 10'
+       V4 raw    Rs     4,150 per per pc       looks  89.9% under V1
+       V4 landed Rs    41,500 per box of 10    actually  +0.7% vs V1 (Rs 41,200)
+  L22 PC-CAT6A   asked per 'box of 50'
+       V4 raw    Rs       268 per per pc       looks  98.1% under V1
+       V4 landed Rs    13,400 per box of 50    actually  -5.6% vs V1 (Rs 14,200)
+
+CONDITIONAL MONEY LEFT ON THE TABLE (shown, never scored)
+  V2 footnote-3 discount 4.5% on OEM-branded lines, subject to deal registration
+     up to Rs 1,790,741 off a whole-of-V2 award
+  V4 handwritten 5.0% if PO by 25 Sep (before approval can close)
+     up to Rs 1,533,510, and V4 is disqualified anyway
+
+Oracle written: /Users/raramuri/Desktop/Personal/AC/dataset/out/99-internal/ground-truth.json

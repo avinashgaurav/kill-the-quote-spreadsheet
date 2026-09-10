@@ -218,6 +218,9 @@ export async function extractDocument(opts: {
     forceTool: EXTRACTION_TOOL.name,
     maxTokens: 16000,
     effort: "high",
+    // A document read is worth waiting for: it happens once per file, in a
+    // batch the buyer expects to take a while.
+    retryBudgetMs: 120_000,
   });
 
   const call = response.toolCalls.find((c) => c.name === EXTRACTION_TOOL.name);
