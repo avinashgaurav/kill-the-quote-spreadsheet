@@ -630,6 +630,88 @@
       "blurb": "Incumbent for peripherals. Replies in one paragraph and expects you to remember last year."
     }
   ],
+  "roster": [
+    {
+      "code": "V1",
+      "name": "Zenith Infotech Solutions Pvt Ltd",
+      "city": "Bengaluru",
+      "email": "prakash.iyer@zenithinfotech.co.in",
+      "reply_on_file": true,
+      "blurb": "Large national reseller, multi-OEM, strong on enduser compute"
+    },
+    {
+      "code": "V2",
+      "name": "Cygnus Technologies India Pvt Ltd",
+      "city": "Mumbai",
+      "email": "farida.merchant@cygnustech.in",
+      "reply_on_file": true,
+      "blurb": "OEM-authorised, imports datacentre kit directly, quotes part USD"
+    },
+    {
+      "code": "V3",
+      "name": "Orbit Systems & Services",
+      "city": "Pune",
+      "email": "sameer@orbitsystems.co.in",
+      "reply_on_file": true,
+      "blurb": "Mid-size partnership. Writes quotes as letters, not spreadsheets"
+    },
+    {
+      "code": "V4",
+      "name": "Vector Digital Systems",
+      "city": "Chennai",
+      "email": "karthik@vectordigital.in",
+      "reply_on_file": true,
+      "blurb": "Small channel partner. Replies from a phone, often a photograph"
+    },
+    {
+      "code": "V5",
+      "name": "Helios Enterprise Solutions Pvt Ltd",
+      "city": "Hyderabad",
+      "email": "vikram.sethi@helios-ent.com",
+      "reply_on_file": true,
+      "blurb": "Incumbent on part of the estate. Terse, refers to previous orders"
+    },
+    {
+      "code": "V6",
+      "name": "Trilok Infosystems Pvt Ltd",
+      "city": "Ahmedabad",
+      "email": "bids@trilokinfosystems.in",
+      "reply_on_file": false,
+      "blurb": "West-region reseller. On the panel since 2023, never quoted"
+    },
+    {
+      "code": "V7",
+      "name": "Meghdoot Technologies LLP",
+      "city": "Kolkata",
+      "email": "sales@meghdoottech.co.in",
+      "reply_on_file": false,
+      "blurb": "East-region partner. Strong on networking, thin on compute"
+    },
+    {
+      "code": "V8",
+      "name": "Arunoday Systems Pvt Ltd",
+      "city": "Noida",
+      "email": "tenders@arunodaysystems.com",
+      "reply_on_file": false,
+      "blurb": "North-region. Usually bids only above Rs 2 crore"
+    },
+    {
+      "code": "V9",
+      "name": "Kadamba Digital Pvt Ltd",
+      "city": "Kochi",
+      "email": "rfq@kadambadigital.in",
+      "reply_on_file": false,
+      "blurb": "Small south-region partner. Added to widen the field"
+    },
+    {
+      "code": "V10",
+      "name": "Sahyadri Compute Solutions",
+      "city": "Nashik",
+      "email": "prashant@sahyadricompute.in",
+      "reply_on_file": false,
+      "blurb": "Newly empanelled. No history with us yet"
+    }
+  ],
   "terms": {
     "V1": {
       "gst": "18% extra as applicable, HSN stated per line",

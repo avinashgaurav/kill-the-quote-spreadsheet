@@ -134,7 +134,16 @@ export function Workbench({
   /** How many suppliers have actually had a document read. */
   const readCount = payload?.vendors.filter((v) => v.meta).length ?? 0;
 
-  const load = useCallback(async () => {
+  /**
+   * Refresh the comparison.
+   *
+   * `jump` controls whether landing data also moves the buyer to the grid. It
+   * has to be optional: replies arrive one supplier at a time, and refreshing
+   * after each one used to yank the screen to the comparison after the FIRST
+   * arrival, so nobody could watch the rest land. Auto-advancing is right on a
+   * first load and wrong in the middle of something.
+   */
+  const load = useCallback(async (jump = true) => {
     try {
       const res = await fetch("/api/comparison", { cache: "no-store" });
       const json = await res.json();
@@ -146,7 +155,7 @@ export function Workbench({
       }
       setLoadError(null);
       setPayload(json);
-      if (json.hasAnyExtraction) setTab("compare");
+      if (jump && json.hasAnyExtraction) setTab("compare");
     } catch (e) {
       setLoadError(String(e));
     } finally {
@@ -348,7 +357,9 @@ export function Workbench({
               <div className="min-h-0 flex-1 overflow-y-auto">
                 <Intake
                   hasData={payload.hasAnyExtraction}
-                  onDone={() => { void load(); }}
+                  // Refresh the numbers, stay where the buyer is: replies are
+                  // still arriving and they are watching them.
+                  onDone={() => { void load(false); }}
                 />
                 <VendorRoster vendors={payload.vendors} />
               </div>

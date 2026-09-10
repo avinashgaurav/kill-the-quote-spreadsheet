@@ -235,6 +235,57 @@ PRIOR_PO = {
 }
 
 # ---------------------------------------------------------------------------
+# The supplier roster
+# ---------------------------------------------------------------------------
+#
+# Ten suppliers a buyer could invite, of which five have a reply on file.
+#
+# That asymmetry is the point, and it is what actually happens: you invite ten
+# and five answer. A demo where everybody replies teaches the wrong lesson,
+# because the interesting states in this product are the ones where somebody
+# did not. A supplier with no reply on file simply never responds, which is
+# exactly the case the chase loop exists for.
+#
+# The five without documents are here as names only. They carry no prices and
+# no questionnaire answers, because inventing a reply for them would be
+# inventing extraction output, and that is the one thing the brief forbids.
+
+ROSTER = [
+    # The five who reply. Codes match the VENDORS below.
+    dict(code="V1", name="Zenith Infotech Solutions Pvt Ltd", city="Bengaluru",
+         email="prakash.iyer@zenithinfotech.co.in", reply_on_file=True,
+         blurb="Large national reseller, multi-OEM, strong on enduser compute"),
+    dict(code="V2", name="Cygnus Technologies India Pvt Ltd", city="Mumbai",
+         email="farida.merchant@cygnustech.in", reply_on_file=True,
+         blurb="OEM-authorised, imports datacentre kit directly, quotes part USD"),
+    dict(code="V3", name="Orbit Systems & Services", city="Pune",
+         email="sameer@orbitsystems.co.in", reply_on_file=True,
+         blurb="Mid-size partnership. Writes quotes as letters, not spreadsheets"),
+    dict(code="V4", name="Vector Digital Systems", city="Chennai",
+         email="karthik@vectordigital.in", reply_on_file=True,
+         blurb="Small channel partner. Replies from a phone, often a photograph"),
+    dict(code="V5", name="Helios Enterprise Solutions Pvt Ltd", city="Hyderabad",
+         email="vikram.sethi@helios-ent.com", reply_on_file=True,
+         blurb="Incumbent on part of the estate. Terse, refers to previous orders"),
+    # The five who do not. Real-looking, deliberately empty.
+    dict(code="V6", name="Trilok Infosystems Pvt Ltd", city="Ahmedabad",
+         email="bids@trilokinfosystems.in", reply_on_file=False,
+         blurb="West-region reseller. On the panel since 2023, never quoted"),
+    dict(code="V7", name="Meghdoot Technologies LLP", city="Kolkata",
+         email="sales@meghdoottech.co.in", reply_on_file=False,
+         blurb="East-region partner. Strong on networking, thin on compute"),
+    dict(code="V8", name="Arunoday Systems Pvt Ltd", city="Noida",
+         email="tenders@arunodaysystems.com", reply_on_file=False,
+         blurb="North-region. Usually bids only above Rs 2 crore"),
+    dict(code="V9", name="Kadamba Digital Pvt Ltd", city="Kochi",
+         email="rfq@kadambadigital.in", reply_on_file=False,
+         blurb="Small south-region partner. Added to widen the field"),
+    dict(code="V10", name="Sahyadri Compute Solutions", city="Nashik",
+         email="prashant@sahyadricompute.in", reply_on_file=False,
+         blurb="Newly empanelled. No history with us yet"),
+]
+
+# ---------------------------------------------------------------------------
 # Vendors
 # ---------------------------------------------------------------------------
 

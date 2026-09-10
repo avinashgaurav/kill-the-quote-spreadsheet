@@ -15,6 +15,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Invite } from "./invite";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -107,6 +108,12 @@ export function Intake({
           not judged on their questionnaire until it has actually been read, so until
           then they show as not assessed rather than as passed.
         </p>
+      </div>
+
+      {/* Collect replies, or drop files in by hand. Both paths end in the same
+          reader, so a demo can use whichever suits and neither is a shortcut. */}
+      <div className="mb-5">
+        <Invite onDone={onDone} />
       </div>
 
       <div

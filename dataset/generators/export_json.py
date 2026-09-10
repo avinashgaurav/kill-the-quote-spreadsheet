@@ -22,7 +22,7 @@ Two files, and the split matters:
 import json
 from pathlib import Path
 
-from catalog import (BUYER, RFX, LINES, VENDORS, QUOTES, TERMS, PRIOR_PO,
+from catalog import (BUYER, RFX, LINES, VENDORS, QUOTES, TERMS, PRIOR_PO, ROSTER,
                      QUESTIONNAIRE, QUESTIONNAIRE_ANSWERS, qualification,
                      baseline_total_inr)
 from normalise import ASSUMPTIONS, UOM_ALIASES, UOM_CONVERSIONS
@@ -38,6 +38,7 @@ def main():
         rfx=RFX,
         lines=LINES,
         vendors=VENDORS,
+        roster=ROSTER,
         terms=TERMS,
         questionnaire=QUESTIONNAIRE,
         questionnaire_answers=QUESTIONNAIRE_ANSWERS,
