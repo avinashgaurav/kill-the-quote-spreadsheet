@@ -1049,6 +1049,39 @@ async function main() {
     );
   }
 
+  // ---- 38. The cheap tier was the frontier model on one provider --------
+  //
+  // `anthropic: { main: "claude-opus-5", cheap: "claude-opus-5" }`. The whole
+  // point of the cheap tier was cancelled on that provider: the crop re-read
+  // runs eight times per photograph and would have gone to the frontier model
+  // to read four digits out of a 300x120 crop. The Gemini side had it right
+  // and the Anthropic side was never revisited after the seam was written.
+  //
+  // The second read's value is that it is INDEPENDENT, not that it is clever.
+  {
+    /**
+     * Checked against the OBJECT, not the source text.
+     *
+     * The first version grepped lib/llm.ts for `main:` and `cheap:` and
+     * matched the model name quoted inside the comment that explains the bug,
+     * so it compared a comment against code and printed nonsense. Same lesson
+     * as the cost model: import the thing and inspect it.
+     */
+    const { MODEL_IDS } = await import("../lib/llm");
+    const providers = Object.entries(MODEL_IDS) as Array<
+      [string, { main: string; cheap: string }]
+    >;
+    const same = providers.filter(([, m]) => m.main === m.cheap);
+    check(
+      "38. A provider's cheap tier was its frontier model",
+      "every provider's cheap tier is a different, smaller model",
+      providers.length >= 2 && same.length === 0,
+      same.length
+        ? `${same.map(([p, m]) => `${p} uses ${m.main} for both`).join("; ")}`
+        : providers.map(([p, m]) => `${p}: ${m.main} / ${m.cheap}`).join("  |  "),
+    );
+  }
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

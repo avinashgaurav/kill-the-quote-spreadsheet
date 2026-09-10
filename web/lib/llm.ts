@@ -5,6 +5,28 @@
  * the model is a configuration choice rather than something welded into the
  * app. Set LLM_PROVIDER=gemini to run on Gemini, otherwise it runs on Claude.
  *
+ * WHICH ONE TO RUN, and why the seam is worth having.
+ *
+ * Gemini 3.1 Pro is what the measured accuracy figures come from: 107 of 107
+ * lines returned across five formats, 100% price and unit exactness, nothing
+ * invented, and confidence that tracked difficulty unprompted. It is also the
+ * cheaper of the two. An earlier version of this comment said "run the real
+ * demo on Claude Opus 5" and recommended Flash for Gemini, which was true when
+ * the only Gemini key available was a free-tier one that returned limit: 0 on
+ * every Pro model. Billing changed that and the comment did not, which is
+ * exactly the sort of stale instruction this file should not carry.
+ *
+ * The one thing Anthropic genuinely does better here is PDF provenance:
+ * `supportsCitations()` below is true only for Anthropic, so a citation on a
+ * three-page PDF comes from the provider rather than from the model reporting
+ * its own locator. `extractDocument` flags the difference as
+ * `provenanceWeaker` rather than hiding it. If PDF provenance is the thing
+ * being examined, switch; otherwise Gemini is the measured choice.
+ *
+ * Either way the switch is one environment variable, which is the point of the
+ * seam: it is insurance against a provider being down or out of credit at a
+ * bad moment, not a preference.
+ *
  * This exists for an honest reason and it is worth stating plainly, because the
  * providers are NOT equivalent for this job:
  *
@@ -35,15 +57,23 @@ export function activeProvider(): Provider {
 }
 
 export const MODEL_IDS = {
-  anthropic: { main: "claude-opus-5", cheap: "claude-opus-5" },
-  // Flash, reluctantly. Every Gemini Pro model returns limit: 0 on a free-tier
-  // key, so Flash is the only one that will actually run without billing.
-  //
-  // Be clear about what that costs: Flash is a small model being asked to read
-  // a photograph of a rotated table with handwritten overrides, which is the
-  // hardest document in the set. Use this to prove the pipeline works, and run
-  // the real demo on Claude Opus 5. Override with GEMINI_MODEL if a Pro model
-  // becomes available.
+  anthropic: {
+    main: process.env.ANTHROPIC_MODEL || "claude-opus-5",
+    /**
+     * Haiku, not Opus.
+     *
+     * This said `cheap: "claude-opus-5"`, so the entire point of the cheap
+     * tier was cancelled on this provider: the crop re-read runs EIGHT TIMES
+     * per photograph and would have gone to the frontier model to read four
+     * digits out of a 300x120 pixel crop. The Gemini side had this right and
+     * the Anthropic side was never revisited after the seam was written.
+     *
+     * The second read's value is that it is INDEPENDENT, not that it is
+     * clever: it is handed one cropped number with no surrounding context, and
+     * two reads agreeing is the evidence. A small model is the correct tool.
+     */
+    cheap: process.env.ANTHROPIC_CHEAP_MODEL || "claude-haiku-4-5-20251001",
+  },
   gemini: {
     // 3.1 Pro for the reading and the reasoning. Gemini's lineage is native
     // multimodal document understanding, which is exactly the hard part here:
