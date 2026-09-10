@@ -21,7 +21,11 @@
     "e2e-test": "python3 scripts/e2e-test.py",
     "test:all": "npm run conformance && npm run reader-test && npm run parse-check && npm run revision-test && npm run generality-test && npm run questionnaire-test && npm run regression-test",
     "regression-test": "tsx scripts/regression-test.ts",
-    "questionnaire-test": "tsx scripts/questionnaire-test.ts"
+    "questionnaire-test": "tsx scripts/questionnaire-test.ts",
+    "types": "tsc --noEmit",
+    "api-check": "tsx scripts/api-check.ts",
+    "accuracy:fresh": "tsx scripts/accuracy.ts --all --fresh",
+    "verify": "npm run types && npm run lint && npm run test:all"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

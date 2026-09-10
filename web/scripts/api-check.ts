@@ -43,7 +43,7 @@ async function main() {
       const r = await callLlm({
         system: "Reply with one word.",
         parts: [{ kind: "text", text: "Say OK." }],
-        maxTokens: 16, tier, retryBudgetMs: 8000,
+        maxTokens: 16, kind: tier, retryBudgetMs: 8000,
       });
       console.log(
         `${label} WORKS   in=${r.usage?.input ?? "?"} out=${r.usage?.output ?? "?"}`,

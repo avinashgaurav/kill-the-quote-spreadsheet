@@ -74,12 +74,28 @@ const LATE_REVISIONS: Record<string, string> = {
 };
 
 const CORPUS = join(process.cwd(), "public", "dataset");
+/** Where the generators write. Present in the repo, absent in a deployment. */
 const FALLBACK = join(process.cwd(), "..", "dataset", "out");
 
+/**
+ * Find one supplier's document on disk.
+ *
+ * The `turbopackIgnore` comments are load-bearing rather than cosmetic. The
+ * bundler sees a `join` with a runtime string, concludes it cannot know which
+ * files are needed, and traces THE WHOLE PROJECT into the function bundle:
+ * every source file and the entire public folder, which here includes the
+ * eleven photographs of a rate card. That is how a 200 kB route becomes a
+ * deployment that is slow to build and eventually too big to build at all.
+ *
+ * The paths are safe to exempt because both roots are fixed at module load
+ * and `rel` only ever comes from MAILBOX or LATE_REVISIONS above, never from
+ * the request body. The public/dataset files are already deployed as static
+ * assets, which is how the route finds them at runtime.
+ */
 function resolve(rel: string): string | null {
   for (const base of [CORPUS, FALLBACK]) {
-    const p = join(base, rel);
-    if (existsSync(p)) return p;
+    const p = join(/* turbopackIgnore: true */ base, rel);
+    if (existsSync(/* turbopackIgnore: true */ p)) return p;
   }
   return null;
 }
@@ -160,7 +176,7 @@ export async function POST(request: Request) {
         continue;
       }
 
-      const buf = await readFile(path);
+      const buf = await readFile(/* turbopackIgnore: true */ path);
       const ext = name.split(".").pop()!.toLowerCase();
       const mimeType = MIME[ext] ?? "application/octet-stream";
 
