@@ -120,6 +120,150 @@ function AskQuestions({
   );
 }
 
+/**
+ * Where the model is used, and where it deliberately is not.
+ *
+ * In the product rather than only in the repository, because the first
+ * question anybody asks about a tool like this is "so what is the AI actually
+ * doing?", and the answer should not require reading a markdown file. It is
+ * also the honest counterweight to a screen full of confident numbers: six
+ * calls, each with a written prohibition, and every arithmetic step in code.
+ *
+ * Hand-maintained, and that is a real cost worth naming: add a seventh model
+ * call and this list is wrong until somebody updates it. It is a shorter list
+ * than the alternative, which is a screen that cannot say what it does.
+ */
+const AI_CALLS: Array<{
+  n: number; where: string; asked: string; forbidden: string;
+}> = [
+  {
+    n: 1, where: "Drafting your enquiry",
+    asked: "Turn what you typed into scope, line items, a questionnaire and terms. Three tools, up to eight turns.",
+    forbidden: "Invent a price or an estimate. It has no view on what things cost.",
+  },
+  {
+    n: 2, where: "Reading a quotation",
+    asked: "What does this document say, line by line, in the supplier's own unit and currency? One forced tool and no others.",
+    forbidden: "Convert, multiply, discount, add or rank. Report a number it cannot read. Return a value with no source.",
+  },
+  {
+    n: 3, where: "Re-reading a photograph's crop",
+    asked: "Just this one value, cropped out, with no surrounding context. Cheap model, thinking off.",
+    forbidden: "See the rest of the page. Two reads that agree is evidence; two that disagree lowers the confidence.",
+  },
+  {
+    n: 4, where: "Reading a questionnaire response",
+    asked: "What did they answer, and what did they attach? The answer and the evidence are kept strictly apart.",
+    forbidden: "Decide whether they pass. It returns no verdict at all.",
+  },
+  {
+    n: 5, where: "Reading a document they attached",
+    asked: "What do you say about yourself: which standard, with the revision year exactly as printed, which expiry date, issued to whom?",
+    forbidden: "Judge whether it satisfies the question it was attached to.",
+  },
+  {
+    n: 6, where: "Answering your questions",
+    asked: "Choose which questions to put to the calculator, and explain what comes back. Ten tools, up to twelve turns.",
+    forbidden: "Compute anything. There is no evaluate tool, no SQL, and no way to hand it two numbers and ask for their sum.",
+  },
+];
+
+const CODE_DECIDES: Array<[string, string]> = [
+  ["Landed cost per the unit you asked for",
+   "Two implementations, Python and TypeScript, proven to agree on all 150 cells by 442 assertions. You cannot do that to a model."],
+  ["Whether an answer satisfies a question",
+   "Comparing a revision year to the one asked for, and an expiry date to today, is not a judgement call."],
+  ["Which supplier is cheapest on a line",
+   "Deterministic, and it has to be identical here, in the analyst, in the chase and in the award note."],
+  ["Whether two totals can be compared",
+   "Two scenarios over different line sets have incomparable totals. A model would compare them, because they are both numbers."],
+  ["Whether a cell can be awarded at all",
+   "A price derived from a prior order stays out until the supplier confirms it. Awarding against an offer nobody made is not an award."],
+];
+
+export function AiPanel({ onClose }: { onClose?: () => void }) {
+  return (
+    <div className="flex h-full flex-col overflow-y-auto">
+      <div className="space-y-1.5 border-b p-4">
+        <p className="text-sm font-semibold">Where the model is used</p>
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          Six calls. Nothing else in this tool talks to a model. If a number on
+          screen cannot be traced to one of these six or to code computing over
+          their output, that is a bug.
+        </p>
+        <p className="text-[11px] leading-relaxed font-medium">
+          The model reads. The code counts.
+        </p>
+      </div>
+
+      <div className="divide-y">
+        {AI_CALLS.map((c) => (
+          <div key={c.n} className="space-y-1 px-4 py-3">
+            <p className="text-[11px] font-semibold">
+              <span className="mr-1.5 font-mono text-muted-foreground">{c.n}</span>
+              {c.where}
+            </p>
+            <p className="text-[10.5px] leading-relaxed text-muted-foreground">
+              {c.asked}
+            </p>
+            <p className="text-[10.5px] leading-relaxed">
+              <span className="font-medium">It may not: </span>
+              <span className="text-muted-foreground">{c.forbidden}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t bg-muted/30 px-4 py-3">
+        <p className="mb-2 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+          Decided in code, not by a model
+        </p>
+        <div className="space-y-2">
+          {CODE_DECIDES.map(([what, why]) => (
+            <div key={what}>
+              <p className="text-[10.5px] font-medium">{what}</p>
+              <p className="text-[10px] leading-relaxed text-muted-foreground">{why}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2 border-t px-4 py-3">
+        <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+          Stubbed, precisely
+        </p>
+        <p className="text-[10.5px] leading-relaxed text-muted-foreground">
+          One thing: the delivery hop. No SMTP server, no WhatsApp API, no mailbox
+          polled. A supplier replies because their document is on file and you
+          invited them.
+        </p>
+        <p className="text-[10.5px] leading-relaxed text-muted-foreground">
+          The channel is not stubbed. WhatsApp cannot carry an attachment, so the
+          pack goes as a link and a supplier&rsquo;s certificate does not come back,
+          which is why their answer then has nothing behind it.
+        </p>
+        <p className="text-[10.5px] leading-relaxed">
+          Everything that arrives is read through the identical path as a file you
+          drag in: same call, same schema, same provenance, same loud failure on an
+          empty read.
+        </p>
+      </div>
+
+      <div className="mt-auto border-t px-4 py-3">
+        <p className="text-[10px] leading-relaxed text-muted-foreground">
+          The trade this costs: code returns &ldquo;cannot resolve&rdquo; where a
+          model would have improvised. A plausible price is worse than an admitted
+          gap, because a gap gets chased and a plausible price gets awarded.
+        </p>
+      </div>
+
+      {onClose && (
+        <button onClick={onClose} className="sr-only">Close</button>
+      )}
+    </div>
+  );
+}
+
 export function SupplierPanel({
   vendor, questionnaire, answers, attachments, linesPriced, totalLines,
   singleVendorInr, onClose,

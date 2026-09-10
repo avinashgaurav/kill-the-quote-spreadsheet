@@ -404,6 +404,7 @@ export function FixtureWarning({ vendors }: { vendors: string[] }) {
 export function TrustBar({
   trust, awardedOn, assumptionCount, unmappedCount, findingsCount, chaseSummary,
   onShowReview, onShowAssumptions, onShowUnmapped, onShowFindings, onShowChase,
+  onShowAi,
 }: {
   trust: {
     total: number; usable: number; excluded: number; needsHuman: number;
@@ -419,6 +420,7 @@ export function TrustBar({
   findingsCount?: number;
   onShowReview?: () => void;
   onShowAssumptions?: () => void;
+  onShowAi?: () => void;
   onShowUnmapped?: () => void;
   onShowChase?: () => void;
   /** Suppliers with something outstanding, and how many have been asked. */
@@ -616,6 +618,18 @@ export function TrustBar({
       >
         <span className="num">{assumptionCount ?? "—"}</span> assumptions behind these
         totals
+      </button>
+
+      {/* The first question anybody asks about a screen like this, answered
+          where the screen is rather than in a file in the repository. It sits
+          on the trust bar because that is what it is: the counterweight to a
+          grid full of confident numbers is being able to say exactly which six
+          calls produced them and what each one was forbidden from doing. */}
+      <button
+        onClick={onShowAi}
+        className="text-muted-foreground underline decoration-dotted transition-colors hover:text-foreground"
+      >
+        where the model is used
       </button>
     </div>
   );

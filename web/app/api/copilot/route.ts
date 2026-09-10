@@ -60,7 +60,12 @@ export async function POST(request: Request) {
         history: turns,
         parts: currentParts,
         tools: COPILOT_TOOLS,
-        maxTokens: 16000,
+        // A drafted enquiry is a big output: thirty line items with
+        // descriptions, ten questions, a dozen terms and a scope. Measured at
+        // roughly 5000 tokens, so this is double, not a blank cheque. On a
+        // thinking model the ceiling covers thinking too, which bills at the
+        // output rate, so an over-set number is money the model may spend.
+        maxTokens: 10000,
         effort: "high",
         // Drafting is a conversation. Nobody waits four minutes for a reply.
         retryBudgetMs: 25_000,
@@ -82,6 +87,27 @@ export async function POST(request: Request) {
       });
 
       if (!response.toolCalls.length) {
+        /**
+         * A draft that ran out of room is a FAILURE, not a draft.
+         *
+         * The same bug the analyst route had: `stopReason` was ignored, so a
+         * reply truncated mid-sentence (or one that spent its whole budget
+         * thinking and emitted nothing) came back as a successful turn with an
+         * empty or half-finished message. In a drafting conversation that is
+         * worse than in the analyst, because the buyer keeps talking to a
+         * thread that has silently lost the plot.
+         */
+        const truncated = /max_tokens|MAX_TOKENS|length/i.test(String(response.stopReason));
+        if (truncated || !response.text.trim()) {
+          return Response.json({
+            ok: false,
+            error: truncated
+              ? "The draft was cut off before it finished. Try describing fewer " +
+                "line items at once, or ask for one section at a time."
+              : "The co-pilot returned nothing at all. Nothing has been drafted.",
+            detail: `stop reason: ${response.stopReason}`,
+          }, { status: 502 });
+        }
         reply = response.text;
         break;
       }

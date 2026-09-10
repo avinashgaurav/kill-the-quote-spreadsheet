@@ -32,7 +32,7 @@ import { ExportBar } from "./export-bar";
 import { ChasePanel } from "./chase-panel";
 import {
   SupplierPanel, ReviewQueuePanel, AssumptionsPanel, UnmappedPanel, FindingsPanel,
-  buildReviewQueue,
+  AiPanel, buildReviewQueue,
 } from "./side-panels";
 import type { Cell, RfxLine } from "@/lib/normalise";
 
@@ -137,6 +137,10 @@ export function Workbench({
     | { kind: "findings" }
     | { kind: "chase" }
     | { kind: "assumptions" }
+    // Not a data panel. It answers "so what is the AI actually doing here?",
+    // which is the first thing anybody asks and should not require reading a
+    // file in the repository.
+    | { kind: "ai" }
     | null
   >(null);
   /** The Ask panel is a drawer below the breakpoint where it fits beside the grid. */
@@ -406,6 +410,7 @@ export function Workbench({
                   assumptionCount={Object.keys(payload.assumptions).length}
                   onShowReview={() => setDrawer({ kind: "review" })}
                   onShowAssumptions={() => setDrawer({ kind: "assumptions" })}
+                  onShowAi={() => setDrawer({ kind: "ai" })}
                   unmappedCount={payload.unmapped.length}
                   onShowUnmapped={() => setDrawer({ kind: "unmapped" })}
                   findingsCount={payload.vendors.reduce(
@@ -479,6 +484,7 @@ export function Workbench({
               : drawer?.kind === "unmapped" ? "Items that match no line you asked for"
               : drawer?.kind === "chase" ? "Go back and ask"
               : drawer?.kind === "findings" ? "What changes what these prices mean"
+              : drawer?.kind === "ai" ? "Where the model is used"
               : "Assumptions"}
           </SheetTitle>
 
@@ -546,6 +552,8 @@ export function Workbench({
               onClose={() => setDrawer(null)}
             />
           )}
+
+          {drawer?.kind === "ai" && <AiPanel onClose={() => setDrawer(null)} />}
 
           {drawer?.kind === "assumptions" && payload && (
             <AssumptionsPanel
