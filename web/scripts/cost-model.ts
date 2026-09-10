@@ -262,6 +262,54 @@ console.log(
 );
 console.log(`  ${D}* thinking is the CONFIGURED BUDGET, i.e. what the model may spend, billed as output${X}`);
 
+// ---- what a specific plan costs -----------------------------------------
+//
+// The totals above are "one full demo", which is not what anybody actually
+// buys credit for. This prices the real plan, and separates the parts that
+// re-charge on a retake from the parts that do not.
+
+const perCall = (c: Call, realisation = 0.35) =>
+  ((c.prefixTok + c.payloadTok) * c.count / 1e6) * IN_PER_M
+  + (c.outTok * c.count / 1e6) * OUT_PER_M
+  + (c.thinkBudget * c.count * realisation / 1e6) * THINK_PER_M;
+
+const byName = (n: string) => CALLS.find((c) => c.what.startsWith(n))!;
+const draft = perCall(byName("Draft"));
+const quotations = perCall(byName("Read 5 quotations"));
+const questionnaires = perCall(byName("Read 3 questionnaires"));
+const certificate = perCall(byName("Read 1 attached"));
+const crops = perCall(byName("Crop"));
+const analystAll = perCall(byName("Analyst"));
+// The analyst runs about three turns per question, so this is the dial.
+const perQuestion = analystAll / 8;
+
+const readsOnce = quotations + questionnaires + certificate + crops;
+
+console.log(`\n${B}What a specific plan costs${X}`);
+console.log(`  ${D}the unit that matters: one analyst question is about ${money(perQuestion)}${X}`);
+console.log(`  ${D}(roughly three turns, each re-sending the tool results so far)${X}\n`);
+
+const line = (what: string, cost: number, note: string) =>
+  console.log(`  ${what.padEnd(46)}${money(cost).padStart(7)}  ${D}${note}${X}`);
+
+line("Read all 8 documents, once", readsOnce,
+     "5 quotations incl. the photograph, 3 questionnaires, 1 certificate");
+line("  of which the 5 quotations alone", quotations,
+     "cheaper, but no questionnaire means no money moment");
+line("Your UI test, clicking around", 0,
+     "grid, panels, exports, chase: all cached or local. Zero.");
+line("Your UI test, 6 analyst questions", perQuestion * 6, "if you ask any");
+line("Walkthrough, one take", draft + perQuestion * 6,
+     "1 drafting conversation + 6 questions. Reads are cached: free.");
+line("Each further take", draft + perQuestion * 6, "reads stay free forever");
+
+const onePass = readsOnce + perQuestion * 6 + draft + perQuestion * 6;
+console.log(`\n  ${B}one clean pass of all three${X}   ${money(onePass).padStart(7)}`);
+console.log(`  ${B}plus two retakes${X}              ${money(onePass + 2 * (draft + perQuestion * 6)).padStart(7)}`);
+console.log(`  ${B}ceiling, everything x2${X}        ${money(onePass * 2).padStart(7)}  ${D}if thinking runs hot${X}`);
+console.log(`\n  ${G}Add $5 for one clean pass. $8 if you want retake room.${X}`);
+console.log(`  ${D}Not included: accuracy --all and e2e-test, priced below.${X}`);
+
 // ---- the test suites ----------------------------------------------------
 
 console.log(`\n${B}Test suites that cost money${X}`);
