@@ -486,7 +486,12 @@ export function TrustBar({
               )}
             >
               <span className="num font-semibold">{trust.notRead}</span>
-              not read yet
+              {/* "of them" is load-bearing. Without it the bar reads "148 cells
+                  left out" beside "120 not read yet" and invites a reader to
+                  add them, which is the same two-correct-numbers-one-wrong-
+                  impression failure the product exists to catch. notRead is a
+                  SUBSET of excluded, so the copy has to say so. */}
+              of them not read yet
             </button>
           </TooltipTrigger>
           <TooltipContent className="max-w-xs text-[11px]">

@@ -116,21 +116,42 @@ export function ComparisonGrid({
       {/* Toolbar: the clean half of the design sits around the dense half. */}
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2.5">
         <div className="flex items-center gap-1">
+          {/*
+            Filters named for what a buyer is looking for, not for the internal
+            state that groups them.
+
+            "Check 22 / Gaps 39 / Adjusted 15" is a legend for a vocabulary
+            nobody has been taught yet, on the first row of chrome above the
+            data. Each of these now says what clicking it shows you, and the
+            counts are of CELLS while "All 30" is a count of LINES, which the
+            old labels gave a reader no way to notice.
+          */}
           {([
-            ["all", `All ${lines.length}`],
-            ["review", `Check ${counts.review}`],
-            ["gaps", `Gaps ${counts.gaps}`],
-            ["traps", `Adjusted ${counts.traps}`],
-          ] as const).map(([k, label]) => (
-            <Button
-              key={k}
-              size="sm"
-              variant={filter === k ? "secondary" : "ghost"}
-              className="h-7 text-xs"
-              onClick={() => setFilter(k as Filter)}
-            >
-              {label}
-            </Button>
+            ["all", `All ${lines.length} lines`, "Every line, whatever state it is in"],
+            ["review", `${counts.review} to check`,
+             "Cells a person needs to look at: off-spec offers, prices we could " +
+             "not read, and figures derived rather than quoted"],
+            ["gaps", `${counts.gaps} with no price`,
+             "Cells with no number: never mentioned, declined, not a price, or " +
+             "not read yet. The mark on each says which"],
+            ["traps", `${counts.traps} converted`,
+             "Cells where the calculator moved the number to make it comparable: " +
+             "a different unit, a different currency, or delivery added"],
+          ] as const).map(([k, label, why]) => (
+            <Tooltip key={k}>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant={filter === k ? "secondary" : "ghost"}
+                  className="h-7 text-xs"
+                  onClick={() => setFilter(k as Filter)}
+                  aria-pressed={filter === k}
+                >
+                  {label}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs text-[11px]">{why}</TooltipContent>
+            </Tooltip>
           ))}
         </div>
         <div className="ml-auto flex items-center gap-3">
@@ -146,7 +167,11 @@ export function ComparisonGrid({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto">
+      {/* Room at the bottom for the floating "Ask about this" button, which
+          appears below xl where the Ask panel does not fit beside the grid.
+          Without it the button sits on top of the last row's prices, and the
+          one row you cannot read is whichever one you scrolled to. */}
+      <div className="min-h-0 flex-1 overflow-auto pb-16 xl:pb-0">
         <table className="grid-table w-full">
           {/* A screen reader landing in a 30 by 5 table of numbers has no idea
               what it is looking at without this. Visually hidden because the

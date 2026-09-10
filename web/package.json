@@ -28,7 +28,8 @@
     "verify": "npm run types && npm run lint && npm run test:all",
     "contrast-test": "tsx scripts/contrast-test.ts",
     "cache-test": "tsx scripts/cache-test.ts",
-    "doc-numbers": "tsx scripts/doc-numbers.ts"
+    "doc-numbers": "tsx scripts/doc-numbers.ts",
+    "sees": "tsx scripts/what-the-model-sees.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
