@@ -971,20 +971,98 @@ export async function storeQuestionnaireAnswers(opts: {
   answers: ReadAnswer[];
   provenance: Record<string, { locator: string; citedText: string }>;
   sourceFilename: string;
-}): Promise<{ stored: number }> {
+  /**
+   * The documents an answer cited, which were opened and read.
+   *
+   * Their bytes are kept so the buyer can look at the certificate the verdict
+   * turns on. A verdict about a document nobody can open is exactly the sort
+   * of assertion the rest of this product refuses to make, and the brief asks
+   * for "attached docs sitting alongside the numbers", not a summary of them.
+   */
+  attachments?: Array<{
+    filename: string;
+    mimeType: string;
+    bytes: Buffer;
+    citedFor: string[];
+    evidence: Record<string, unknown>;
+    confidence: number;
+  }>;
+}): Promise<{ stored: number; attachmentsStored: number }> {
   const run = await q();
+  const rfxId = opts.rfxId ?? RFX_ID;
   await run(
     `update vendors
         set read_answers = $3, answers_provenance = $4,
             answers_read_at = now(), answers_source = $5
       where rfx_id = $1 and id = $2`,
     [
-      opts.rfxId ?? RFX_ID, opts.vendorId,
+      rfxId, opts.vendorId,
       JSON.stringify(opts.answers), JSON.stringify(opts.provenance),
       opts.sourceFilename,
     ],
   );
-  return { stored: opts.answers.length };
+
+  let attachmentsStored = 0;
+  for (const a of opts.attachments ?? []) {
+    try {
+      await run(
+        `insert into attachments
+           (id, rfx_id, vendor_id, filename, mime_type, byte_size, file_base64,
+            cited_for, evidence, reader_confidence)
+         values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+         on conflict (rfx_id, vendor_id, filename) do update
+           set cited_for = excluded.cited_for,
+               evidence = excluded.evidence,
+               reader_confidence = excluded.reader_confidence,
+               file_base64 = excluded.file_base64`,
+        [
+          `att_${randomUUID().slice(0, 12)}`, rfxId, opts.vendorId,
+          a.filename, a.mimeType, a.bytes.length,
+          // Base64 in a text column, for the same reason the response bytes
+          // are: a serverless filesystem is read-only, and the two drivers
+          // disagree about binary parameter encoding.
+          a.bytes.toString("base64"),
+          JSON.stringify(a.citedFor), JSON.stringify(a.evidence), a.confidence,
+        ],
+      );
+      attachmentsStored += 1;
+    } catch {
+      // A stored answer is worth more than a stored attachment. If this write
+      // fails the verdict still stands on what was read; the buyer just
+      // cannot open the file, which the panel reports rather than hiding.
+    }
+  }
+
+  return { stored: opts.answers.length, attachmentsStored };
+}
+
+/** Documents suppliers attached, for the panel and for serving. */
+export async function loadAttachments(rfxId?: string) {
+  const run = await q();
+  try {
+    const r = await run(
+      `select vendor_id, filename, mime_type, byte_size, cited_for, evidence,
+              reader_confidence
+         from attachments where rfx_id = $1 order by vendor_id, filename`,
+      [rfxId ?? RFX_ID],
+    );
+    const out: Record<string, Array<Record<string, unknown>>> = {};
+    for (const row of r.rows ?? []) {
+      const v = String(row.vendor_id);
+      (out[v] ??= []).push({
+        filename: String(row.filename),
+        mimeType: String(row.mime_type),
+        byteSize: Number(row.byte_size ?? 0),
+        citedFor: (row.cited_for ?? []) as string[],
+        evidence: (row.evidence ?? {}) as Record<string, unknown>,
+        readerConfidence: row.reader_confidence == null
+          ? null : Number(row.reader_confidence),
+      });
+    }
+    return out;
+  } catch {
+    return {};
+  }
 }
 
 /** Everything the comparison screen and the analyst both need. */
@@ -1049,6 +1127,17 @@ export async function buildComparisonPayload() {
       };
     }),
     questionnaire: catalog.questionnaire,
+    /**
+     * Attachments actually held, per supplier, with what each one says.
+     *
+     * Separate from `questionnaireAnswers[].doc`, which is the filename the
+     * supplier CITED. A cited document we do not hold and a cited document we
+     * have opened and read are different facts leading to different actions,
+     * and the panel has to be able to tell them apart: one is "their
+     * certificate is expired", the other is "they told us about a certificate
+     * we have never seen".
+     */
+    attachments: await loadAttachments(rfx.rfxId),
     /**
      * The answers as READ, and the verdict as COMPUTED. Not a typed table.
      *

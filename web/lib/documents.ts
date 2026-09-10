@@ -264,6 +264,56 @@ export function questionnaireWorkbook(draft: DraftedRfx, rfxId: string): Buffer 
  * normalised number gets re-quoted as a raw one. Here each cell carries its own
  * source, its raw value and its flags, so the caveats survive being emailed.
  */
+/**
+ * The comparison as CSV.
+ *
+ * BUILD-PLAN promised CSV alongside the workbook and it was never built. It is
+ * worth having for a reason the xlsx cannot cover: a CSV is what somebody
+ * pastes into whatever they already use, and it is the format a reviewer can
+ * open with no assumptions at all.
+ *
+ * The xlsx is still the better artefact, because it carries the provenance in
+ * cell comments and this cannot. So the status column is not optional here:
+ * a CSV of bare numbers with the excluded cells left blank would be a
+ * spreadsheet exactly like the one this product exists to kill.
+ */
+export function comparisonCsv(p: ComparisonPayload): string {
+  const vendors = p.vendors;
+  const q = (v: unknown) => {
+    const t = v === null || v === undefined ? "" : String(v);
+    return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+  };
+
+  const rows: string[] = [
+    `# ${(p.rfx as { id: string }).id} comparison, normalised`,
+    `# Every rate is ex-GST, in INR, per the unit the enquiry asked for.`,
+    `# ${p.trust.usable} of ${p.trust.total} cells are usable in a total. ` +
+    `${p.trust.excluded} are excluded and carry a status rather than a blank.`,
+    `# A blank rate with a status is NOT a zero. Read the status column.`,
+    `# Provenance per cell is in the xlsx export and the JSON audit bundle.`,
+    "",
+    [
+      "Line", "SKU", "Group", "Description", "UoM", "UnitsPerUoM", "Qty",
+      ...vendors.flatMap((v) => [`${v.code} ${v.name} rate`, `${v.code} status`]),
+    ].map(q).join(","),
+  ];
+
+  for (const l of p.lines) {
+    const cells = vendors.flatMap((v) => {
+      const c = p.matrix[v.code]?.[l.no];
+      return [
+        c?.unitInr ?? "",
+        c ? c.status : "not_read",
+      ];
+    });
+    rows.push([
+      l.no, l.sku, l.group, l.desc, l.uom, l.pack_size, l.qty, ...cells,
+    ].map(q).join(","));
+  }
+
+  return rows.join("\n") + "\n";
+}
+
 export function comparisonWorkbook(p: ComparisonPayload): Buffer {
   const wb = XLSX.utils.book_new();
   const vendors = p.vendors;
@@ -330,10 +380,12 @@ export function comparisonWorkbook(p: ComparisonPayload): Buffer {
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
     ["Qualification — mandatory questionnaire items"],
     ["A supplier failing any mandatory item cannot be awarded at any price."],
+    ["NOT ASSESSED means nobody has read their questionnaire. They are carried as " +
+     "eligible rather than excluded, which is a gap on our side and not a pass."],
     [],
     ["Supplier", "Reply format", "Qualified", "Failed mandatory", "Lines priced"],
     ...vendors.map((v) => [
-      v.name, v.reply_format, v.qualified ? "YES" : "NO",
+      v.name, v.reply_format, qualWord(v).toUpperCase(),
       (v.failedMandatory ?? []).join(", ") || "-",
       `${p.scenarios.singleVendor[v.code]?.linesPriced ?? 0} of ${p.lines.length}`,
     ]),
@@ -402,6 +454,26 @@ export function auditBundle(p: ComparisonPayload) {
  * recommendation, because the reader's question is never "what did we decide",
  * it is "was that decision sound".
  */
+/**
+ * Three states in one word, for a document a CFO reads.
+ *
+ * "Yes" and "NO" is two states, and there are three. A supplier whose
+ * questionnaire nobody has opened is carried as eligible on purpose, because
+ * dropping a real bid for want of a document nobody chased is the more
+ * expensive mistake. But an award note that prints "Yes" against them has
+ * quietly turned our own uncollected work into a statement about their
+ * compliance, in the one artefact that outlives the tool and gets attached to
+ * an approval.
+ *
+ * The grid has said NOT ASSESSED since the questionnaire loop was built. The
+ * exports had not caught up.
+ */
+const qualWord = (v?: { qualified?: boolean; assessed?: boolean }) =>
+  !v ? "unknown"
+    : v.assessed === false ? "NOT ASSESSED"
+    : v.qualified ? "Yes"
+    : "NO";
+
 export function awardNote(p: ComparisonPayload, opts: { qualifiedOnly?: boolean } = {}): string {
   const rfxId = (p.rfx as { id: string }).id;
   /**
@@ -457,7 +529,7 @@ ${[...byVendor].sort((a, b) => b[1] - a[1]).map(([code, total]) => {
   const v = p.vendors.find((x) => x.code === code);
   const lines = Object.values(scenario.picks).filter((x) => x.vendor === code).length;
   return `<tr><td>${esc(v?.name ?? code)}</td><td class="n">${lines}</td>
-<td class="n">${inr(total)}</td><td>${v?.qualified ? "Yes" : "NO"}</td></tr>`;
+<td class="n">${inr(total)}</td><td>${qualWord(v)}</td></tr>`;
 }).join("")}
 </tbody></table>
 <p class="muted">Against the buyer's own internal estimate of

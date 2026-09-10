@@ -270,12 +270,54 @@ export function AnalystChat({
   );
 }
 
+/**
+ * Five colours, in a fixed order, so a supplier keeps its colour across charts.
+ *
+ * Reused from the chart tokens rather than invented, and deliberately not
+ * red or amber: those two mean "needs a person" everywhere else on this
+ * screen, and a bar that happens to be amber must not read as a warning.
+ */
+const GROUP_FILL = [
+  "var(--chart-1)", "var(--chart-3)", "var(--chart-2)",
+  "var(--chart-4)", "var(--chart-5)",
+];
+
 function Chart({ spec }: { spec: ChartSpec }) {
   const data = spec.series.map((s) => ({ ...s, name: s.label }));
   const money = (spec.unit ?? "INR").toUpperCase() === "INR";
+
+  /**
+   * Colour by group when the model gave one.
+   *
+   * `group` has been in the chart contract from the start and the renderer
+   * ignored it, so every bar was the same colour and the most useful chart in
+   * this product could not be drawn: thirty lines, each coloured by which
+   * supplier wins it, which shows the shape of a split award at a glance in a
+   * way a table of thirty rows does not.
+   */
+  const groups = [...new Set(data.map((d) => d.group).filter(Boolean))] as string[];
+  const fillFor = (g?: string) =>
+    g && groups.length > 1
+      ? GROUP_FILL[groups.indexOf(g) % GROUP_FILL.length]
+      : "var(--chart-1)";
+
   return (
     <div className="rounded-md border bg-card p-3">
       <p className="mb-2 text-[11px] font-medium">{spec.title}</p>
+      {groups.length > 1 && (
+        <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+          {groups.map((g) => (
+            <span key={g} className="flex items-center gap-1 text-[9.5px]">
+              <span
+                aria-hidden="true"
+                className="inline-block h-2 w-2 rounded-[2px]"
+                style={{ background: fillFor(g) }}
+              />
+              {g}
+            </span>
+          ))}
+        </div>
+      )}
       <ResponsiveContainer width="100%" height={Math.max(140, data.length * 26)}>
         <BarChart data={data} layout="vertical" margin={{ left: 4, right: 40, top: 4, bottom: 4 }}>
           <CartesianGrid horizontal={false} stroke="var(--grid-line)" />
@@ -297,14 +339,14 @@ function Chart({ spec }: { spec: ChartSpec }) {
             contentStyle={{ fontSize: 11, borderRadius: 6 }}
           />
           <Bar dataKey="value" radius={[0, 2, 2, 0]}>
-            {data.map((_, i) => (
-              <RCell key={i} fill="var(--chart-1)" />
+            {data.map((d, i) => (
+              <RCell key={i} fill={fillFor(d.group)} />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
       <p className="mt-1 text-[9.5px] text-muted-foreground">
-        Plotted from computed values.
+        Plotted from computed values. Nothing here was estimated to make a chart.
       </p>
     </div>
   );

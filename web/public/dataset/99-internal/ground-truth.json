@@ -1479,7 +1479,7 @@
         ],
         "trace": [
           "vendor said: 'monitors and docks same as our March PO rates'",
-          "prior PO NBR/PO/2026/00317 dated 2026-03-21: Rs 10,100 per nos",
+          "prior PO KRL/PO/2026/00317 dated 2026-03-21: Rs 10,100 per nos",
           "resolved to Rs 10,100"
         ],
         "needs_confirmation": true,
@@ -1505,7 +1505,7 @@
         ],
         "trace": [
           "vendor said: 'monitors and docks same as our March PO rates'",
-          "prior PO NBR/PO/2026/00317 dated 2026-03-21: Rs 13,900 per nos",
+          "prior PO KRL/PO/2026/00317 dated 2026-03-21: Rs 13,900 per nos",
           "resolved to Rs 13,900"
         ],
         "needs_confirmation": true,
@@ -1630,7 +1630,7 @@
         ],
         "trace": [
           "vendor said: 'switches +6% over last year'",
-          "prior PO NBR/PO/2026/00317: Rs 188,000",
+          "prior PO KRL/PO/2026/00317: Rs 188,000",
           "+6.0% uplift -> Rs 199,280"
         ],
         "needs_confirmation": true,

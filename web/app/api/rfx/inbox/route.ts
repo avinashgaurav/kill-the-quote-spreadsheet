@@ -164,6 +164,30 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const code = String(body.supplierCode ?? "").trim();
     const includeRevision = body.includeRevision === true;
+    const channel = String(body.channel ?? "email").trim().toLowerCase();
+
+    /**
+     * The channel is not cosmetic, and this is where it stops being a label.
+     *
+     * The send route already models it correctly outbound: WhatsApp cannot
+     * carry an attachment, so the four-document pack goes as a link. This
+     * route ignored `channel` completely, so the choice changed nothing about
+     * what came back, while WORKFLOW.md claimed "your choice at step 3 becomes
+     * the hardest input at step 4". A document asserting behaviour the code
+     * does not have is the same defect as a hardcoded answer, one layer up.
+     *
+     * A channel that cannot carry an attachment cannot carry one INBOUND
+     * either. So on WhatsApp a supplier's questionnaire form arrives and the
+     * certificate it cites does not, and the consequence lands exactly where
+     * it should: their answer to "are you ISO 27001:2022 certified?" has
+     * nothing behind it that we can check, and the reason is a choice the
+     * buyer made two steps earlier. Not a fabricated behaviour: it is what the
+     * medium does.
+     */
+    const CARRIES_ATTACHMENTS: Record<string, boolean> = {
+      email: true, portal: true, whatsapp: false,
+    };
+    const carriesAttachments = CARRIES_ATTACHMENTS[channel] ?? true;
 
     if (!code) {
       return Response.json(
@@ -219,9 +243,11 @@ export async function POST(request: Request) {
         // get different readers. Same routing as a manual upload.
         if (looksLikeQuestionnaire(name)) {
           // Everything that came with it, so an answer that points at a
-          // certificate can be checked against the certificate.
+          // certificate can be checked against the certificate. Unless the
+          // channel cannot carry one, in which case it genuinely did not
+          // arrive and the answer stands alone.
           const attachments = [];
-          for (const arel of arriving.attachments ?? []) {
+          for (const arel of carriesAttachments ? (arriving.attachments ?? []) : []) {
             const apath = resolve(arel);
             if (!apath) continue;
             const aname = arel.split("/").pop()!;
@@ -241,6 +267,7 @@ export async function POST(request: Request) {
           await storeQuestionnaireAnswers({
             rfxId: rfx.rfxId, vendorId: code,
             answers: qr.answers, provenance: qr.provenance, sourceFilename: name,
+            attachments: qr.openedAttachments,
           });
           results.push({
             filename: name, ok: true, kind: "questionnaire",
@@ -252,6 +279,11 @@ export async function POST(request: Request) {
               states: e.standard, expires: e.validUntil,
             })),
             attachmentsNotHeld: qr.attachmentsNotHeld,
+            // Named separately from "they never sent it", because the cause is
+            // ours and it is reversible: ask them again over email.
+            attachmentsBlockedByChannel: carriesAttachments
+              ? []
+              : (arriving.attachments ?? []).map((a) => a.split("/").pop()!),
           });
           continue;
         }
@@ -288,10 +320,18 @@ export async function POST(request: Request) {
       supplierCode: code,
       replied: true,
       results,
+      channel,
+      carriesAttachments,
       note:
         "Delivery is simulated: nothing was emailed and no mailbox was polled. " +
         "The reading is not simulated. Each document above went through the same " +
-        "model call, schema and provenance checks as a file dragged in by hand.",
+        "model call, schema and provenance checks as a file dragged in by hand." +
+        (carriesAttachments
+          ? ""
+          : ` You chose ${channel}, which cannot carry an attachment, so any ` +
+            `certificate a supplier cited did not arrive. Their answers stand ` +
+            `alone and cannot be checked against their own documents. Ask them ` +
+            `again over email or the portal to close that.`),
     });
   } catch (e) {
     return Response.json({ ok: false, error: String(e) }, { status: 500 });

@@ -1,5 +1,7 @@
 import { buildComparisonPayload } from "@/lib/store";
-import { comparisonWorkbook, auditBundle, awardNote } from "@/lib/documents";
+import {
+  comparisonWorkbook, comparisonCsv, auditBundle, awardNote,
+} from "@/lib/documents";
 
 /**
  * Exports: what leaves the tool.
@@ -48,6 +50,15 @@ export async function GET(
       });
     }
 
+    if (kind === "comparison-csv") {
+      return new Response(comparisonCsv(payload), {
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": `attachment; filename="${rfxId}_comparison.csv"`,
+        },
+      });
+    }
+
     if (kind === "award-note") {
       return new Response(awardNote(payload, { qualifiedOnly }), {
         headers: { "Content-Type": "text/html; charset=utf-8" },
@@ -64,7 +75,7 @@ export async function GET(
     }
 
     return Response.json(
-      { error: `Unknown export '${kind}'. Try comparison, award-note or audit.` },
+      { error: `Unknown export '${kind}'. Try comparison, comparison-csv, award-note or audit.` },
       { status: 404 },
     );
   } catch (e) {

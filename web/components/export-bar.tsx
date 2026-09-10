@@ -31,6 +31,14 @@ export function ExportBar({ qualifiedOnly }: { qualifiedOnly: boolean }) {
         "caveat as a comment, so nothing is lost when you email it on.",
     },
     {
+      href: "/api/export/comparison-csv",
+      label: "Comparison (csv)",
+      blurb:
+        "The same grid for whatever you already use. No cell comments, so the status " +
+        "column is not optional here: a blank rate beside a status is not a zero. " +
+        "Provenance is in the xlsx and the audit bundle.",
+    },
+    {
       href: "/api/export/audit",
       label: "Audit bundle (json)",
       blurb:

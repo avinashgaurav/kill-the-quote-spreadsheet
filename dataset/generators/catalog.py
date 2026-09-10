@@ -36,13 +36,13 @@ RFX = {
     "buyer_contact": {
         "name": "Ananya Kulkarni",
         "title": "Category Manager - IT & Telecom",
-        "email": "ananya.kulkarni@northbridgeretail.in",
+        "email": "ananya.kulkarni@kaveriretail.in",
         "phone": "+91 80 4718 2290",
     },
     "approver": {
         "name": "Rajat Menon",
         "title": "VP - Procurement",
-        "email": "rajat.menon@northbridgeretail.in",
+        "email": "rajat.menon@kaveriretail.in",
     },
     "incoterm_asked": "FOR destination, all three sites",
     "tax_basis_asked": "Quote ex-GST. State GST rate and HSN per line.",
@@ -222,7 +222,7 @@ LINES = [
 # ---------------------------------------------------------------------------
 
 PRIOR_PO = {
-    "po_number": "NBR/PO/2026/00317",
+    "po_number": "KRL/PO/2026/00317",
     "po_date": date(2026, 3, 21),
     "vendor": "Helios Enterprise Solutions Pvt Ltd",
     "rates": {

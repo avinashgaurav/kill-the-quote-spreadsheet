@@ -79,6 +79,15 @@ interface Payload {
     string,
     Record<string, { answer: string | null; doc: string | null; ok: boolean; note?: string }>
   >;
+  /** Documents held per supplier, keyed by code. Empty until one is read. */
+  attachments?: Record<string, Array<{
+    filename: string;
+    mimeType: string;
+    citedFor: string[];
+    evidence: { standard?: string | null; validUntil?: string | null;
+                issuedTo?: string | null; summary?: string | null };
+    readerConfidence?: number | null;
+  }>>;
   assumptions: Record<string, {
     value: unknown; source: string; alternative?: string; note: string; confidence?: string;
   }>;
@@ -496,6 +505,7 @@ export function Workbench({
               vendor={drawerVendor}
               questionnaire={payload.questionnaire}
               answers={payload.questionnaireAnswers[drawer.vendor] ?? {}}
+              attachments={payload.attachments?.[drawer.vendor] ?? []}
               linesPriced={payload.scenarios.singleVendor[drawer.vendor]?.linesPriced ?? 0}
               totalLines={payload.lines.length}
               singleVendorInr={payload.scenarios.singleVendor[drawer.vendor]?.totalInr ?? 0}

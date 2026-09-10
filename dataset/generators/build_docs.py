@@ -797,7 +797,7 @@ Regards,
     m["Subject"] = f"RE: {RFX['id']} - FY27 IT Hardware Refresh - our rates"
     m["Date"] = format_datetime(datetime(2026, 9, 17, 21, 14, 8))
     m["Message-ID"] = make_msgid(domain="helios-ent.com")
-    m["In-Reply-To"] = f"<{RFX['id'].lower()}.invite.4471@northbridgeretail.in>"
+    m["In-Reply-To"] = f"<{RFX['id'].lower()}.invite.4471@kaveriretail.in>"
     m["X-Mailer"] = "Microsoft Outlook 16.0"
     m.set_content(body)
 

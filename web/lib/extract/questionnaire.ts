@@ -418,6 +418,23 @@ export interface QuestionnaireReadResult {
     /** True when the response claimed evidence and the document disagreed. */
     overrode: boolean;
   }>;
+  /**
+   * The attachments that were opened, with their bytes, ready to be stored.
+   *
+   * Returned rather than stored here because reading and persisting are
+   * different jobs and this module does not touch the database. The caller
+   * keeps them so a buyer can open the certificate a verdict turns on: a
+   * finding about a document nobody can look at is the one kind of assertion
+   * the rest of this product refuses to make.
+   */
+  openedAttachments: Array<{
+    filename: string;
+    mimeType: string;
+    bytes: Buffer;
+    citedFor: string[];
+    evidence: Record<string, unknown>;
+    confidence: number;
+  }>;
   /** Attachments the supplier named that we do not hold. */
   attachmentsNotHeld: string[];
 }
@@ -531,6 +548,10 @@ export async function extractQuestionnaire(opts: {
   const attachmentsNotHeld: string[] = [];
   const have = opts.attachments ?? [];
   const readByFile = new Map<string, Awaited<ReturnType<typeof extractEvidence>>>();
+  // Which questions each file was cited against, and the file itself, so one
+  // certificate cited three times is stored once and listed against all three.
+  const cited = new Map<string, string[]>();
+  const bytesFor = new Map<string, AttachedDocument>();
 
   for (const a of answers) {
     if (!a.attachedDocument) continue;
@@ -559,6 +580,8 @@ export async function extractQuestionnaire(opts: {
     // disagrees with the document, the document is the fact and the summary is
     // a claim. Both are kept: `overrode` is what lets the buyer be shown that
     // the form said one thing and the certificate said another.
+    cited.set(file.filename, [...(cited.get(file.filename) ?? []), a.questionNo]);
+    bytesFor.set(file.filename, file);
     const overrode = Boolean(
       a.evidence?.standard && ev.standard && a.evidence.standard !== ev.standard,
     );
@@ -596,6 +619,21 @@ export async function extractQuestionnaire(opts: {
     provenance,
     evidenceRead,
     attachmentsNotHeld,
+    openedAttachments: [...readByFile.entries()].flatMap(([filename, ev]) => {
+      const file = bytesFor.get(filename);
+      if (!file) return [];
+      return [{
+        filename,
+        mimeType: file.mimeType,
+        bytes: file.buf,
+        citedFor: cited.get(filename) ?? [],
+        evidence: {
+          standard: ev.standard, validUntil: ev.validUntil,
+          issuedTo: ev.issuedTo, summary: ev.summary,
+        },
+        confidence: ev.confidence,
+      }];
+    }),
   };
 }
 

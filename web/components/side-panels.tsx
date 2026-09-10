@@ -121,7 +121,8 @@ function AskQuestions({
 }
 
 export function SupplierPanel({
-  vendor, questionnaire, answers, linesPriced, totalLines, singleVendorInr, onClose,
+  vendor, questionnaire, answers, attachments, linesPriced, totalLines,
+  singleVendorInr, onClose,
 }: {
   vendor: {
     code: string; name: string; city?: string; reply_format: string;
@@ -139,6 +140,22 @@ export function SupplierPanel({
   };
   questionnaire: QuestionnaireQ[];
   answers: Record<string, AnswerRow>;
+  /**
+   * Documents we actually HOLD for this supplier, with what each one states.
+   *
+   * Distinct from the filename an answer cites. "Their certificate names the
+   * 2013 revision" and "they told us about a certificate we have never seen"
+   * are different findings with different next actions, and the list below has
+   * to be able to say which.
+   */
+  attachments?: Array<{
+    filename: string;
+    mimeType: string;
+    citedFor: string[];
+    evidence: { standard?: string | null; validUntil?: string | null;
+                issuedTo?: string | null; summary?: string | null };
+    readerConfidence?: number | null;
+  }>;
   linesPriced: number;
   totalLines: number;
   singleVendorInr: number;
@@ -383,12 +400,54 @@ export function SupplierPanel({
             <p className="mt-3 mb-1.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
               Documents they cited
             </p>
-            <ul className="space-y-1">
-              {docs.map((d) => (
-                <li key={d.q} className="text-[10.5px] text-muted-foreground">
-                  <span className="font-mono">{d.q}</span> · {d.doc}
-                </li>
-              ))}
+            <ul className="space-y-1.5">
+              {docs.map((d) => {
+                // Held, opened and read, versus merely named. The distinction
+                // is the whole point of this list: a buyer could previously
+                // read a finding about a certificate and had no way to open
+                // it, and no way to tell whether we even had it.
+                const held = (attachments ?? []).find((a) =>
+                  d.doc && a.filename.toLowerCase() === String(d.doc).toLowerCase(),
+                );
+                return (
+                  <li key={d.q} className="text-[10.5px] leading-relaxed">
+                    <span className="font-mono text-muted-foreground">{d.q}</span>{" "}
+                    {held ? (
+                      <>
+                        <a
+                          href={`/api/source/${encodeURIComponent(vendor.code)}?file=${encodeURIComponent(held.filename)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline decoration-dotted underline-offset-2 hover:text-foreground"
+                        >
+                          {held.filename}
+                        </a>
+                        {held.evidence?.standard && (
+                          <span className="block text-muted-foreground">
+                            the document itself states{" "}
+                            <span className="text-foreground">{held.evidence.standard}</span>
+                            {held.evidence.validUntil
+                              ? <>, valid to <span className="text-foreground">{held.evidence.validUntil}</span></>
+                              : ", with no expiry printed on it"}
+                          </span>
+                        )}
+                        {held.evidence?.issuedTo && (
+                          <span className="block text-muted-foreground">
+                            issued to {held.evidence.issuedTo}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-muted-foreground">{d.doc}</span>
+                        <span className="block text-[var(--cell-review)]">
+                          cited, but not on file. Nothing has been checked against it.
+                        </span>
+                      </>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}

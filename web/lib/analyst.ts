@@ -240,8 +240,10 @@ function toolsFor(vendorEnum: string[]): Anthropic.Tool[] { return [
       additionalProperties: false,
       required: ["kind", "title", "series"],
       properties: {
-        // Only one renderer exists. Advertising three and silently drawing bars
-        // teaches the model to ask for something it will not get.
+        // One renderer, two shapes. Advertising a pie or a line and silently
+        // drawing bars would teach the model to ask for something it will not
+        // get, so this stays honest about what exists: bars, optionally
+        // coloured by `group` below, which covers both a ranking and a split.
         kind: { type: "string", enum: ["bar"] },
         title: { type: "string" },
         unit: { type: "string", description: "e.g. 'INR' or '%'." },
@@ -254,7 +256,15 @@ function toolsFor(vendorEnum: string[]): Anthropic.Tool[] { return [
             properties: {
               label: { type: "string" },
               value: { type: "number" },
-              group: { type: "string" },
+              group: {
+                type: "string",
+                description:
+                  "Optional. Colours the bar and adds a legend entry, so use it " +
+                  "for the dimension the buyer is really asking about: which " +
+                  "SUPPLIER wins each line, or which category a line sits in. " +
+                  "A thirty-bar chart coloured by winning supplier shows the " +
+                  "shape of a split award in a way a thirty-row table does not.",
+              },
             },
           },
         },

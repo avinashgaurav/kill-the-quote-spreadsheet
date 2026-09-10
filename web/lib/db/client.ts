@@ -288,6 +288,43 @@ CREATE TABLE IF NOT EXISTS extraction_cache (
 
 CREATE INDEX IF NOT EXISTS extraction_cache_file_idx ON extraction_cache (file_hash);
 
+/*
+ * Documents a supplier ATTACHED to an answer, and what each one says.
+ *
+ * The brief asks for "questionnaire answers and attached docs sitting
+ * alongside the numbers". The reading half was built first: an answer that
+ * cites VDS_ISO27001.pdf causes that PDF to be opened and read, because the
+ * revision year and the expiry date are inside it and not on the form.
+ *
+ * But the bytes were then thrown away, so the buyer could read our conclusion
+ * about the certificate and could not look at the certificate. On a screen
+ * whose entire argument is "here is where this came from", that is the wrong
+ * way round: a verdict about a document you cannot open is exactly the kind of
+ * assertion the rest of this product refuses to make.
+ *
+ * Stored per (enquiry, supplier, filename). The evidence columns hold what the
+ * reader found IN the document, kept beside it so the panel can show the
+ * chain: they answered X, they attached Y, and Y itself states Z.
+ *
+ * No semicolons in this comment. The DDL is split on them.
+ */
+CREATE TABLE IF NOT EXISTS attachments (
+  id text PRIMARY KEY,
+  rfx_id text NOT NULL REFERENCES rfx(id) ON DELETE CASCADE,
+  vendor_id text NOT NULL,
+  filename text NOT NULL,
+  mime_type text NOT NULL,
+  byte_size integer NOT NULL DEFAULT 0,
+  file_base64 text,
+  cited_for jsonb NOT NULL DEFAULT '[]'::jsonb,
+  evidence jsonb NOT NULL DEFAULT '{}'::jsonb,
+  reader_confidence real,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS attachments_unique_idx
+  ON attachments (rfx_id, vendor_id, filename);
+
 CREATE TABLE IF NOT EXISTS analyst_turns (
   id text PRIMARY KEY,
   rfx_id text NOT NULL REFERENCES rfx(id) ON DELETE CASCADE,

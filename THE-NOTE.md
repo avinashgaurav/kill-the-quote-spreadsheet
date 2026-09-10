@@ -25,13 +25,16 @@ exactly that to me, in 43 seconds, reporting no problem at all.
 **3. Provenance is a NOT NULL column, not a convention.** A number that can't say where
 it came from physically cannot be stored.
 
-**4. Both readers report; code decides.** The same split runs twice. On a quotation the
+**4. Both readers report; code decides, and the attachment governs.** The same split runs twice. On a quotation the
 model gives the number in the supplier's own unit and code computes landed cost. On a
 questionnaire the model gives the answer, what they attached, and what the attachment
 *says*, and code decides whether that satisfies the question. A supplier answers *"Yes,
 we are ISO 27001 certified"* and attaches a certificate that expired and names the
 withdrawn 2013 revision; a model asked "did they pass?" says yes, because they said yes.
-Comparing a date to today is not a judgement call. Three qualification states, not two:
+Comparing a date to today is not a judgement call. And their response is a *form*, with
+room for a filename and nothing else, so the named certificate is opened and read on its
+own: read only the form and the honest answer is "nothing contradicts them", which is a
+pass. I know because that is what it did until I checked. Three qualification states, not two:
 passed, failed, and **not read** — and the third is the one that stops a screen claiming
 a failure it has no evidence for.
 
@@ -63,7 +66,9 @@ buyer; wrong for a real tenant model.
 
 **A real mailbox.** Replies arrive because you invited a supplier whose document is on
 file, not because anything was emailed or polled. The reading is real; the transport is
-the stub the brief permits.
+the stub the brief permits. The channel is not: choose WhatsApp and a supplier's
+attached certificate genuinely does not arrive, because the medium cannot carry it, and
+their answer then has nothing behind it.
 
 **Auto-closing a chase.** When a supplier answers, nothing marks it answered
 automatically. The buyer closes it with a reason. Matching a later upload to an open

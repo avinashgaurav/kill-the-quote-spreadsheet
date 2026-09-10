@@ -80,10 +80,20 @@ sales, and the questionnaire afterwards from somebody in compliance, on a differ
 day in a different format. That gap is why a supplier can be priced and unassessed at
 the same time.
 
-**The channel is not cosmetic.** WhatsApp cannot carry an attachment, so the pack goes
-as a link, and the supplier who gets a link on their phone is the one most likely to
-reply with a photo of a rate card. Your choice at step 3 becomes the hardest input at
-step 4.
+**The channel is not cosmetic, and here is exactly what it changes.** WhatsApp cannot
+carry an attachment. So the pack goes out as a link rather than four files, and the
+supplier who gets a link on their phone is the one most likely to reply with a
+photograph of a rate card. More consequential: **a channel that cannot carry an
+attachment cannot carry one back either.** Choose WhatsApp and a supplier's
+questionnaire form arrives while the certificate it cites does not, so their answer to
+*"are you ISO 27001:2022 certified?"* stands alone with nothing to check it against.
+The screen says so, and says the remedy is to ask again over email.
+
+That is not a flourish. It is the medium doing what the medium does, and it means your
+choice at step 3 is the reason step 4 is harder. This used to be a claim in this
+document that the code did not honour: the send step modelled the channel correctly on
+the way out and the inbox ignored it entirely. A document asserting behaviour the code
+does not have is a hardcoded answer one layer up.
 
 ---
 
@@ -99,10 +109,24 @@ column is a mistake nobody downstream can detect. It then asks whose it is, offe
 roster, and takes a new name. That supplier gets their own column, is marked NOT
 ASSESSED, can be chased, and appears in the award note.
 
-**Questionnaire responses are read by their own loop.** The model reports the answer,
-what they attached, and what the attachment itself says: the standard it names, its
-expiry date, who it was issued to. Code then decides whether that satisfies the
-question.
+**Questionnaire responses are read by their own loop, and so are their attachments.**
+The model reports the answer and what they attached. Then the attachment is opened and
+read **as a document in its own right**, and asked one thing: what do you say about
+yourself? The standard you name, with its revision year exactly as printed. The expiry
+date on your face. Who you were issued to.
+
+This matters more than it sounds. A questionnaire response is a form, and a form has
+room for a filename. Read only the form and you get *"answered yes, attached something,
+nothing contradicts it"*, which is a pass. The contradiction is inside the PDF. So
+**the attachment governs**: where the form and the document disagree, the document is
+the fact and the form is a claim, and both are kept so the buyer sees the disagreement
+rather than only its conclusion.
+
+Only a file an answer actually **cites** is opened, so the supplier's own citation
+decides what counts as evidence and a file that merely arrived in the same email is
+never treated as backing an answer. A cited document we do not hold is reported as
+exactly that, which is a different sentence from "their certificate is expired", and
+you can click through to read any document we do hold.
 
 **The system reads each one** with a real model call and turns it into structured facts,
 each traceable to the exact spreadsheet cell, PDF page, paragraph, or pixel box it came
@@ -206,8 +230,18 @@ cites the cells it used.
 **It refuses** to answer from anything but the extracted data, and says so when it
 cannot answer.
 
-**Then export:** the award note, the full comparison, and an audit bundle. The award note
-includes who was asked for what, when it was due, and whether they answered.
+**Then export**, four ways. The award note, printable, leading with what the total rests
+on. The comparison as xlsx, with each cell's source, original value and caveats as a
+cell comment. The same grid as CSV for whatever you already use, where the status column
+is not optional because there are no comments to carry it. And a JSON audit bundle,
+enough to rebuild the decision without the tool.
+
+The award note says who was asked for what, when it was due, and whether they answered.
+It also carries three qualification states rather than two: a supplier nobody has
+assessed shows as **NOT ASSESSED**, not as "Yes". They are carried as eligible on
+purpose, because dropping a real bid for want of a document nobody chased is the more
+expensive mistake, but the document that goes to a CFO must not turn our own
+uncollected work into a statement about their compliance.
 
 ---
 
@@ -262,7 +296,7 @@ eight suites. No API key, no network, about forty seconds.
 | Questionnaire | Verdicts derived from evidence, each able to say why, and the finding that needs the ATTACHMENT opened | 16/16 ✅ | no |
 | Contrast | Every colour that carries meaning, against its WCAG floor, in both themes, with the oklch maths checked against a real browser first | pass ✅ | no |
 | Cache | The extraction cache stores, returns, and misses for the right reasons | 6/6 ✅ | no |
-| Regressions | 39 bugs that shipped cannot return unnoticed | 39/39 ✅ | no |
+| Regressions | 44 bugs that shipped cannot return unnoticed, including one asserting the deployed dataset is byte-identical to the generated one | 44/44 ✅ | no |
 | End to end | Happy and sad paths over HTTP, plus an interviewer's own file | 42 cases | yes |
 | Demo | Ten walkthrough claims against the brief | 10/10 | yes |
 | Accuracy | Recall, price exactness, unit correctness, invention rate, and whether confidence falls when accuracy falls | measured, see below | yes |

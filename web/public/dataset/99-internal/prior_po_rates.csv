@@ -2,8 +2,8 @@
 # Needed to resolve V5's relative pricing. Deliberately
 # incomplete: it does NOT cover every line V5 refers to.
 po_number,po_date,vendor,sku,uom,rate_inr_ex_gst
-NBR/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,MON-24,nos,10100
-NBR/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,DOCK-USBC,nos,13900
-NBR/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,SW-48P,nos,188000
-NBR/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,KBM-WL,nos,1920
-NBR/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,BAG-15,nos,1500
+KRL/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,MON-24,nos,10100
+KRL/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,DOCK-USBC,nos,13900
+KRL/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,SW-48P,nos,188000
+KRL/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,KBM-WL,nos,1920
+KRL/PO/2026/00317,2026-03-21,Helios Enterprise Solutions Pvt Ltd,BAG-15,nos,1500

@@ -43,7 +43,9 @@ type Arrival =
       code: string; state: "read" | "failed";
       files: Array<{ filename: string; ok: boolean; kind?: string; format?: string;
                      rowsFound?: number; priced?: number; answersRead?: number;
-                     ms?: number; error?: string }>;
+                     ms?: number; error?: string;
+                     attachmentsRead?: Array<{ file: string }>;
+                     attachmentsBlockedByChannel?: string[] }>;
     };
 
 export function Invite({ onDone }: { onDone: () => void }) {
@@ -198,9 +200,19 @@ export function Invite({ onDone }: { onDone: () => void }) {
                         replied ·{" "}
                         {arr.files.map((f) =>
                           f.kind === "questionnaire"
-                            ? `questionnaire, ${f.answersRead} answers`
+                            ? `questionnaire, ${f.answersRead} answers` +
+                              (f.attachmentsRead?.length
+                                ? ` + ${f.attachmentsRead.length} attached doc(s) opened`
+                                : "")
                             : `${f.format ?? "document"}, ${f.priced ?? 0} priced`,
                         ).join(" · ")}
+                        {/* The consequence of the channel, said where the
+                            choice was made rather than buried in a panel. */}
+                        {arr.files.some((f) => f.attachmentsBlockedByChannel?.length) && (
+                          <span className="block text-[var(--cell-review)]">
+                            their attached document did not arrive on this channel
+                          </span>
+                        )}
                       </span>
                     )}
                     {arr.state === "failed" && (
@@ -237,9 +249,16 @@ export function Invite({ onDone }: { onDone: () => void }) {
           <Button size="sm" className="h-7 text-xs" disabled={!picked.size} onClick={send}>
             Send to {picked.size} supplier{picked.size === 1 ? "" : "s"}
           </Button>
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-[10px] leading-relaxed text-muted-foreground">
             {willReply.length} of the {picked.size} you have chosen have a response on
             file. The rest will not reply, which is the ordinary case.
+            {channel === "whatsapp" && (
+              <span className="block text-[var(--cell-review)]">
+                WhatsApp cannot carry an attachment, so the pack goes as a link and any
+                certificate a supplier cites will not arrive. Their questionnaire
+                answers will stand alone, with nothing to check them against.
+              </span>
+            )}
           </span>
         </div>
       ) : (

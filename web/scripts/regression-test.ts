@@ -20,7 +20,10 @@ process.env.PGLITE_DIR = mkdtempSync(join(tmpdir(), "regtest-"));
 delete process.env.DATABASE_URL;
 
 import { getQuery } from "../lib/db/client";
-import { seedRfx, ensureVendor, activeRfx, RFX_ID } from "../lib/store";
+import {
+  seedRfx, ensureVendor, activeRfx, RFX_ID,
+  storeQuestionnaireAnswers, loadAttachments,
+} from "../lib/store";
 import {
   buildMatrix, trustSummary, likeForLike, cheapestPerLine, singleVendor,
   LINES, VENDORS, QUALIFICATION,
@@ -659,6 +662,162 @@ async function main() {
     "the questionnaire FORM names a filename and nothing more. The revision " +
     "year and the expiry live inside the PDF, so a real read found nothing " +
     "contradicting the answer and six mandatory failures became five",
+  );
+
+  // ---- 22. A verdict about a document nobody could open ----------------
+  //
+  // The brief asks for "questionnaire answers and attached docs sitting
+  // alongside the numbers". The reading half was built first, and then the
+  // attachment's BYTES were thrown away: a buyer could read the finding that
+  // Vector's certificate names the withdrawn 2013 revision and expired in
+  // November, and could not look at the certificate. On a screen whose whole
+  // argument is "here is where this came from", a verdict about a document you
+  // cannot open is the one assertion the rest of the product refuses to make.
+  //
+  // Compounded by the serving route filtering `mime_type like 'image/%'`, so
+  // even a stored PDF would have 404'd.
+  {
+    const pdf = Buffer.from(
+      "%PDF-1.4 not a real certificate, but real bytes with a real round trip",
+    );
+    const stored = await storeQuestionnaireAnswers({
+      vendorId: "V4",
+      answers: [{
+        questionNo: "Q2", answer: "Yes",
+        attachedDocument: "VDS_ISO27001.pdf",
+        evidence: {
+          standard: "ISO/IEC 27001:2013", validUntil: "2025-11-30",
+          issuedTo: "Vector Digital Systems Pvt Ltd", summary: "ISMS certificate.",
+        },
+        confidence: 0.93,
+      }],
+      provenance: { Q2: { locator: "row 2", citedText: "Yes" } },
+      sourceFilename: "Vector_Questionnaire_Response.pdf",
+      attachments: [{
+        filename: "VDS_ISO27001.pdf", mimeType: "application/pdf", bytes: pdf,
+        citedFor: ["Q2"],
+        evidence: { standard: "ISO/IEC 27001:2013", validUntil: "2025-11-30" },
+        confidence: 0.93,
+      }],
+    });
+
+    const held = await loadAttachments();
+    const mine = (held.V4 ?? []).find((a) => a.filename === "VDS_ISO27001.pdf");
+
+    check(
+      "22. The certificate a verdict turns on could not be opened",
+      "an attachment that was read is stored, with what it states beside it",
+      stored.attachmentsStored === 1 && Boolean(mine)
+        && (mine!.evidence as { standard?: string }).standard === "ISO/IEC 27001:2013"
+        && (mine!.citedFor as string[]).includes("Q2"),
+      mine
+        ? `held for V4, ${mine.byteSize} bytes, cited against ` +
+          `${(mine.citedFor as string[]).join(", ")}, and the document itself states ` +
+          `${(mine.evidence as { standard?: string }).standard}`
+        : "NOT STORED. The buyer can read the finding and not the document.",
+    );
+
+    const src = readFileSync(
+      resolve(process.cwd(), "app/api/source/[vendor]/route.ts"), "utf8",
+    );
+    check(
+      "22b. Only images were servable",
+      "a document can be fetched by name, whatever its type",
+      /searchParams\.get\("file"\)/.test(src) && /from attachments/.test(src),
+      "the route selected `mime_type like 'image/%'`, so a stored certificate " +
+      "would have 404'd even once the bytes were kept",
+    );
+  }
+
+  // ---- 23. The channel you chose changed nothing -----------------------
+  const inboxSrc = readFileSync(
+    resolve(process.cwd(), "app/api/rfx/inbox/route.ts"), "utf8",
+  );
+  check(
+    "23. The channel was a label, not a choice",
+    "a channel that cannot carry an attachment does not deliver one",
+    /CARRIES_ATTACHMENTS/.test(inboxSrc) && /carriesAttachments/.test(inboxSrc),
+    "the send route modelled it correctly outbound and this route ignored " +
+    "`channel` entirely, while WORKFLOW.md claimed the choice becomes the " +
+    "hardest input one step later. A document asserting behaviour the code " +
+    "does not have is a hardcoded answer one layer up",
+  );
+
+  // ---- 24. The served dataset drifted from the generated one -----------
+  //
+  // `web/public/dataset` is a COPY of `dataset/out`, and it exists because a
+  // deployed function reads supplier documents from it. Nothing kept the two
+  // in step. So regenerating the corpus updated the answer key, the tests and
+  // the local reads, and the DEPLOYED site carried on serving the previous
+  // documents: the one place where a demo would show something the tests had
+  // never seen.
+  //
+  // Surfaced by renaming the buyer. The generators said kaveriretail.in and
+  // the served copy still said northbridgeretail.in, which is the buyer
+  // writing to their suppliers from a company that is not the buyer.
+  //
+  // Compared by content hash rather than by mtime, because a copy is either
+  // the same bytes or it is a different document.
+  {
+    const { createHash } = await import("node:crypto");
+    const { readdirSync, statSync } = await import("node:fs");
+
+    const hashTree = (root: string): Map<string, string> => {
+      const out = new Map<string, string>();
+      const walk = (dir: string, rel: string) => {
+        for (const e of readdirSync(dir).sort()) {
+          const full = join(dir, e);
+          const r = rel ? `${rel}/${e}` : e;
+          if (statSync(full).isDirectory()) walk(full, r);
+          else out.set(r, createHash("sha256").update(readFileSync(full)).digest("hex"));
+        }
+      };
+      try { walk(root, ""); } catch { /* absent tree reports as empty */ }
+      return out;
+    };
+
+    const served = hashTree(resolve(process.cwd(), "public/dataset"));
+    const built = hashTree(resolve(process.cwd(), "..", "dataset", "out"));
+
+    const missing = [...built.keys()].filter((k) => !served.has(k));
+    const extra = [...served.keys()].filter((k) => !built.has(k));
+    const changed = [...built.entries()]
+      .filter(([k, h]) => served.has(k) && served.get(k) !== h)
+      .map(([k]) => k);
+
+    check(
+      "24. The deployed site served a different dataset from the tests",
+      "public/dataset is byte-identical to dataset/out",
+      built.size > 0 && !missing.length && !extra.length && !changed.length,
+      built.size === 0
+        ? "dataset/out is missing entirely, so nothing could be compared"
+        : missing.length || extra.length || changed.length
+          ? `${changed.length} changed, ${missing.length} missing, ${extra.length} stale. ` +
+            `Run: cp -R ../dataset/out/. public/dataset/  ` +
+            `First few: ${[...changed, ...missing].slice(0, 3).join(", ")}`
+          : `${built.size} files, every hash identical`,
+    );
+  }
+
+  // ---- 25. The exports said "Yes" about a supplier nobody had checked ---
+  //
+  // The grid has shown three qualification states since the questionnaire loop
+  // was built: passed, failed, and NOT ASSESSED. The exports had not caught up,
+  // and printed "Yes" against a supplier whose questionnaire nobody had opened.
+  //
+  // That is the worst place for it. An award note is the artefact that outlives
+  // the tool, gets attached to an approval and read by internal audit eight
+  // months later, and it had quietly turned our own uncollected work into a
+  // statement about a supplier's compliance.
+  const docsSrc = readFileSync(resolve(process.cwd(), "lib/documents.ts"), "utf8");
+  check(
+    "25. The award note called an unassessed supplier qualified",
+    "the exports carry all three states, not two",
+    /qualWord/.test(docsSrc) && /NOT ASSESSED/.test(docsSrc)
+      && !/v\?\.qualified \? "Yes" : "NO"/.test(docsSrc),
+    "an unassessed supplier is carried as eligible on purpose, because dropping " +
+    "a real bid for want of a document nobody chased is the more expensive " +
+    "mistake. Printing 'Yes' next to them makes it a claim about the supplier",
   );
 
   console.log(

@@ -155,6 +155,7 @@ export async function POST(request: Request) {
             answers: qr.answers,
             provenance: qr.provenance,
             sourceFilename: file.name,
+            attachments: qr.openedAttachments,
           });
           results.push({
             filename: file.name, ok: true, vendorId, kind: "questionnaire",
