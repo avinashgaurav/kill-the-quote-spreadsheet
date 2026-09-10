@@ -157,7 +157,7 @@ export function verdictFor(row: Record<string, unknown>): Verdict {
   });
 }
 
-function seedAnswersFor(code: string): ReadAnswer[] {
+export function seedAnswersFor(code: string): ReadAnswer[] {
   const all = catalog.questionnaire_answers as Record<
     string, Record<string, { answer: string | null; doc: string | null; note?: string }>
   >;

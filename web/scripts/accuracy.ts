@@ -67,8 +67,29 @@ type Truth = {
 };
 const QUOTES = rawQuotes.quotes as unknown as Record<string, Record<string, Truth>>;
 
-/** Statuses in the answer key that mean "there is a number on the page". */
-const PRICED = new Set(["quoted", "substituted", "downgraded", "moq_adjusted", "uom_mismatch"]);
+/**
+ * Statuses in the answer key that mean "there is a number on the page".
+ *
+ * Derived from the key rather than listed by hand. The hand-written version
+ * omitted `bundled`, so a line the supplier genuinely priced at Rs 13,400 with
+ * twelve free against a hundred and twenty laptops counted as a line nobody
+ * priced, and the reader reporting that exact figure was scored as having
+ * invented it. The reader was right and the metric was wrong, which is the
+ * more embarrassing way round.
+ *
+ * A status carries a price if any entry with that status has one. Statuses that
+ * never do (omitted, not_quoted, illegible, relative, match_rival) stay out,
+ * which is what makes the invention count mean anything.
+ */
+const PRICED: Set<string> = (() => {
+  const out = new Set<string>();
+  for (const rows of Object.values(QUOTES)) {
+    for (const r of Object.values(rows)) {
+      if (r && r.price !== undefined && r.price !== null) out.add(r.status);
+    }
+  }
+  return out;
+})();
 
 // ---------------------------------------------------------------------------
 // Comparing a reported unit to the written one

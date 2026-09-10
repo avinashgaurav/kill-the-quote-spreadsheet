@@ -22,7 +22,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { getQuery } from "./db/client";
-import { seedRfx, RFX_ID } from "./store";
+import { seedRfx, seedAnswersFor, RFX_ID } from "./store";
 import { LINES, VENDORS } from "./normalise";
 import type { RawQuote } from "./normalise";
 
@@ -80,6 +80,31 @@ export async function resetDrafts() {
   };
 }
 
+/**
+ * Clear every response on the shipped enquiry, harness-written or genuinely read.
+ *
+ * Distinct from wipeFixture, which removes only harness cells, and needed once
+ * the loops actually run: the demo suite asserts that the grid starts blank, and
+ * after a real read there is real data that no amount of fixture-wiping removes.
+ * A test that cannot get back to a known state is a test that passes once.
+ *
+ * Development only, like everything else here.
+ */
+export async function clearAllResponses() {
+  const query = await getQuery();
+  const n = await query<{ count: string }>(
+    `select count(*)::text as count from responses where rfx_id = $1`, [RFX_ID],
+  );
+  await query(`delete from responses where rfx_id = $1`, [RFX_ID]);
+  await query(
+    `update vendors set read_answers = null, answers_provenance = null,
+            answers_read_at = null, answers_source = null
+      where rfx_id = $1`,
+    [RFX_ID],
+  );
+  return { responsesRemoved: Number(n.rows[0]?.count ?? 0) };
+}
+
 export async function wipeFixture() {
   const query = await getQuery();
   const r = await query<{ count: string }>(
@@ -102,6 +127,29 @@ export async function wipeFixture() {
 export async function seedFixture() {
   await seedRfx();
   const query = await getQuery();
+
+  // Restore the seeded questionnaire answers too.
+  //
+  // seedRfx writes them, but returns early once the enquiry exists, so after a
+  // clear the answers stayed null and every supplier came back unassessed,
+  // therefore qualified, therefore "cheapest among qualified" equalled
+  // "cheapest among everyone" and the money moment vanished. The harness exists
+  // to put everything downstream of the reader into a known state, and the
+  // questionnaire answers are downstream of the reader.
+  for (const v of VENDORS) {
+    const code = v.code;
+    const answers = seedAnswersFor(code);
+    if (!answers.length) continue;
+    await query(
+      `update vendors
+          set read_answers = $2, answers_read_at = now(), answers_source = $3
+        where rfx_id = $1 and id = $4`,
+      [
+        RFX_ID, JSON.stringify(answers),
+        "seeded from the fabricated dataset, NOT read from a document", code,
+      ],
+    );
+  }
   const fixture = JSON.parse(readFileSync(FIXTURE, "utf8")) as {
     quotes: Record<string, Record<string, RawQuote>>;
   };

@@ -61,7 +61,10 @@ def sh(cmd):
 # ===========================================================================
 
 print(f"{BOLD}Resetting to a blank enquiry{OFF}")
-r = post("/api/dev/fixture?wipe=true")
+# Everything, real reads included. Wiping only the harness cells no longer
+# gets back to blank now that the loops actually run against a model.
+post("/api/dev/fixture?reset=true")
+r = post("/api/dev/fixture?clear=all")
 print(f"  cleared {r.get('removed', 0)} fixture cell(s); 150 cells now empty")
 
 

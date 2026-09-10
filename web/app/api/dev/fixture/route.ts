@@ -1,4 +1,4 @@
-import { seedFixture, wipeFixture, resetDrafts } from "@/lib/fixture";
+import { seedFixture, wipeFixture, resetDrafts, clearAllResponses } from "@/lib/fixture";
 
 /**
  * DEVELOPMENT ONLY. Load or clear test-harness data.
@@ -33,8 +33,12 @@ export async function POST(request: Request) {
   // Drops drafted enquiries and returns to the shipped example. Separate from
   // `wipe`, which only removes harness cells: they answer different questions.
   const reset = url.searchParams.get("reset") === "true";
+  // Everything on the shipped enquiry, real reads included. `wipe` clears only
+  // harness cells and cannot get a test back to blank once a model has run.
+  const clear = url.searchParams.get("clear") === "all";
 
   try {
+    if (clear) return Response.json({ ok: true, ...(await clearAllResponses()) });
     if (reset) return Response.json({ ok: true, ...(await resetDrafts()) });
     const r = wipe ? await wipeFixture() : await seedFixture();
     return Response.json({ ok: true, ...r });
