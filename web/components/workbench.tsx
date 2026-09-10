@@ -266,13 +266,16 @@ export function Workbench({
             done: Boolean(payload?.rfx),
             hint: payload?.rfx
               ? `${(payload.rfx as { id: string }).id} exists and went out to ${payload.vendors.length} suppliers`
-              : "Describe what you need to buy and the co-pilot drafts the enquiry",
+              // Says what it does for you, not how it works. The mechanism
+              // ("a co-pilot drafts it") is the least interesting thing about
+              // this step; the refusal is the point.
+              : "Say what you need in your own words. It will not let an ambiguous line go out",
           },
           intake: {
             done: readCount > 0,
             hint: readCount > 0
               ? `${readCount} of ${payload?.vendors.length ?? 0} suppliers read`
-              : "Drop in whatever the suppliers sent, in any format",
+              : "Quotations and questionnaires, in whatever format they arrived",
           },
           compare: {
             enabled: Boolean(payload?.hasAnyExtraction),

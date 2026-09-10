@@ -370,10 +370,32 @@ export const COPILOT_TOOLS: ToolSpec[] = [
 // ---------------------------------------------------------------------------
 
 /** Openers, shown before the buyer types anything. */
+/**
+ * Openers for the drafting conversation.
+ *
+ * Written the way a category buyer actually opens: a rough shape, a couple of
+ * numbers, and every genuinely important detail missing. That is not laziness
+ * on their part, it is what having the requirement in your head rather than on
+ * paper sounds like.
+ *
+ * Each one also carries a latent trap the co-pilot has to close, because a
+ * demo prompt that drafts cleanly first time shows nothing. In order:
+ *
+ *   memory and optics    a kit of two and a box of ten, the units that make a
+ *                        bid look ninety per cent cheaper than it is
+ *   packaging            priced per thousand, per kilo and per running metre,
+ *                        sometimes in one quotation
+ *   "onsite on
+ *    everything"         warranty scope, which decides whether a supplier
+ *                        quotes one year and puts the other two on their own line
+ *   "the usual list"     nothing to draft from at all, so the right first move
+ *                        is a question rather than a document
+ */
 export const COPILOT_PROMPTS = [
-  "I need to refresh about 200 laptops and monitors across three offices, plus some datacentre kit",
-  "Twelve rack servers and the switches to go with them, for two datacentres",
-  "Barcode scanners and rugged handhelds for 40 retail stores",
+  "About 200 laptops and 30 monitors for three offices, plus 12 rack servers with memory and 10G optics for the Pune datacentre",
+  "Corrugated boxes for four fulfilment centres, five sizes, plus tape and void fill",
+  "Refresh the store network. Routers, switches, patch cords, and I want 3-year onsite on everything",
+  "MRO spares for the plant, the usual consumables list",
 ];
 
 /**

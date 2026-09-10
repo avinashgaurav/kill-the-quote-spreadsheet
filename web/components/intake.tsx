@@ -102,6 +102,11 @@ export function Intake({
           Drop in whatever they sent. Spreadsheets, PDFs, Word letters, phone photos of a
           rate card, a one-line email. Nothing has to match your template.
         </p>
+        <p className="text-sm text-muted-foreground">
+          Questionnaire responses go here too, and are read the same way. A supplier is
+          not judged on their questionnaire until it has actually been read, so until
+          then they show as not assessed rather than as passed.
+        </p>
       </div>
 
       <div
