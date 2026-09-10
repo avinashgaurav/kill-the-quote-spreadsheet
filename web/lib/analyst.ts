@@ -300,7 +300,29 @@ export interface ToolContext {
   citedCells: Set<string>;
 }
 
+/**
+ * A number, once.
+ *
+ * This used to return `{ inr, display, short }`, so every figure went to the
+ * model three ways: 4068132, "Rs 40,68,132" and "Rs 4.07 cr". Each cell in
+ * query_lines carries two of these, and query_lines over all 30 lines and 5
+ * suppliers measured 12,144 tokens. Roughly 40% of that was the same numbers
+ * spelled differently.
+ *
+ * The formatting was never needed. ANALYST_SYSTEM already instructs it to
+ * "write amounts the way the audience reads them: lakh and crore, Indian digit
+ * grouping", and a language model formatting an integer is not the part at
+ * risk. Every turn of every question re-sent those duplicates.
+ *
+ * Kept for the SUMMARY tools (get_overview, run_award_scenario), where there
+ * are a handful of figures and a pre-formatted headline is worth the tokens
+ * because the model quotes it verbatim. Dropped from the per-cell tools, which
+ * is where the volume is.
+ */
 const money = (n: number | null) => (n === null ? null : { inr: n, display: inr(n), short: inrShort(n) });
+
+/** Just the integer. For anything that repeats per cell. */
+const amount = (n: number | null) => n;
 
 // ---------------------------------------------------------------------------
 // Everything below reads THIS enquiry, not the shipped one.
@@ -534,8 +556,10 @@ export async function runTool(
               status: c.status,
               awardable: isAwardable(c.status),
               raw: c.raw ? `${c.raw.ccy ?? "INR"} ${c.raw.price ?? "-"} per ${c.raw.uom ?? "?"}` : null,
-              landedUnit: money(c.unitInr),
-              landedExtended: money(c.extendedInr),
+              // Integers. 150 cells x 2 figures x 3 spellings was the single
+              // largest tool result in the system.
+              landedUnitInr: amount(c.unitInr),
+              landedExtendedInr: amount(c.extendedInr),
               flags: c.flags,
               confidence: payload.confidence[`${v}:${l.no}`] ?? null,
             };
@@ -543,13 +567,19 @@ export async function runTool(
           return {
             lineNo: l.no, sku: l.sku, description: l.desc, group: l.group,
             askedUom: l.uom, unitsPerUom: l.pack_size, askedQty: l.qty,
-            buyerEstimateUnit: money(l.baseline_inr),
+            buyerEstimateUnitInr: amount(l.baseline_inr),
             cells,
           };
         })
         .filter((r) => Object.keys(r.cells).length > 0);
 
-      return { lines: rows, note: "Landed values are normalised to the asked unit and to INR." };
+      return {
+        lines: rows,
+        note:
+          "Every *Inr figure is a plain integer of rupees, normalised to the " +
+          "asked unit. Format them for the reader yourself: lakh and crore, " +
+          "Indian digit grouping.",
+      };
     }
 
     case "run_award_scenario": {

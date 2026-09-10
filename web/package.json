@@ -30,7 +30,8 @@
     "cache-test": "tsx scripts/cache-test.ts",
     "doc-numbers": "tsx scripts/doc-numbers.ts",
     "sees": "tsx scripts/what-the-model-sees.ts",
-    "demo:load": "tsx scripts/load-demo.ts"
+    "demo:load": "tsx scripts/load-demo.ts",
+    "cost-model": "tsx scripts/cost-model.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
