@@ -47,3 +47,17 @@ next-env.d.ts
 # Harness extraction cache: real model output, keyed by prompt+file hash.
 # Local only. A committed cache would let a stale reading score a changed prompt.
 .cache/
+
+# Scratch probes, throwaway by convention.
+#
+# A leading underscore in scripts/ has meant "temporary" all along, and five of
+# them got committed anyway: a `git add -A` ran while background agents were
+# writing _probe5.ts, _probe6.ts, _probe7.ts, _tmp_chase.ts and _tmp_dump.ts
+# into that directory. Nothing broke, and the repo carried five files that were
+# never meant to be read, in the folder a reviewer opens to see how it is
+# tested.
+#
+# My own instructions say never `git add -A`. Convention did not stop it, so a
+# rule does.
+web/scripts/_*
+scripts/_*
