@@ -55,6 +55,15 @@ export function SupplierPanel({
   vendor: {
     code: string; name: string; city?: string; reply_format: string;
     qualified: boolean; failedMandatory: string[];
+    /** False when nobody has read their questionnaire. Not the same as failing. */
+    assessed?: boolean;
+    /** One per question, each carrying the sentence that produced its verdict. */
+    assessments?: Array<{
+      questionNo: string; mandatory: boolean; status: string; why: string;
+      blocksAward: boolean; answer: string | null; attachedDocument: string | null;
+    }>;
+    /** Where the answers came from: a document we read, or the dataset. */
+    answersSource?: string | null;
     meta: { filenames: string[]; unreadableRegions?: string[] } | null;
   };
   questionnaire: QuestionnaireQ[];
@@ -83,7 +92,22 @@ export function SupplierPanel({
           <p className="text-sm font-semibold">{vendor.name}</p>
         </div>
 
-        {vendor.qualified ? (
+        {/*
+          Three states, not two. "Nobody has read their questionnaire" used to
+          be indistinguishable from "they passed", which is how a row could say
+          "nothing read" and "FAILED 6" at the same time.
+        */}
+        {vendor.assessed === false ? (
+          <div className="rounded-md border border-[var(--cell-review)]/50 bg-[var(--cell-review-bg)] px-3 py-2">
+            <p className="text-xs font-medium">Questionnaire not read</p>
+            <p className="mt-0.5 text-[11px] leading-relaxed">
+              Nobody has assessed them, which is not the same as passing. Upload their
+              questionnaire response to find out. Until then their prices are included,
+              because excluding a real bid for want of a document nobody chased would be
+              its own kind of wrong.
+            </p>
+          </div>
+        ) : vendor.qualified ? (
           <div className="rounded-md border bg-muted/40 px-3 py-2">
             <p className="text-xs font-medium">Passed every mandatory question</p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -102,6 +126,43 @@ export function SupplierPanel({
               what you are giving up, but they are excluded from every award.
             </p>
           </div>
+        )}
+
+        {/*
+          Every failure with the sentence that produced it. This is the whole
+          point of deriving the verdict rather than storing one: a red badge
+          that cannot say why is unaccountable, and the expired-certificate
+          finding only means anything if the buyer can read the reasoning.
+        */}
+        {(vendor.assessments ?? []).some((a) => a.blocksAward) && (
+          <div className="space-y-2">
+            <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+              Why, question by question
+            </p>
+            {(vendor.assessments ?? [])
+              .filter((a) => a.blocksAward)
+              .map((a) => (
+                <div key={a.questionNo} className="text-[11px] leading-relaxed">
+                  <p className="font-medium">
+                    {a.questionNo}
+                    <span className="ml-1.5 font-normal text-muted-foreground">
+                      {a.status.replace(/_/g, " ")}
+                    </span>
+                  </p>
+                  <p className="mt-0.5 border-l-2 border-destructive/50 pl-2">{a.why}</p>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {vendor.answersSource && (
+          <p className="text-[10px] leading-relaxed text-muted-foreground">
+            {/^seeded/i.test(vendor.answersSource)
+              ? "Their answers came from the fabricated dataset, not from reading a " +
+                "document. The verdict above is still computed from them, and uploading " +
+                "their real questionnaire replaces the answers and recomputes it."
+              : `Answers read from ${vendor.answersSource}.`}
+          </p>
         )}
 
         <div className="flex gap-5 text-xs">

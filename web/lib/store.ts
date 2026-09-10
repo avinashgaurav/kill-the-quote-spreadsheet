@@ -22,6 +22,9 @@ import {
   type Matrix, type RawQuote, type RfxContext, type RfxLine,
 } from "./normalise";
 import type { Extraction, ExtractedRow } from "./extract/contract";
+import {
+  assessQuestionnaire, type QuestionSpec, type ReadAnswer, type Verdict,
+} from "./questionnaire";
 import type { ExtractionMeta } from "./extract/run";
 
 export const RFX_ID = (catalog.rfx as { id: string }).id;
@@ -77,18 +80,30 @@ export async function seedRfx(): Promise<{ seeded: boolean; lines: number; vendo
   const answers = catalog.questionnaire_answers as Record<string, unknown>;
   for (const v of VENDORS) {
     const qual = QUALIFICATION[v.code];
+    const seeded = seedAnswersFor(v.code);
     const full = (catalog.vendors as Array<Record<string, unknown>>)
       .find((x) => x.code === v.code)!;
     await run(
       `insert into vendors
          (id, rfx_id, code, legal_name, city, gstin, contact, qualified,
-          failed_mandatory, questionnaire_answers)
-       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+          failed_mandatory, questionnaire_answers, read_answers,
+          answers_provenance, answers_read_at, answers_source)
+       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,
+               case when $11::jsonb is null then null else now() end,$13)`,
       [
         v.code, RFX_ID, v.code, v.name, v.city, String(full.gstin ?? ""),
         JSON.stringify({ name: full.contact, role: full.role, email: full.email }),
+        // The `qualified` and `failed_mandatory` columns are LEGACY. They hold
+        // the hand-written verdict that this whole path exists to remove, and
+        // nothing reads them any more: the verdict is derived from the answers
+        // on every read. Kept only so an older row still parses.
         qual.qualified, JSON.stringify(qual.failed_mandatory),
         JSON.stringify(answers[v.code] ?? {}),
+        seeded.length ? JSON.stringify(seeded) : null,
+        JSON.stringify({}),
+        seeded.length
+          ? "seeded from the fabricated dataset, NOT read from a document"
+          : null,
       ],
     );
   }
@@ -107,6 +122,86 @@ export async function seedRfx(): Promise<{ seeded: boolean; lines: number; vendo
   }
 
   return { seeded: true, lines: LINES.length, vendors: VENDORS.length };
+}
+
+/**
+ * Turn the fabricated questionnaire answers into the shape a READER would have
+ * produced, so the verdict can be derived from them rather than asserted.
+ *
+ * This is the fix for a contradiction that was visible on the screen: a
+ * supplier's row said "nothing read" beside "FAILED 6", and those six failures
+ * came from a table somebody had typed.
+ *
+ * The answers themselves are legitimately part of the dataset, exactly like the
+ * quotation documents: a supplier said something, and we fabricated what.
+ * What was NOT legitimate was also fabricating the verdict. So the answers are
+ * seeded and stamped as seeded, and every verdict is computed from them by
+ * `assessQuestionnaire`, which is the same code that runs on a real read.
+ *
+ * The expired-certificate finding is now genuinely found: the seed reports
+ * "ISO/IEC 27001:2013, EXPIRED 2025-11-30", and code notices both that the
+ * revision is not the one asked for and that the date has passed.
+ */
+/**
+ * The verdict for one supplier row, computed from the answers on it.
+ *
+ * The single place a qualification decision is made, so the grid, the award
+ * note, the chase and the analyst cannot disagree about who is eligible.
+ */
+export function verdictFor(row: Record<string, unknown>): Verdict {
+  const read = (row.read_answers ?? null) as ReadAnswer[] | null;
+  return assessQuestionnaire({
+    questions: catalog.questionnaire as unknown as QuestionSpec[],
+    answers: Array.isArray(read) ? read : [],
+    supplierName: row.legal_name ? String(row.legal_name) : undefined,
+  });
+}
+
+function seedAnswersFor(code: string): ReadAnswer[] {
+  const all = catalog.questionnaire_answers as Record<
+    string, Record<string, { answer: string | null; doc: string | null; note?: string }>
+  >;
+  const mine = all[code];
+  if (!mine) return [];
+
+  const out: ReadAnswer[] = [];
+  for (const [no, a] of Object.entries(mine)) {
+    // A blank entry is INCLUDED, with a null answer.
+    //
+    // This is the difference between "we hold their response and this question
+    // is blank" and "nobody has looked at their questionnaire". One supplier in
+    // this dataset replied to the enquiry and sent no questionnaire at all;
+    // skipping their blanks made them come back UNASSESSED, and therefore
+    // eligible, when in fact they were asked ten mandatory questions and
+    // answered none. Being asked and not answering is a failure. Never being
+    // asked is not, and that is what an absent read_answers column means.
+
+    // The dataset writes a document as one string, e.g.
+    //   "ISO/IEC 27001:2013, EXPIRED 2025-11-30"
+    //   "OEM authorisation letters, Dell / HPE / Cisco, valid to 2027-03-31"
+    // which is how a reader would see it printed. Split into the standard and
+    // the date the way a reader would report them.
+    let evidence: ReadAnswer["evidence"] = null;
+    if (a.doc) {
+      const std = /\b(ISO(?:\/IEC)?\s*\d{4,5}\s*:\s*\d{4})\b/i.exec(a.doc);
+      const date = /(\d{4}-\d{2}-\d{2})/.exec(a.doc);
+      evidence = {
+        standard: std ? std[1] : null,
+        validUntil: date ? date[1] : null,
+        issuedTo: null,
+        summary: a.doc,
+      };
+    }
+
+    out.push({
+      questionNo: no,
+      answer: a.answer,
+      attachedDocument: a.doc,
+      evidence,
+      confidence: 0.5,
+    });
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,7 +268,12 @@ export async function activeRfx(): Promise<{
       [RFX_ID],
     )).rows?.[0];
     const rfxId = String(picked?.id ?? RFX_ID);
-    if (rfxId === RFX_ID) return fallback;
+
+    // The shipped example takes the same path as anything else. It used to
+    // short-circuit to a constant that carried the HAND-WRITTEN qualification
+    // verdict, which is exactly the thing being removed: the verdict has to be
+    // derived from the stored answers whichever enquiry is on screen.
+    const seededExample = rfxId === RFX_ID;
 
     const lineRows = (await run(
       `select no, sku, group_name, description, spec, uom, pack_size, qty, hsn,
@@ -198,7 +298,8 @@ export async function activeRfx(): Promise<{
 
     const vendorRows = (await run(
       `select code, legal_name, city, qualified, failed_mandatory,
-              questionnaire_answers
+              questionnaire_answers, read_answers, answers_provenance,
+              answers_read_at, answers_source
          from vendors where rfx_id = $1 order by code`,
       [rfxId],
     )).rows ?? [];
@@ -206,25 +307,42 @@ export async function activeRfx(): Promise<{
     return {
       rfxId,
       ctx: {
-        lines,
+        lines: seededExample ? LINES : lines,
         vendors: vendorRows.map((v) => ({ code: String(v.code) })),
-        // A supplier with no verdict recorded is treated as QUALIFIED. The
-        // alternative, defaulting to disqualified, would quietly exclude a
-        // supplier from every award scenario for want of a row, which is a
-        // silent and expensive way to be wrong.
+        // DERIVED, never read from a stored verdict. A supplier nobody has
+        // assessed comes back qualified rather than disqualified, because
+        // excluding a real bid from every scenario for want of a questionnaire
+        // is a silent and expensive way to be wrong. The UI marks them as
+        // unassessed so it never reads as a pass.
         qualification: Object.fromEntries(
-          vendorRows.map((v) => [String(v.code), { qualified: v.qualified !== false }]),
+          vendorRows.map((v) => {
+            const verdict = verdictFor(v);
+            return [String(v.code), {
+              qualified: verdict.assessed ? verdict.qualified : true,
+            }];
+          }),
         ),
       },
-      isSeededExample: false,
-      baselineTotalInr: lines.reduce(
-        (a, l) => a + Number(l.baseline_inr ?? 0) * Number(l.qty ?? 0), 0),
+      isSeededExample: seededExample,
+      baselineTotalInr: seededExample
+        ? BASELINE_TOTAL_INR
+        : lines.reduce((a, l) => a + Number(l.baseline_inr ?? 0) * Number(l.qty ?? 0), 0),
       questionnaireAnswers: Object.fromEntries(
         vendorRows.map((v) => [String(v.code), v.questionnaire_answers ?? {}]),
       ),
       vendorRows,
     };
-  } catch {
+  } catch (e) {
+    // Loud, not silent. This used to swallow the error and quietly return the
+    // shipped constants, which meant a missing column or a schema drift showed
+    // up as the OLD hand-written qualification verdicts reappearing on screen
+    // with nothing anywhere saying why. A fallback you cannot see is worse than
+    // no fallback.
+    console.error(
+      "[activeRfx] could not load the enquiry from the database, falling back to " +
+      "the shipped example. The screen may be showing stale qualification data:",
+      e,
+    );
     return fallback;
   }
 }
@@ -815,6 +933,35 @@ export async function loadComparison(
   };
 }
 
+/**
+ * Store questionnaire answers read from a supplier's own response document.
+ *
+ * Answers only. The verdict is recomputed from them on every read, so it can
+ * never drift from the evidence and a certificate expiring next week changes
+ * the verdict without anybody migrating a row.
+ */
+export async function storeQuestionnaireAnswers(opts: {
+  rfxId?: string;
+  vendorId: string;
+  answers: ReadAnswer[];
+  provenance: Record<string, { locator: string; citedText: string }>;
+  sourceFilename: string;
+}): Promise<{ stored: number }> {
+  const run = await q();
+  await run(
+    `update vendors
+        set read_answers = $3, answers_provenance = $4,
+            answers_read_at = now(), answers_source = $5
+      where rfx_id = $1 and id = $2`,
+    [
+      opts.rfxId ?? RFX_ID, opts.vendorId,
+      JSON.stringify(opts.answers), JSON.stringify(opts.provenance),
+      opts.sourceFilename,
+    ],
+  );
+  return { stored: opts.answers.length };
+}
+
 /** Everything the comparison screen and the analyst both need. */
 export async function buildComparisonPayload() {
   const rfx = await activeRfx();
@@ -840,6 +987,12 @@ export async function buildComparisonPayload() {
   const dbVendor = (code: string) =>
     rfx.vendorRows.find((v) => String(v.code) === code);
 
+  // Derived once, here, and handed to everything downstream so the grid, the
+  // award note, the chase and the analyst cannot disagree about who is eligible.
+  const verdicts = Object.fromEntries(
+    rfx.vendorRows.map((v) => [String(v.code), verdictFor(v)]),
+  );
+
   return {
     rfx: rfx.isSeededExample ? catalog.rfx : { ...(catalog.rfx as object), id: rfx.rfxId },
     buyer: catalog.buyer,
@@ -856,12 +1009,17 @@ export async function buildComparisonPayload() {
         city: (d?.city as string) ?? (c?.city as string) ?? "",
         reply_format: (c?.reply_format as string) ?? "",
         qualified: ctx.qualification[code]?.qualified ?? true,
-        // Distinct from `qualified`. A supplier nobody has assessed is not the
-        // same as one who passed, and the screen must not merge them.
-        assessed: rfx.isSeededExample ? true : d?.qualified !== null,
-        failedMandatory:
-          (d?.failed_mandatory as unknown[]) ??
-          (QUALIFICATION[code]?.failed_mandatory as unknown[]) ?? [],
+        // Distinct from `qualified`. A supplier whose questionnaire nobody has
+        // read is not the same as one who passed, and the screen must never
+        // merge them. This is the state that used to render as "FAILED 6" from
+        // a typed table beside a row saying "nothing read".
+        assessed: verdicts[code]?.assessed ?? false,
+        // DERIVED from the answers, not read from a stored verdict. Every entry
+        // here carries the sentence that produced it.
+        failedMandatory: verdicts[code]?.failedMandatory ?? [],
+        assessments: verdicts[code]?.assessments ?? [],
+        answersSource: (d?.answers_source as string) ?? null,
+        answersReadAt: d?.answers_read_at ? String(d.answers_read_at) : null,
         meta: loaded.vendorMeta[code] ?? null,
       };
     }),

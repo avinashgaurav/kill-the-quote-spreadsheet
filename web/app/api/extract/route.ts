@@ -1,5 +1,13 @@
 import { extractDocument, fileHash, type ExtractionCache } from "@/lib/extract/run";
-import { activeRfx, guessVendor, seedRfx, storeExtraction, ensureVendor } from "@/lib/store";
+import {
+  activeRfx, guessVendor, seedRfx, storeExtraction, ensureVendor,
+  storeQuestionnaireAnswers,
+} from "@/lib/store";
+import {
+  extractQuestionnaire, looksLikeQuestionnaire,
+} from "@/lib/extract/questionnaire";
+import catalog from "@/lib/data/catalog.json";
+import type { QuestionSpec } from "@/lib/questionnaire";
 import { getQuery } from "@/lib/db/client";
 
 /**
@@ -133,6 +141,47 @@ export async function POST(request: Request) {
       // serverless filesystem is read-only, so writing here failed with EROFS
       // on the deployed site and took the whole upload path down with it.
       const storagePath = `db:${fh}`;
+
+      // A questionnaire response and a quotation are different documents
+      // answering different questions, so they get different readers. The
+      // filename is a hint, not a fact: getting it wrong is recoverable,
+      // because a quotation read as a questionnaire returns no answers and
+      // throws loudly rather than silently producing nothing.
+      if (looksLikeQuestionnaire(file.name)) {
+        try {
+          const qr = await extractQuestionnaire({
+            buf,
+            filename: file.name,
+            mimeType: file.type || "application/octet-stream",
+            questions: catalog.questionnaire as unknown as QuestionSpec[],
+          });
+          await storeQuestionnaireAnswers({
+            rfxId: rfx.rfxId,
+            vendorId,
+            answers: qr.answers,
+            provenance: qr.provenance,
+            sourceFilename: file.name,
+          });
+          results.push({
+            filename: file.name, ok: true, vendorId, kind: "questionnaire",
+            model: qr.model, ms: qr.ms,
+            answersRead: qr.answers.length,
+            withEvidence: qr.answers.filter((a) => a.attachedDocument).length,
+            unreadableRegions: qr.unreadableRegions,
+            note:
+              `Read ${qr.answers.length} questionnaire answer(s). The pass or fail ` +
+              `verdict is not stored: it is computed from these answers against the ` +
+              `questions every time the comparison is read, so a certificate that ` +
+              `expires next week changes the verdict without anybody editing a row.`,
+          });
+        } catch (e) {
+          results.push({
+            filename: file.name, ok: false, vendorId, kind: "questionnaire",
+            error: String(e),
+          });
+        }
+        continue;
+      }
 
       try {
         const { extraction, rows, meta, nestedFiles } = await extractDocument({

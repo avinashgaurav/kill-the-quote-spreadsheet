@@ -28,6 +28,8 @@ import {
 import { buildComparisonPayload } from "../lib/store";
 import { awardNote } from "../lib/documents";
 import { sendIssues } from "../lib/copilot";
+import { assessQuestionnaire, type QuestionSpec } from "../lib/questionnaire";
+import catalog from "../lib/data/catalog.json";
 import rawQuotes from "../lib/data/raw-quotes.json";
 import type { RawQuote } from "../lib/normalise";
 
@@ -231,11 +233,18 @@ async function main() {
 
   await run(`delete from rfx where id in ('REG-DRAFT','REG-OTHER')`);
   const back = await activeRfx();
+  // Asserted on the shipped suppliers being present, not on an exact count:
+  // an earlier case in this same suite deliberately creates one, and a test
+  // that breaks when another test does its job is a test about itself.
+  const seededPresent = VENDORS.every((v) =>
+    back.ctx.vendors.some((x) => x.code === v.code));
   check(
     "6b. Discarding a draft left the tool stuck",
     "with no drafts, the shipped example is the active enquiry again",
-    back.rfxId === RFX_ID && back.isSeededExample && back.ctx.vendors.length === VENDORS.length,
-    `back to ${back.rfxId} with ${back.ctx.lines.length} lines`,
+    back.rfxId === RFX_ID && back.isSeededExample && seededPresent
+      && back.ctx.lines.length === LINES.length,
+    `back to ${back.rfxId} with ${back.ctx.lines.length} lines and all ` +
+    `${VENDORS.length} shipped suppliers present`,
   );
 
   // ---- 7. A schema change never reached an existing database ----------
@@ -443,6 +452,59 @@ async function main() {
     `the pointer names line W3 and W3 was not extracted, so status is ` +
     `${missingUplift?.status} with no landed value, rather than Rs 50,000 ranked ` +
     `against bids that include the cover`,
+  );
+
+  // ---- 17. Qualification verdicts came from a typed table -------------
+  //
+  // A supplier's row said "nothing read" beside "FAILED 6". Those six failures
+  // were entries in a hand-written table; nothing had opened the supplier's
+  // questionnaire, and the four questionnaire responses in the corpus had no
+  // code path that read them. The screen was asserting a conclusion it could
+  // not have reached.
+  const store = readFileSync(resolve(process.cwd(), "lib/store.ts"), "utf8");
+  const usesTypedVerdict =
+    /failedMandatory:\s*\n?\s*\(?d\?\.failed_mandatory/.test(store) ||
+    /failedMandatory:.*QUALIFICATION\[/.test(store);
+  check(
+    "17. Qualification came from a hand-written table",
+    "the verdict is derived from questionnaire answers, never read from a stored one",
+    !usesTypedVerdict,
+    usesTypedVerdict
+      ? "the payload is reading a stored verdict column again"
+      : "every verdict comes from assessQuestionnaire over the answers on the row",
+  );
+
+  const unread = assessQuestionnaire({
+    questions: catalog.questionnaire as unknown as QuestionSpec[],
+    answers: [],
+  });
+  check(
+    "17b. An unread supplier rendered as failed",
+    "a supplier whose questionnaire nobody has read is unassessed, not failed",
+    unread.assessed === false && unread.failedMandatory.length === 0,
+    `assessed=${unread.assessed}, failed=[] — it cannot claim a failure it has no ` +
+    `evidence for, and it cannot claim a pass either`,
+  );
+
+  // And the finding that matters is genuinely computed, not stated.
+  const expired = assessQuestionnaire({
+    questions: catalog.questionnaire as unknown as QuestionSpec[],
+    asOf: new Date("2026-09-18"),
+    answers: [{
+      questionNo: "Q2", answer: "Yes", attachedDocument: "cert.pdf",
+      evidence: {
+        standard: "ISO/IEC 27001:2013", validUntil: "2025-11-30",
+        issuedTo: null, summary: null,
+      },
+      confidence: 0.9,
+    }],
+  });
+  const q2 = expired.assessments.find((a) => a.questionNo === "Q2");
+  check(
+    "17c. The expired certificate was a fact I typed, not a finding",
+    "an answer contradicted by its own evidence is caught, and says which and why",
+    q2?.status === "evidence_contradicts" && /2013|2022/.test(q2.why),
+    q2?.why ?? "not caught",
   );
 
   console.log(

@@ -164,11 +164,13 @@ async function main() {
   );
 
   check(
-    "an unassessed supplier reads as unassessed, not as qualified",
-    v("GUJCORR")?.assessed === false && v("PACKWELL")?.assessed === true,
-    `GUJCORR assessed=${v("GUJCORR")?.assessed} (nobody has checked their ` +
-    `questionnaire), PACKWELL assessed=${v("PACKWELL")?.assessed}. Showing an ` +
-    `unassessed supplier as "eligible" is the failure worth avoiding here.`,
+    "a stored 'qualified' flag does not make a supplier look assessed",
+    v("GUJCORR")?.assessed === false && v("PACKWELL")?.assessed === false,
+    `Both suppliers show assessed=false. PACKWELL was deliberately inserted with ` +
+    `qualified=true in the legacy column and STILL reads as unassessed, because a ` +
+    `verdict is now derived from questionnaire answers that were actually read. ` +
+    `A typed flag is not an assessment, which is the whole point: a row used to be ` +
+    `able to claim "FAILED 6" on a screen that had read nothing.`,
   );
 
   const cell = payload.matrix.GUJCORR?.[3];

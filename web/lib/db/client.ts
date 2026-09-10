@@ -288,6 +288,19 @@ const MIGRATIONS = [
    * half-megabyte photograph is not worth a driver-specific code path.
    */
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS file_base64 text`,
+  /*
+   * A supplier's questionnaire answers, as READ from their response document,
+   * plus where each one came from.
+   *
+   * The verdict is deliberately NOT stored. It is derived from these answers on
+   * every read, so a threshold change, or a certificate that expires between
+   * now and award, recomputes rather than going stale. A stored verdict is the
+   * hand-written table this whole path exists to remove.
+   */
+  `ALTER TABLE vendors ADD COLUMN IF NOT EXISTS read_answers jsonb`,
+  `ALTER TABLE vendors ADD COLUMN IF NOT EXISTS answers_provenance jsonb`,
+  `ALTER TABLE vendors ADD COLUMN IF NOT EXISTS answers_read_at timestamptz`,
+  `ALTER TABLE vendors ADD COLUMN IF NOT EXISTS answers_source text`,
   `ALTER TABLE rfx ADD COLUMN IF NOT EXISTS knowingly_ambiguous jsonb NOT NULL DEFAULT '[]'::jsonb`,
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1`,
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS supersedes_id text`,
