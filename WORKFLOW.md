@@ -296,7 +296,7 @@ eight suites. No API key, no network, about forty seconds.
 | Questionnaire | Verdicts derived from evidence, each able to say why, and the finding that needs the ATTACHMENT opened | 16/16 ✅ | no |
 | Contrast | Every colour that carries meaning, against its WCAG floor, in both themes, with the oklch maths checked against a real browser first | pass ✅ | no |
 | Cache | The extraction cache stores, returns, and misses for the right reasons | 6/6 ✅ | no |
-| Regressions | 54 bugs that shipped cannot return unnoticed, including one asserting the deployed dataset is byte-identical to the generated one | 54/54 ✅ | no |
+| Regressions | 55 bugs that shipped cannot return unnoticed, including one asserting the deployed dataset is byte-identical to the generated one | 55/55 ✅ | no |
 | End to end | Happy and sad paths over HTTP, plus an interviewer's own file | 42 cases | yes |
 | Demo | Ten walkthrough claims against the brief | 10/10 | yes |
 | Accuracy | Recall, price exactness, unit correctness, invention rate, and whether confidence falls when accuracy falls | measured, see below | yes |

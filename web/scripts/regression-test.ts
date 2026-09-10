@@ -991,6 +991,27 @@ async function main() {
     );
   }
 
+  // ---- 36. An export outlived the caveat on its own data ---------------
+  //
+  // When the database cannot be read, the screen shows the shipped example and
+  // says "do not act on these numbers". Every export ignored that and produced
+  // a clean 14 kB award note recommending Rs 4.06 crore, with "NOT ASSESSED"
+  // against both recommended suppliers and a line asserting the mandatory
+  // questionnaire had been applied.
+  //
+  // An award note's stated job is to stand alone for whoever audits this in a
+  // year, which makes it the worst possible artefact to build on data the app
+  // itself has disowned.
+  check(
+    "36. The exports ignored the not-live warning",
+    "a degraded comparison exports nothing at all",
+    /payload\.degraded/.test(
+      readFileSync(resolve(process.cwd(), "app/api/export/[kind]/route.ts"), "utf8"),
+    ),
+    "same argument as refusing to export an empty comparison: it would look " +
+    "exactly like a finished analysis",
+  );
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

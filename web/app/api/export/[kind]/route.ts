@@ -42,6 +42,34 @@ export async function GET(
   try {
     const payload = await buildComparisonPayload();
 
+    /**
+     * An export must not outlive the caveat on the screen it came from.
+     *
+     * When `degraded` is set the database could not be read, so the comparison
+     * is showing the shipped example and its stored qualification verdicts and
+     * the UI says "do not act on these numbers". Every export ignored that and
+     * produced a clean 14 kB award note recommending Rs 4.06 crore, with
+     * "Qualified: NOT ASSESSED" against both recommended suppliers and a line
+     * asserting the mandatory questionnaire had been applied.
+     *
+     * An award note's stated job is to stand alone for whoever audits this in
+     * a year. A document that outlives the warning attached to its own data is
+     * the worst artefact this product could emit, so it is refused: an export
+     * of numbers the app has disowned would look exactly like a finished
+     * analysis, which is the same argument as refusing to export an empty one.
+     */
+    if (payload.degraded) {
+      return Response.json({
+        error:
+          "This comparison could not be read from the database, so the screen is " +
+          "showing the shipped example rather than anything derived from what was " +
+          "read, and nothing will be exported from it. An award note that outlives " +
+          "the warning attached to its own data is worse than no award note. " +
+          "Reload once the database is reachable and export again.",
+        degraded: payload.degraded,
+      }, { status: 409 });
+    }
+
     if (!payload.hasAnyExtraction) {
       return Response.json(
         {
