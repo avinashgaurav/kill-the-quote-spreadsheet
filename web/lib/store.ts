@@ -335,6 +335,8 @@ export async function storeExtraction(opts: {
   byteSize: number;
   fileHash: string;
   storagePath: string;
+  /** The document's own bytes, so the provenance panel can reopen it later. */
+  fileBytes?: Buffer;
   extraction: Extraction;
   rows: ExtractedRow[];
   meta: ExtractionMeta;
@@ -374,8 +376,8 @@ export async function storeExtraction(opts: {
     `insert into responses
        (id, rfx_id, vendor_id, filename, mime_type, byte_size, file_hash,
         storage_path, extraction_status, extraction_meta, revision, blanket_fallback,
-        supersedes_id)
-     values ($1,$2,$3,$4,$5,$6,$7,$8,'extracted',$9,$10,$11,$12)`,
+        supersedes_id, file_base64)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,'extracted',$9,$10,$11,$12,$13)`,
     [
       responseId, rfxId, opts.vendorId, opts.filename, opts.mimeType,
       opts.byteSize, opts.fileHash, opts.storagePath,
@@ -393,6 +395,7 @@ export async function storeExtraction(opts: {
         ? JSON.stringify(opts.extraction.blanketFallback)
         : null,
       supersedesId,
+      opts.fileBytes ? opts.fileBytes.toString("base64") : null,
     ],
   );
 

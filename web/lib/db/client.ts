@@ -275,6 +275,19 @@ CREATE TABLE IF NOT EXISTS analyst_turns (
  * database and an existing one, which is what IF NOT EXISTS buys.
  */
 const MIGRATIONS = [
+  /*
+   * The uploaded document itself, base64 in a text column.
+   *
+   * It used to be written to .uploads/ on disk, which works locally and fails
+   * on Vercel with EROFS: a serverless filesystem is read-only. So uploading
+   * anything on the deployed site was broken outright, and the provenance panel
+   * would have had nothing to open even if it had not been.
+   *
+   * Base64 text rather than bytea because the Neon HTTP driver and PGlite
+   * disagree about binary parameter encoding, and a 33% size penalty on a
+   * half-megabyte photograph is not worth a driver-specific code path.
+   */
+  `ALTER TABLE responses ADD COLUMN IF NOT EXISTS file_base64 text`,
   `ALTER TABLE rfx ADD COLUMN IF NOT EXISTS knowingly_ambiguous jsonb NOT NULL DEFAULT '[]'::jsonb`,
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1`,
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS supersedes_id text`,
@@ -292,11 +305,28 @@ async function connect(): Promise<{ db: Db; query: Query }> {
 
   if (!globalForDb.__quoteKillerReady) {
     globalForDb.__quoteKillerReady = (async () => {
-      for (const stmt of DDL.split(";").map((s) => s.trim()).filter(Boolean)) {
-        await query(stmt);
-      }
-      for (const stmt of MIGRATIONS) {
-        await query(stmt);
+      // One round trip, not twenty.
+      //
+      // Splitting the DDL and firing each statement separately costs a network
+      // round trip per statement. Against embedded Postgres that is free;
+      // against Neon in Singapore it was about 2.7 seconds on every cold start,
+      // which the buyer sees as a loading skeleton before anything appears.
+      //
+      // Every statement is CREATE ... IF NOT EXISTS or ALTER ... ADD COLUMN IF
+      // NOT EXISTS, so the whole thing is idempotent and safe to send as one
+      // script. PGlite and Neon both accept multiple statements in one call.
+      const script = [
+        ...DDL.split(";").map((s) => s.trim()).filter(Boolean),
+        ...MIGRATIONS,
+      ].join(";\n") + ";";
+      try {
+        await query(script);
+      } catch {
+        // A driver that refuses multi-statement input falls back to one at a
+        // time. Slower, and still correct, which is the right way round.
+        for (const stmt of script.split(";").map((s) => s.trim()).filter(Boolean)) {
+          await query(stmt);
+        }
       }
     })();
   }

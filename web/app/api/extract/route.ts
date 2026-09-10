@@ -1,6 +1,3 @@
-import { writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
-
 import { extractDocument, fileHash, type ExtractionCache } from "@/lib/extract/run";
 import { activeRfx, guessVendor, seedRfx, storeExtraction, ensureVendor } from "@/lib/store";
 import { getQuery } from "@/lib/db/client";
@@ -68,9 +65,6 @@ export async function POST(request: Request) {
       );
     }
 
-    const uploadDir = join(process.cwd(), ".uploads");
-    await mkdir(uploadDir, { recursive: true });
-
     const cache = await dbCache();
     const results: unknown[] = [];
 
@@ -135,8 +129,10 @@ export async function POST(request: Request) {
         });
       }
 
-      const storagePath = join(uploadDir, `${fh}_${file.name}`);
-      await writeFile(storagePath, buf);
+      // The bytes go into the database with the response, not onto disk. A
+      // serverless filesystem is read-only, so writing here failed with EROFS
+      // on the deployed site and took the whole upload path down with it.
+      const storagePath = `db:${fh}`;
 
       try {
         const { extraction, rows, meta, nestedFiles } = await extractDocument({
@@ -172,6 +168,7 @@ export async function POST(request: Request) {
           byteSize: buf.length,
           fileHash: fh,
           storagePath,
+          fileBytes: buf,
           extraction,
           rows,
           meta,

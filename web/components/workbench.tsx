@@ -253,8 +253,12 @@ export function Workbench({
         rfxTitle={payload?.rfx.title}
         issued={(payload?.rfx as { issued?: string } | undefined)?.issued}
         due={payload?.rfx.due}
-        lineCount={payload?.lines.length ?? 0}
-        vendorCount={payload?.vendors.length ?? 0}
+        // Undefined, not 0, while the first request is in flight. "0 line items
+        // out to 0 suppliers" is a factual claim, and for the two or three
+        // seconds of a cold start it was a false one: it read as an app with no
+        // data rather than an app still fetching it.
+        lineCount={payload?.lines.length}
+        vendorCount={payload?.vendors.length}
         tab={tab}
         onTab={setTab}
         steps={{

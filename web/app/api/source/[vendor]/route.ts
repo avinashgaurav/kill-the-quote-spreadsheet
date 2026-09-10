@@ -17,14 +17,16 @@ export async function GET(
 ) {
   const { vendor } = await ctx.params;
 
-  if (!/^V\d+$/.test(vendor)) {
-    return new Response("Bad vendor id", { status: 400 });
+  // Supplier codes are created from uploaded filenames, so they are not always
+  // V-plus-digits. Still constrained, because this value reaches a query.
+  if (!/^[A-Za-z0-9_.&-]{1,40}$/.test(vendor)) {
+    return new Response("Bad supplier id", { status: 400 });
   }
 
   try {
     const query = await getQuery();
     const r = await query(
-      `select storage_path, mime_type from responses
+      `select storage_path, mime_type, file_base64 from responses
         where vendor_id = $1 and mime_type like 'image/%'
         order by created_at desc limit 1`,
       [vendor],
@@ -33,7 +35,11 @@ export async function GET(
     const row = r.rows?.[0];
     if (!row) return new Response("No image on file for this supplier", { status: 404 });
 
-    const buf = await readFile(String(row.storage_path));
+    // The bytes live in the database. Older rows written before that change
+    // carry a filesystem path, so those still resolve from disk.
+    const buf = row.file_base64
+      ? Buffer.from(String(row.file_base64), "base64")
+      : await readFile(String(row.storage_path));
     return new Response(new Uint8Array(buf), {
       headers: {
         "Content-Type": String(row.mime_type),

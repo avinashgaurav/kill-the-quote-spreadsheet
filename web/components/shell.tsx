@@ -30,8 +30,9 @@ export function AppHeader({
   rfxTitle?: string;
   issued?: string;
   due?: string;
-  lineCount: number;
-  vendorCount: number;
+  /** Undefined until the first fetch lands. Never rendered as 0. */
+  lineCount?: number;
+  vendorCount?: number;
   tab: string;
   onTab: (t: "draft" | "intake" | "compare") => void;
   /** Real state per step, so the nav reports progress instead of numbering it. */
@@ -64,17 +65,28 @@ export function AppHeader({
             <TooltipTrigger asChild>
               <p className="cursor-help truncate text-[11px] leading-tight text-muted-foreground">
                 <span className="font-mono">{rfxId}</span>
-                <Dot />
-                <span className="num">{lineCount}</span> line items out to{" "}
-                <span className="num">{vendorCount}</span> suppliers
+                {lineCount === undefined || vendorCount === undefined ? (
+                  <>
+                    <Dot />
+                    loading the enquiry
+                  </>
+                ) : (
+                  <>
+                    <Dot />
+                    <span className="num">{lineCount}</span> line items out to{" "}
+                    <span className="num">{vendorCount}</span> suppliers
+                  </>
+                )}
               </p>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="max-w-sm space-y-1 text-[11px]">
               {rfxTitle && <p className="font-medium">{rfxTitle}</p>}
-              <p className="text-muted-foreground">
-                {buyerName} asked {vendorCount} suppliers to price {lineCount} line
-                items. Every price on this screen was read from what they sent back.
-              </p>
+              {lineCount !== undefined && vendorCount !== undefined && (
+                <p className="text-muted-foreground">
+                  {buyerName} asked {vendorCount} suppliers to price {lineCount} line
+                  items. Every price on this screen was read from what they sent back.
+                </p>
+              )}
               {(issued || due) && (
                 <p className="num text-muted-foreground">
                   {issued && `issued ${issued}`}
