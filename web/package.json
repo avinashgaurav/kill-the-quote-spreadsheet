@@ -19,13 +19,14 @@
     "revision-test": "tsx scripts/revision-test.ts",
     "generality-test": "tsx scripts/generality-test.ts",
     "e2e-test": "python3 scripts/e2e-test.py",
-    "test:all": "npm run conformance && npm run reader-test && npm run parse-check && npm run revision-test && npm run generality-test && npm run questionnaire-test && npm run regression-test",
+    "test:all": "npm run conformance && npm run reader-test && npm run parse-check && npm run revision-test && npm run generality-test && npm run questionnaire-test && npm run contrast-test && npm run regression-test",
     "regression-test": "tsx scripts/regression-test.ts",
     "questionnaire-test": "tsx scripts/questionnaire-test.ts",
     "types": "tsc --noEmit",
     "api-check": "tsx scripts/api-check.ts",
     "accuracy:fresh": "tsx scripts/accuracy.ts --all --fresh",
-    "verify": "npm run types && npm run lint && npm run test:all"
+    "verify": "npm run types && npm run lint && npm run test:all",
+    "contrast-test": "tsx scripts/contrast-test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

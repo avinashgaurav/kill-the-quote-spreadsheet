@@ -465,6 +465,7 @@ export function Workbench({
               cell={selectedCell}
               line={selectedLine}
               vendorName={selectedVendor.name}
+              vendorCode={drawer.vendor}
               provenance={payload?.provenance[`${drawer.vendor}:${drawer.lineNo}`]}
               confidence={payload?.confidence[`${drawer.vendor}:${drawer.lineNo}`]}
               verification={payload?.verification[`${drawer.vendor}:${drawer.lineNo}`]}

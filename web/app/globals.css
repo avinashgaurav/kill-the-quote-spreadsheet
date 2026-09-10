@@ -153,12 +153,23 @@
      glyphs, which are the marks that say the system is NOT SURE. At
      oklch(0.72 ...) they measured 2.34:1 on their own tint, i.e. the least
      legible thing on a screen whose whole claim is that it shows you what it
-     does not know. Darkened to clear 4.5:1 as text; the stripe and the fill
-     below are unchanged, so the grid's colour temperature is the same. */
+     does not know. Darkened to clear 4.5:1 as text.
+
+     It now draws the left rule too, and --cell-review-stripe is gone. That
+     token was a second, lighter amber at 2.56:1 against the page, below the
+     3:1 floor for a non-text mark, and it drew the rule on a DERIVED price:
+     a number the system worked out because the supplier wrote "same as our
+     March rates" and never quoted a figure. The red rule beside it, meaning
+     the milder "they quoted something off-spec", was already at 4.73:1. So
+     the more dangerous of the two states was the fainter of the two marks.
+     Same bug as the glyphs above, same cause: doubt drawn softly because
+     softly is what doubt feels like. */
   --cell-review: oklch(0.53 0.14 60);
-  --cell-review-stripe: oklch(0.72 0.15 70);
   --cell-review-bg: oklch(0.97 0.03 85);
-  --cell-caveat: oklch(0.58 0.19 25);
+  /* 0.58 put this at 4.27:1 on its own tint, which reads fine and misses the
+     4.5:1 floor. The sentence it carries is "they quoted something different,
+     decide if that is acceptable", and an unreadable caveat is not a caveat. */
+  --cell-caveat: oklch(0.56 0.19 25);
   --cell-caveat-bg: oklch(0.97 0.02 25);
   --cell-empty: oklch(0.92 0 0);
   --grid-line: oklch(0.91 0 0);
@@ -167,7 +178,6 @@
 
 .dark {
   --cell-review: oklch(0.84 0.13 78);
-  --cell-review-stripe: oklch(0.78 0.14 75);
   --cell-review-bg: oklch(0.27 0.04 75);
   --cell-caveat: oklch(0.68 0.17 25);
   --cell-caveat-bg: oklch(0.26 0.04 25);
@@ -187,7 +197,7 @@
 
 .cell-review {
   background: var(--cell-review-bg);
-  box-shadow: inset 2px 0 0 var(--cell-review-stripe);
+  box-shadow: inset 2px 0 0 var(--cell-review);
 }
 
 .cell-caveat {
@@ -239,7 +249,7 @@
 
 .grid-table tbody tr:hover td.cell-review {
   box-shadow:
-    inset 2px 0 0 var(--cell-review-stripe),
+    inset 2px 0 0 var(--cell-review),
     inset 0 0 0 999px color-mix(in oklch, var(--accent) 32%, transparent);
 }
 

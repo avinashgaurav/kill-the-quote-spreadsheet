@@ -545,12 +545,49 @@ export interface RfxContext {
   lines: RfxLine[];
   vendors: Array<{ code: string }>;
   qualification: Record<string, { qualified: boolean }>;
+  /**
+   * The whole-order discount each supplier STATED, as the model read it off
+   * their own document.
+   *
+   * This used to be read straight out of `catalog.terms`, keyed by vendor
+   * code, which made it the one number on the award screen that came from the
+   * fabricated dataset rather than from a real read. Two things were wrong
+   * with that, and the second is worse than the first:
+   *
+   *   the demo   "Zenith's total if you award them everything, after their
+   *              stated discount" was a figure the answer key knew and the
+   *              extraction did not, on a screen whose entire claim is that
+   *              the model reads and the code counts.
+   *
+   *   any real   a genuine supplier's discount WAS extracted correctly, into
+   *   enquiry    `terms.totalLevelDiscountPercent`, and then silently dropped,
+   *              because `catalog.terms` will never hold a code that is not
+   *              one of the five in the example. Their award total was
+   *              overstated by their own discount and nothing said so.
+   *
+   * Absent means "we have not read a discount from this supplier", which is
+   * correctly different from "they offered none".
+   */
+  statedDiscountPct?: Record<string, number | null>;
 }
 
 export const defaultContext = (): RfxContext => ({
   lines: LINES,
   vendors: VENDORS,
   qualification: QUALIFICATION as unknown as RfxContext["qualification"],
+  /**
+   * The seeded example's terms, and ONLY as the floor.
+   *
+   * Nothing has been read in this state, so there is nothing truer to use, and
+   * the Python reference calculator uses the same figures, which is what lets
+   * the two implementations be proven equal. The moment a document is actually
+   * read, `activeRfx()` overrides this with what the model found.
+   */
+  statedDiscountPct: Object.fromEntries(
+    Object.entries(TERMS).map(([code, t]) => [
+      code, (t.total_level_discount_pct as number | undefined) ?? null,
+    ]),
+  ),
 });
 
 export function buildMatrix(
@@ -749,7 +786,8 @@ export function singleVendor(
     total += cell.extendedInr as number;
     priced += 1;
   }
-  const discPct = TERMS[vc]?.total_level_discount_pct as number | undefined;
+  // From what was read, not from the catalog. See RfxContext.statedDiscountPct.
+  const discPct = ctx.statedDiscountPct?.[vc] ?? undefined;
 
   /**
    * A total-level discount conditional on the COMPLETE scope must not be

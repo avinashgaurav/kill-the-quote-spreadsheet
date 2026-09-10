@@ -51,21 +51,46 @@ export const maxDuration = 300;
  *
  * Paths only. Nothing here says what the documents contain.
  */
-const MAILBOX: Record<string, string[]> = {
+interface Arriving {
+  /** The document itself. */
+  path: string;
+  /**
+   * Files that came with it, which its own contents refer to.
+   *
+   * A questionnaire response is a form. Against "are you ISO 27001:2022
+   * certified?" a supplier writes "Yes" and puts a FILENAME in the document
+   * column, because that is what a form has room for. The revision year and
+   * the expiry date live inside the attached certificate, and reading only the
+   * form gets you "answered yes, attached something, nothing contradicts it".
+   *
+   * So an attachment is delivered with its parent and read as its own
+   * document. This is the mechanism the whole expired-certificate finding
+   * depends on, and until it existed the finding only survived because the
+   * fixture had the standard and the date typed into a string.
+   */
+  attachments?: string[];
+}
+
+const MAILBOX: Record<string, Arriving[]> = {
   V1: [
-    "01-vendor-zenith/Zenith_Quotation_ZIS-NBR-2026-1184.xlsx",
-    "01-vendor-zenith/Zenith_Questionnaire_Response.xlsx",
+    { path: "01-vendor-zenith/Zenith_Quotation_ZIS-NBR-2026-1184.xlsx" },
+    { path: "01-vendor-zenith/Zenith_Questionnaire_Response.xlsx" },
   ],
-  V2: ["02-vendor-cygnus/Cygnus_Quotation_CTI-Q-2026-0918.pdf"],
+  V2: [{ path: "02-vendor-cygnus/Cygnus_Quotation_CTI-Q-2026-0918.pdf" }],
   V3: [
-    "03-vendor-orbit/Orbit_Offer_OSS-QT-2026-27-0442.docx",
-    "03-vendor-orbit/Orbit_Questionnaire_Response.docx",
+    { path: "03-vendor-orbit/Orbit_Offer_OSS-QT-2026-27-0442.docx" },
+    { path: "03-vendor-orbit/Orbit_Questionnaire_Response.docx" },
   ],
   V4: [
-    "04-vendor-vector/IMG_20260917_1142_vector_rate_card.jpg",
-    "04-vendor-vector/Vector_Questionnaire_Response.pdf",
+    { path: "04-vendor-vector/IMG_20260917_1142_vector_rate_card.jpg" },
+    {
+      path: "04-vendor-vector/Vector_Questionnaire_Response.pdf",
+      // The certificate they answered Q2 with. It names the 2013 revision and
+      // expired on 2025-11-30, and neither fact is anywhere on the form.
+      attachments: ["04-vendor-vector/VDS_ISO27001.pdf"],
+    },
   ],
-  V5: ["05-vendor-helios/helios_reply_2026-09-17.eml"],
+  V5: [{ path: "05-vendor-helios/helios_reply_2026-09-17.eml" }],
 };
 
 /** A later revision, delivered only when the buyer asks for it. */
@@ -146,9 +171,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const files = [
+    const files: Arriving[] = [
       ...(MAILBOX[code] ?? []),
-      ...(includeRevision && LATE_REVISIONS[code] ? [LATE_REVISIONS[code]] : []),
+      ...(includeRevision && LATE_REVISIONS[code]
+        ? [{ path: LATE_REVISIONS[code] }]
+        : []),
     ];
 
     if (!files.length) {
@@ -168,7 +195,8 @@ export async function POST(request: Request) {
     const rfx = await activeRfx();
     const results: unknown[] = [];
 
-    for (const rel of files) {
+    for (const arriving of files) {
+      const rel = arriving.path;
       const path = resolve(rel);
       const name = rel.split("/").pop()!;
       if (!path) {
@@ -184,9 +212,24 @@ export async function POST(request: Request) {
         // A questionnaire response and a quotation are different documents and
         // get different readers. Same routing as a manual upload.
         if (looksLikeQuestionnaire(name)) {
+          // Everything that came with it, so an answer that points at a
+          // certificate can be checked against the certificate.
+          const attachments = [];
+          for (const arel of arriving.attachments ?? []) {
+            const apath = resolve(arel);
+            if (!apath) continue;
+            const aname = arel.split("/").pop()!;
+            attachments.push({
+              filename: aname,
+              mimeType: MIME[aname.split(".").pop()!.toLowerCase()] ?? "application/octet-stream",
+              buf: await readFile(/* turbopackIgnore: true */ apath),
+            });
+          }
+
           const qr = await extractQuestionnaire({
             buf, filename: name, mimeType,
             questions: catalog.questionnaire as unknown as QuestionSpec[],
+            attachments,
           });
           await storeQuestionnaireAnswers({
             rfxId: rfx.rfxId, vendorId: code,
@@ -195,6 +238,13 @@ export async function POST(request: Request) {
           results.push({
             filename: name, ok: true, kind: "questionnaire",
             answersRead: qr.answers.length, model: qr.model, ms: qr.ms,
+            // Reported so the screen can say which certificates were actually
+            // opened, rather than leaving "attached" to imply "checked".
+            attachmentsRead: qr.evidenceRead.map((e) => ({
+              file: e.filename, forQuestion: e.questionNo,
+              states: e.standard, expires: e.validUntil,
+            })),
+            attachmentsNotHeld: qr.attachmentsNotHeld,
           });
           continue;
         }

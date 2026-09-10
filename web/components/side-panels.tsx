@@ -24,6 +24,7 @@
  * Rs 38 lakh should be first even if the model is fairly sure about it.
  */
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -47,6 +48,76 @@ export interface AnswerRow {
   doc: string | null;
   ok: boolean;
   note?: string;
+}
+
+/**
+ * Ask one supplier about the mandatory questions they failed.
+ *
+ * The panel could already explain, per question, exactly why a supplier was
+ * disqualified, in a sentence derived from their own evidence. What it could
+ * not do was act. So a buyer read "answered Yes and attached a certificate
+ * that expired on 2025-11-30" and then had to go and find the chase step,
+ * work out which items to select, and hope they picked the same ones.
+ *
+ * Scoped to the failed questions only. A supplier who failed two mandatory
+ * items and answered the other eight should be asked about two.
+ */
+function AskQuestions({
+  vendorCode, vendorName, questionNos,
+}: {
+  vendorCode: string;
+  vendorName: string;
+  questionNos: string[];
+}) {
+  const [state, setState] = useState<"idle" | "sending" | "done">("idle");
+  const [note, setNote] = useState<string | null>(null);
+  if (!questionNos.length) return null;
+
+  async function send() {
+    setState("sending");
+    try {
+      const r = await fetch("/api/rfx/chase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vendorId: vendorCode, questionNos }),
+      });
+      const j = await r.json();
+      setState("done");
+      setNote(
+        j.ok
+          ? `Asked ${vendorName} to resolve ${questionNos.join(", ")}. Recorded on the ` +
+            `enquiry, so the award note can say it was asked and when it was due.`
+          // A refusal here is usually the right answer and worth showing
+          // verbatim: it means nothing on those questions is actually
+          // outstanding from them.
+          : String(j.error ?? "The request was refused."),
+      );
+    } catch (e) {
+      setState("done");
+      setNote(String(e));
+    }
+  }
+
+  if (state === "done") {
+    return <p className="pt-1 text-[10px] leading-relaxed">{note}</p>;
+  }
+
+  return (
+    <button
+      onClick={send}
+      disabled={state === "sending"}
+      className={cn(
+        "mt-1 rounded-md border border-foreground/25 bg-background px-2.5 py-1.5",
+        "text-[11px] font-medium transition-colors hover:bg-accent",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+        "disabled:opacity-60",
+      )}
+    >
+      {state === "sending"
+        ? "Asking…"
+        : `Ask them to resolve ${questionNos.length === 1 ? questionNos[0] : `these ${questionNos.length}`}`}
+    </button>
+  );
 }
 
 export function SupplierPanel({
@@ -228,6 +299,11 @@ export function SupplierPanel({
             <p className="pt-0.5 text-[10px] text-muted-foreground">
               Where an answer and its attachment disagree, the attachment decides.
             </p>
+            <AskQuestions
+              vendorCode={vendor.code}
+              vendorName={vendor.name}
+              questionNos={failed.map((q) => q.no)}
+            />
           </div>
         </>
       )}

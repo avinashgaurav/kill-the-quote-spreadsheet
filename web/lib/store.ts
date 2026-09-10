@@ -322,6 +322,31 @@ export async function activeRfx(): Promise<{
             }];
           }),
         ),
+        /**
+         * Each supplier's stated whole-order discount, as READ off their
+         * document, so the award total uses their terms and not the example's.
+         *
+         * A supplier we have not read contributes nothing here, which the
+         * calculator treats as "no discount known" rather than "no discount
+         * offered". Those are different, and only the second one is a fact.
+         */
+        statedDiscountPct: Object.fromEntries(
+          (await run(
+            // Ordered oldest first so a later revision's terms overwrite an
+            // earlier one's in the object below. A supplier who re-quotes with
+            // a different discount is quoting the new one.
+            `select vendor_id, extraction_meta from responses
+              where rfx_id = $1 order by revision asc, created_at asc`,
+            [rfxId],
+          )).rows?.flatMap((r) => {
+            const meta = (r.extraction_meta ?? {}) as Record<string, unknown>;
+            const terms = (meta.terms ?? {}) as Record<string, unknown>;
+            const pct = terms.totalLevelDiscountPercent;
+            return typeof pct === "number"
+              ? [[String(r.vendor_id), pct] as [string, number]]
+              : [];
+          }) ?? [],
+        ),
       },
       isSeededExample: seededExample,
       baselineTotalInr: seededExample
@@ -1024,9 +1049,47 @@ export async function buildComparisonPayload() {
       };
     }),
     questionnaire: catalog.questionnaire,
-    questionnaireAnswers: rfx.isSeededExample
-      ? catalog.questionnaire_answers
-      : rfx.questionnaireAnswers,
+    /**
+     * The answers as READ, and the verdict as COMPUTED. Not a typed table.
+     *
+     * This used to be `catalog.questionnaire_answers` whenever the enquiry was
+     * the shipped one, which is to say during every demo. That file carries
+     * hand-written `ok` booleans and hand-written `note` sentences, e.g.
+     *
+     *   "FAILS MANDATORY. The answer says Yes; the attached certificate is
+     *    expired and is against the superseded 2013 standard."
+     *
+     * and it was handed to the analyst, the award note and the chase as though
+     * it were a finding. The answers themselves are legitimately fabricated,
+     * exactly like the quotation documents: a supplier said something and we
+     * invented what. The VERDICT and the SENTENCE were not legitimate.
+     *
+     * So this is now projected from the assessments, which `assessQuestionnaire`
+     * derives per request by comparing a revision year against the one asked
+     * for and an expiry date against today. Same shape as before, so the award
+     * note, the chase and the supplier panel needed no change; every value in
+     * it is now derived from something that was read.
+     *
+     * `ok` is deliberately not `!blocksAward`: a DESIRABLE question that fails
+     * does not block an award, and calling it "ok" would hide it. It means
+     * "nothing contradicts this answer", which is a statement about evidence
+     * rather than about consequences.
+     */
+    questionnaireAnswers: Object.fromEntries(
+      Object.entries(verdicts).map(([code, verdict]) => [
+        code,
+        Object.fromEntries(verdict.assessments.map((a) => [a.questionNo, {
+          answer: a.answer,
+          doc: a.attachedDocument,
+          ok: a.status === "supported",
+          note: a.why,
+          status: a.status,
+          mandatory: a.mandatory,
+          blocksAward: a.blocksAward,
+          readerConfidence: a.confidence,
+        }])),
+      ]),
+    ),
     assumptions: catalog.assumptions,
     baselineTotalInr: rfx.baselineTotalInr,
     matrix: loaded.matrix,

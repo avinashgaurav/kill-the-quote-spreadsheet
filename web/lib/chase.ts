@@ -351,10 +351,34 @@ export function chaseMessage(opts: {
   buyerName: string;
   dueAt: string;
   selected?: ChaseKind[];
+  /**
+   * Narrow the request to specific lines or specific questions.
+   *
+   * Because the buyer's question is usually not "what does this supplier owe
+   * me across the board", it is "I am looking at THIS cell and I cannot read
+   * it, ask them about THIS". The chase panel sends nothing here and gets
+   * everything outstanding; the ask-again button on one cell sends one line
+   * number and gets a message about one line.
+   *
+   * A scope that matches nothing produces no message rather than a broad one.
+   * Silently widening the ask would be the worst outcome: the buyer thinks
+   * they queried one figure and the supplier receives a list of nine.
+   */
+  onlyLines?: number[];
+  onlyQuestions?: string[];
 }): { subject: string; body: string; items: ChaseItem[] } {
-  const items = opts.selected?.length
+  let items = opts.selected?.length
     ? opts.gaps.items.filter((i) => opts.selected!.includes(i.kind))
     : opts.gaps.items;
+
+  if (opts.onlyLines?.length || opts.onlyQuestions?.length) {
+    const lines = new Set(opts.onlyLines ?? []);
+    const qs = new Set(opts.onlyQuestions ?? []);
+    items = items.filter((i) =>
+      (i.lineNos?.some((n) => lines.has(n)) ?? false) ||
+      (i.questionNo ? qs.has(i.questionNo) : false),
+    );
+  }
 
   const dueText = new Date(opts.dueAt).toLocaleDateString("en-IN", {
     day: "numeric", month: "long", year: "numeric",

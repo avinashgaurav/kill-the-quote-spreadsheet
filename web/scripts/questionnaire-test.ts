@@ -254,6 +254,78 @@ console.log("=".repeat(78) + "\n");
   );
 }
 
+// ---- the attachment governs, and the form alone does not ----------------
+//
+// The case the entire demo turns on, and it used to pass for the wrong reason.
+//
+// A questionnaire response is a form. Against "are you ISO 27001:2022
+// certified?" the supplier writes "Yes" and puts a FILENAME in the document
+// column, because that is all a form has room for. So a real read of the form
+// alone yields attachedDocument "VDS_ISO27001.pdf" with evidence null, and the
+// assessment correctly finds nothing contradicting the answer.
+//
+// The revision year and the expiry date are inside that PDF. Until the reader
+// opened attachments, nothing in the system ever saw them, and the finding
+// survived only because the seeded fixture had the standard and the date typed
+// into the `doc` string. A genuine read turned six mandatory failures into
+// five and the money moment disappeared.
+//
+// These assertions pin both halves: the form alone must NOT produce the
+// finding, and the form plus the opened attachment MUST.
+{
+  const q2 = QUESTIONS.find((q) => /27001/.test(q.q))!;
+  const cert = (over: Record<string, unknown>) => answer({
+    questionNo: q2.no, answer: "Yes", attachedDocument: "VDS_ISO27001.pdf",
+    ...over,
+  });
+
+  const formOnly = assessQuestionnaire({
+    questions: [q2], asOf: ASOF, answers: [cert({ evidence: null })],
+  });
+  check(
+    "the form ALONE cannot find the expired certificate",
+    formOnly.assessments[0].status !== "evidence_contradicts",
+    `status ${formOnly.assessments[0].status}. This is exactly why attachments are ` +
+    `opened: the form names a file and the file holds the facts.`,
+  );
+
+  const withCert = assessQuestionnaire({
+    questions: [q2], asOf: ASOF,
+    answers: [cert({
+      // The shape extractEvidence returns after opening the PDF itself.
+      evidence: {
+        standard: "ISO/IEC 27001:2013", validUntil: "2025-11-30",
+        issuedTo: "Vector Digital Systems Pvt Ltd",
+        summary: "Information security management system certificate.",
+      },
+    })],
+  });
+  const a = withCert.assessments[0];
+  check(
+    "the attachment's own contents produce the finding",
+    a.status === "evidence_contradicts" && a.blocksAward
+      && /2013/.test(a.why) && /2022/.test(a.why),
+    a.why,
+  );
+
+  const expiredOnly = assessQuestionnaire({
+    questions: [q2], asOf: ASOF,
+    answers: [cert({
+      evidence: {
+        // The revision they asked for, so only the date can fail it.
+        standard: "ISO/IEC 27001:2022", validUntil: "2025-11-30",
+        issuedTo: "Vector Digital Systems Pvt Ltd",
+        summary: "Information security management system certificate.",
+      },
+    })],
+  });
+  check(
+    "an expiry is caught independently of the revision year",
+    expiredOnly.assessments[0].status === "evidence_contradicts"
+      && /2025-11-30|expir/i.test(expiredOnly.assessments[0].why),
+    expiredOnly.assessments[0].why,
+  );
+}
 console.log("\n" + "=".repeat(78));
 if (fail === 0) {
   console.log(`${G}${B}${pass}/${pass} pass${X}  verdicts come from the evidence, not from a table.`);

@@ -90,6 +90,25 @@ export async function POST(request: Request) {
     const queue = [...files];
     const MAX_DOCUMENTS = 40;
 
+    /**
+     * Everything in this upload, so a questionnaire can be checked against the
+     * certificate that came with it.
+     *
+     * Safe to hand over wholesale. `matchAttachment` inside the questionnaire
+     * reader only opens a file whose name an ANSWER actually cites, so a
+     * sibling nobody referred to is never read and never charged for. The
+     * supplier's own citation decides what counts as evidence, which is the
+     * right rule: we are not entitled to treat a file as backing an answer
+     * just because it arrived in the same email.
+     */
+    const uploaded = await Promise.all(
+      files.map(async (f) => ({
+        filename: f.name,
+        mimeType: f.type || "application/octet-stream",
+        buf: Buffer.from(await f.arrayBuffer()),
+      })),
+    );
+
     for (let i = 0; i < queue.length && i < MAX_DOCUMENTS; i++) {
       const file = queue[i];
       const buf = Buffer.from(await file.arrayBuffer());
@@ -154,6 +173,7 @@ export async function POST(request: Request) {
             filename: file.name,
             mimeType: file.type || "application/octet-stream",
             questions: catalog.questionnaire as unknown as QuestionSpec[],
+            attachments: uploaded.filter((u) => u.filename !== file.name),
           });
           await storeQuestionnaireAnswers({
             rfxId: rfx.rfxId,
@@ -168,11 +188,29 @@ export async function POST(request: Request) {
             answersRead: qr.answers.length,
             withEvidence: qr.answers.filter((a) => a.attachedDocument).length,
             unreadableRegions: qr.unreadableRegions,
+            // Which certificates were actually opened, and what they turned
+            // out to say. "Attached" must never be allowed to imply "checked".
+            attachmentsRead: qr.evidenceRead.map((e) => ({
+              file: e.filename, forQuestion: e.questionNo,
+              states: e.standard, expires: e.validUntil,
+              contradictedTheForm: e.overrode,
+            })),
+            attachmentsNotHeld: qr.attachmentsNotHeld,
             note:
-              `Read ${qr.answers.length} questionnaire answer(s). The pass or fail ` +
-              `verdict is not stored: it is computed from these answers against the ` +
-              `questions every time the comparison is read, so a certificate that ` +
-              `expires next week changes the verdict without anybody editing a row.`,
+              `Read ${qr.answers.length} questionnaire answer(s)` +
+              (qr.evidenceRead.length
+                ? `, and opened ${qr.evidenceRead.length} attached document(s) to see ` +
+                  `what they state rather than trusting that they support the answer`
+                : "") +
+              (qr.attachmentsNotHeld.length
+                ? `. They cite ${qr.attachmentsNotHeld.length} document(s) we do not ` +
+                  `hold (${qr.attachmentsNotHeld.join(", ")}), so those answers have ` +
+                  `nothing behind them yet: ask for the file`
+                : "") +
+              `. The pass or fail verdict is not stored: it is computed from these ` +
+              `answers against the questions every time the comparison is read, so a ` +
+              `certificate that expires next week changes the verdict without anybody ` +
+              `editing a row.`,
           });
         } catch (e) {
           results.push({

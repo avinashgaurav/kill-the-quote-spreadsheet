@@ -5,7 +5,7 @@ import {
   type Part, type ToolSpec,
 } from "@/lib/llm";
 import {
-  ANALYST_SYSTEM, ANALYST_TOOLS, runTool, type ToolContext,
+  ANALYST_SYSTEM, analystTools, runTool, type ToolContext,
 } from "@/lib/analyst";
 import { buildComparisonPayload, RFX_ID } from "@/lib/store";
 import { getQuery } from "@/lib/db/client";
@@ -75,8 +75,12 @@ export async function POST(request: Request) {
         system: ANALYST_SYSTEM,
         history: turns,
         parts: currentParts,
-        tools: ANALYST_TOOLS as ToolSpec[],
-        maxTokens: 16000,
+        tools: analystTools(payload) as ToolSpec[],
+        // Sized to the actual output. On a thinking model maxOutputTokens
+        // covers thinking too, and thinking bills at the output rate, so 16000
+        // was not a safety margin, it was a budget the model could spend. A
+        // final answer here is a short paragraph and a small table.
+        maxTokens: 4000,
         effort: "high",
         // Someone is watching a cursor blink. Twelve turns each waiting on a
         // busy provider is how a question takes four minutes, so each turn
@@ -102,6 +106,28 @@ export async function POST(request: Request) {
       });
 
       if (!response.toolCalls.length) {
+        /**
+         * A reply that ran out of room is a FAILURE, not an answer.
+         *
+         * `stopReason` was ignored here, so a response truncated mid-sentence
+         * (or one that spent its whole budget thinking and emitted nothing)
+         * returned `ok: true` with an empty string, and the buyer got a blank
+         * panel after a paid call. Blank is the one answer this product must
+         * never give silently, because the screen's entire claim is that it
+         * tells you what it does not know.
+         */
+        const truncated = /max_tokens|MAX_TOKENS|length/i.test(String(response.stopReason));
+        if (truncated || !response.text.trim()) {
+          return Response.json({
+            ok: false,
+            error: truncated
+              ? "The answer was cut off before it finished. Ask for less at once, " +
+                "or split the question."
+              : "The model returned nothing at all. Nothing has been stored.",
+            detail: `stop reason: ${response.stopReason}`,
+            toolCalls, charts: ctx.charts,
+          }, { status: 502 });
+        }
         answer = response.text;
         break;
       }

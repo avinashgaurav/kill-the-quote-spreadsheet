@@ -119,6 +119,15 @@ export async function POST(request: Request) {
     const vendorId = String(body.vendorId ?? "").trim();
     const channel = String(body.channel ?? "email");
     const kinds = Array.isArray(body.kinds) ? (body.kinds as ChaseKind[]) : undefined;
+    // Scoped asks. "Ask them about this one cell" is the commonest thing a
+    // buyer wants and used to be impossible: the only chase available was
+    // everything the supplier owed, which is a different conversation.
+    const onlyLines = Array.isArray(body.lineNos)
+      ? (body.lineNos as unknown[]).map(Number).filter(Number.isFinite)
+      : undefined;
+    const onlyQuestions = Array.isArray(body.questionNos)
+      ? (body.questionNos as unknown[]).map(String)
+      : undefined;
 
     if (!vendorId) {
       return Response.json(
@@ -151,12 +160,22 @@ export async function POST(request: Request) {
 
     const dueAt = body.dueAt ? new Date(String(body.dueAt)).toISOString() : defaultDue();
 
-    const msg = chaseMessage({ gaps: g, rfxId, rfxTitle, buyerName, dueAt, selected: kinds });
+    const msg = chaseMessage({
+      gaps: g, rfxId, rfxTitle, buyerName, dueAt, selected: kinds,
+      onlyLines, onlyQuestions,
+    });
     if (!msg.items.length) {
+      // A scoped ask that matches nothing must refuse, never widen. The buyer
+      // asked about one cell; sending them a list of everything outstanding
+      // instead would be a different message to a different conversation.
+      const scoped = Boolean(onlyLines?.length || onlyQuestions?.length);
       return Response.json({
         ok: false,
         refused: true,
-        error: "Nothing selected to ask for.",
+        error: scoped
+          ? "There is nothing outstanding on that item. Either they already sent " +
+            "it, or it is settled on our side and does not need them."
+          : "Nothing selected to ask for.",
       }, { status: 422 });
     }
 

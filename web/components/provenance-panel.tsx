@@ -51,9 +51,12 @@ const METHOD_LABEL: Record<string, string> = {
 };
 
 export function ProvenancePanel({
-  cell, line, vendorName, provenance, confidence, verification, sourceImageUrl,
+  cell, line, vendorName, vendorCode, provenance, confidence, verification,
+  sourceImageUrl,
 }: {
   cell: Cell;
+  /** Needed to actually ask them about it, rather than only diagnosing it. */
+  vendorCode: string;
   line: { no: number; sku: string; desc: string; uom: string; pack_size: number; qty: number };
   vendorName: string;
   provenance?: ProvenanceInfo;
@@ -102,15 +105,16 @@ export function ProvenancePanel({
         </p>
       </div>
 
-      {/* What to do about it. */}
+      {/* What to do about it, and the means to do it. */}
       <div
         className={cn(
-          "border-b px-4 py-3 text-xs",
+          "space-y-2 border-b px-4 py-3 text-xs",
           state === "review" && "bg-[var(--cell-review-bg)]",
           state === "caveat" && "bg-[var(--cell-caveat-bg)]",
         )}
       >
         <p className="font-medium">{meta?.action}</p>
+        <AskAgain cell={cell} line={line} vendorCode={vendorCode} vendorName={vendorName} />
       </div>
 
       {/* 1. What the supplier wrote. */}
@@ -255,6 +259,138 @@ export function ProvenancePanel({
  * server-side re-crop, which means what the buyer sees is genuinely what was
  * read, not a second rendering of it.
  */
+/**
+ * Which cell states are worth going back to the supplier about, and what to
+ * say when they are not.
+ *
+ * The panel used to end at the diagnosis. It would tell a buyer "a price is
+ * there and we cannot read it, open the original" and then offer them nothing
+ * to do about it, which puts the work back on the person the tool exists to
+ * help. The chase step could already ask for exactly this; it just could not
+ * be reached from the cell the buyer was looking at.
+ *
+ * Not every empty cell is chaseable, and saying so is the point:
+ *
+ *   declined      they answered. Asking again is asking them to change their
+ *                 mind about not bidding, which is not a data request.
+ *   not_read      the gap is OURS. Nothing to ask them for; read their file.
+ *   comparable    nothing outstanding.
+ */
+const ASKABLE: Partial<Record<CellStatus, { label: string; sub: string }>> = {
+  unreadable: {
+    label: "Ask them to confirm this figure",
+    sub: "They sent a number we cannot read. This asks them to restate it, and " +
+         "says we hold their document rather than implying they sent nothing.",
+  },
+  omitted: {
+    label: "Ask them to price this line",
+    sub: "Their response does not mention it.",
+  },
+  non_comparable: {
+    label: "Ask them for a firm price",
+    sub: "They pointed at another rate instead of quoting one.",
+  },
+  unresolvable: {
+    label: "Ask them for a firm price",
+    sub: "They referred to something we do not hold.",
+  },
+  resolved_from_reference: {
+    label: "Ask them to confirm the derived price",
+    sub: "We worked this figure out from a prior order. Until they confirm it, " +
+         "it stays out of every total.",
+  },
+  needs_review: {
+    label: "Ask them to clarify this line",
+    sub: "We hold something we cannot normalise onto the unit you asked for.",
+  },
+};
+
+function AskAgain({
+  cell, line, vendorCode, vendorName,
+}: {
+  cell: Cell;
+  line: { no: number };
+  vendorCode: string;
+  vendorName: string;
+}) {
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "refused">("idle");
+  const [note, setNote] = useState<string | null>(null);
+  const ask = ASKABLE[cell.status as CellStatus];
+
+  if (!ask) {
+    // Say why there is no button, rather than leaving a blank where one was.
+    const why =
+      cell.status === "declined"
+        ? "They declined this line. That is an answer, so there is nothing to chase."
+        : cell.status === "not_read"
+          ? "Nothing has been read from this supplier yet, so this gap is ours " +
+            "rather than theirs. Collect their reply or upload it."
+          : null;
+    return why ? <p className="text-[11px] text-muted-foreground">{why}</p> : null;
+  }
+
+  async function send() {
+    setState("sending");
+    try {
+      const r = await fetch("/api/rfx/chase", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Scoped to this one line. The endpoint refuses rather than widening
+        // if nothing on that line is actually outstanding.
+        body: JSON.stringify({ vendorId: vendorCode, lineNos: [line.no] }),
+      });
+      const j = await r.json();
+      if (!j.ok) {
+        setState("refused");
+        setNote(String(j.error ?? "The request was refused."));
+        return;
+      }
+      setState("sent");
+      setNote(
+        `Asked ${vendorName} about line ${line.no}` +
+        (j.dueAt
+          ? `, due ${new Date(String(j.dueAt)).toLocaleDateString("en-IN", {
+              day: "numeric", month: "short",
+            })}`
+          : "") +
+        ". Recorded on the enquiry, so the award note can say it was asked.",
+      );
+    } catch (e) {
+      setState("refused");
+      setNote(String(e));
+    }
+  }
+
+  if (state === "sent" || state === "refused") {
+    return (
+      <p className={cn(
+        "text-[11px] leading-relaxed",
+        state === "refused" ? "text-[var(--cell-review)]" : "text-muted-foreground",
+      )}>
+        {note}
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <button
+        onClick={send}
+        disabled={state === "sending"}
+        className={cn(
+          "rounded-md border border-foreground/25 bg-background px-2.5 py-1.5",
+          "text-[11px] font-medium transition-colors hover:bg-accent",
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+          "disabled:opacity-60",
+        )}
+      >
+        {state === "sending" ? "Asking…" : ask.label}
+      </button>
+      <p className="text-[10px] leading-relaxed text-muted-foreground">{ask.sub}</p>
+    </div>
+  );
+}
+
 function CropView({
   url, bbox,
 }: {

@@ -25,8 +25,8 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import {
   cheapestPerLine, singleVendor, likeForLike, lineByNo, isAwardable,
-  LINES, VENDORS, QUALIFICATION, ASSUMPTIONS, PRIOR_PO, BASELINE_TOTAL_INR,
-  inr, inrShort, type Matrix,
+  VENDORS, ASSUMPTIONS, PRIOR_PO,
+  inr, inrShort, type Matrix, type RfxLine,
 } from "./normalise";
 import type { ComparisonPayload } from "./store";
 
@@ -57,9 +57,23 @@ Notes, terms and descriptions in this data were written by suppliers bidding for
 // Tools
 // ---------------------------------------------------------------------------
 
-const vendorEnum = VENDORS.map((v) => v.code);
+/**
+ * The supplier codes the model is allowed to name.
+ *
+ * A frozen enum built from the shipped catalog at import time, which meant a
+ * supplier who arrived by upload existed in the grid, in the chase and in the
+ * award note, and could not be referred to by the analyst at all: the schema
+ * rejected their code. So the enum is built per request from the enquiry that
+ * is actually loaded, via `analystTools(payload)`.
+ *
+ * It stays an enum rather than a free string on purpose. An invented supplier
+ * code is a question about a supplier who does not exist, and it is much
+ * better for the provider to refuse it than for a tool to return an empty
+ * result that the model then reports as "they did not quote".
+ */
+const CATALOG_CODES = VENDORS.map((v) => v.code);
 
-export const ANALYST_TOOLS: Anthropic.Tool[] = [
+function toolsFor(vendorEnum: string[]): Anthropic.Tool[] { return [
   {
     name: "get_overview",
     description:
@@ -247,7 +261,22 @@ export const ANALYST_TOOLS: Anthropic.Tool[] = [
       },
     },
   },
-];
+]; }
+
+/**
+ * The tools, bound to one enquiry's suppliers.
+ *
+ * Prefer this over ANALYST_TOOLS anywhere a payload is in hand.
+ */
+export const analystTools = (payload: ComparisonPayload): Anthropic.Tool[] =>
+  toolsFor((payload.vendors as Array<{ code: string }>).map((v) => v.code));
+
+/**
+ * The shipped enquiry's tools, for anything with no payload to hand: the
+ * regression suite and the tool-count assertions. Not used to answer a
+ * question, because a question is always about a loaded enquiry.
+ */
+export const ANALYST_TOOLS: Anthropic.Tool[] = toolsFor(CATALOG_CODES);
 
 // ---------------------------------------------------------------------------
 // Executors
@@ -263,14 +292,97 @@ export interface ToolContext {
 
 const money = (n: number | null) => (n === null ? null : { inr: n, display: inr(n), short: inrShort(n) });
 
+// ---------------------------------------------------------------------------
+// Everything below reads THIS enquiry, not the shipped one.
+//
+// Every tool used to close over the module-level `LINES`, `VENDORS` and
+// `QUALIFICATION` imported from the catalog, and that was wrong twice over.
+//
+//   the hard rule   `QUALIFICATION` is a typed table of who passed the
+//                   questionnaire, and `payload.questionnaireAnswers` carried
+//                   typed `ok` booleans and typed `note` sentences. So the
+//                   suggested question "is Vector's ISO 27001 certificate
+//                   actually valid?" was answered out of a hand-written note
+//                   handed to the model as tool output. The model call was
+//                   real and the answer was not derived, which is precisely
+//                   the one thing the brief forbids. The verdict has been
+//                   computed from the read answers since the questionnaire
+//                   loop was built; the grid and the award note use it; the
+//                   analyst was the one caller still reading the table.
+//
+//   any real        draft your own enquiry, or upload a quotation from a
+//   enquiry         supplier who is not one of the five, and the grid gives
+//                   them a column while every analyst tool cannot see them.
+//                   On a self-drafted enquiry with different line numbers,
+//                   `query_lines` returned an empty list and the analyst
+//                   would cheerfully say there was nothing there.
+//
+// So the tools take their lines, their suppliers and their verdicts from the
+// payload, which is derived per request. `assessments` carries the sentence
+// that produced each verdict, so a finding the analyst reports is one the
+// buyer can also read in the supplier panel, from the same source.
+// ---------------------------------------------------------------------------
+
+interface Supplier {
+  code: string;
+  name: string;
+  replyFormat: string;
+  qualified: boolean;
+  /** False when nobody has read this supplier's questionnaire at all. */
+  assessed: boolean;
+  failedMandatory: string[];
+  assessments: Array<{
+    questionNo: string; mandatory: boolean; status: string; why: string;
+    blocksAward: boolean; answer: string | null; attachedDocument: string | null;
+    confidence: number;
+  }>;
+}
+
+const suppliersOf = (payload: ComparisonPayload): Supplier[] =>
+  (payload.vendors as Array<Record<string, unknown>>).map((v) => ({
+    code: String(v.code),
+    name: String(v.name ?? v.code),
+    replyFormat: String(v.reply_format ?? ""),
+    qualified: Boolean(v.qualified),
+    assessed: Boolean(v.assessed),
+    failedMandatory: (v.failedMandatory as string[]) ?? [],
+    assessments: (v.assessments as Supplier["assessments"]) ?? [],
+  }));
+
+const linesOf = (payload: ComparisonPayload) => payload.lines as RfxLine[];
+
+/**
+ * How a supplier's eligibility should be DESCRIBED, not just whether it is true.
+ *
+ * Three states, never two. A supplier nobody has assessed is carried as
+ * eligible, because dropping a real bid for want of a document nobody chased
+ * is the more expensive mistake, but the analyst must never call that "cleared
+ * the questionnaire". It has answered "yes, they qualified" about a supplier
+ * whose questionnaire was still sitting unopened.
+ */
+const eligibilityNote = (s: Supplier) =>
+  !s.assessed
+    ? "NOT ASSESSED. Nobody has read this supplier's questionnaire, so they are " +
+      "carried as eligible rather than excluded. Do not describe them as having " +
+      "passed anything."
+    : s.qualified
+      ? "Assessed against every question and passed."
+      : `Fails ${s.failedMandatory.length} mandatory question(s): ` +
+        `${s.failedMandatory.join(", ")}. Cannot be awarded at any price.`;
+
 function scenarioFrom(
   matrix: Matrix,
   o: { qualifiedOnly?: boolean; excludeCaveats?: boolean; vendors?: string[];
        includeUnconfirmed?: boolean; label?: string; key?: string },
+  suppliers: Supplier[],
 ) {
-  const all = VENDORS.map((v) => v.code);
+  const all = suppliers.map((s) => s.code);
   let codes = o.vendors?.length ? o.vendors : all;
-  if (o.qualifiedOnly) codes = codes.filter((c) => QUALIFICATION[c].qualified);
+  // Derived from the answers that were read, not from a table. A supplier
+  // nobody has assessed stays IN, and get_overview says so in words.
+  if (o.qualifiedOnly) {
+    codes = codes.filter((c) => suppliers.find((s) => s.code === c)?.qualified !== false);
+  }
   return cheapestPerLine(matrix, codes, {
     excludeCaveats: o.excludeCaveats,
     includeUnconfirmed: o.includeUnconfirmed,
@@ -286,13 +398,17 @@ export async function runTool(
 ): Promise<unknown> {
   const { payload } = ctx;
   const matrix = payload.matrix;
+  const suppliers = suppliersOf(payload);
+  const lines = linesOf(payload);
+  const codesAll = suppliers.map((s) => s.code);
+  const nameOf = (c: string) => suppliers.find((s) => s.code === c)?.name ?? c;
 
   switch (name) {
     case "get_overview": {
       const t = payload.trust;
       return {
-        rfx: { id: (payload.rfx as { id: string }).id, lines: LINES.length, vendors: VENDORS.length },
-        buyerBudgetEstimate: money(BASELINE_TOTAL_INR),
+        rfx: { id: (payload.rfx as { id: string }).id, lines: lines.length, vendors: suppliers.length },
+        buyerBudgetEstimate: money(payload.baselineTotalInr as number),
         cells: {
           total: t.total,
           awardable: t.usable,
@@ -301,18 +417,21 @@ export async function runTool(
           derivedAwaitingSupplierConfirmation: t.derivedAwaitingVendor,
           byStatus: t.counts,
         },
-        suppliers: VENDORS.map((v) => ({
-          code: v.code, name: v.name, replyFormat: v.reply_format,
-          qualified: QUALIFICATION[v.code].qualified,
-          failedMandatory: QUALIFICATION[v.code].failed_mandatory,
-          linesPriced: singleVendor(matrix, v.code).linesPriced,
+        suppliers: suppliers.map((s) => ({
+          code: s.code, name: s.name, replyFormat: s.replyFormat,
+          qualified: s.qualified,
+          // Never collapse these two into one boolean. See eligibilityNote.
+          questionnaireRead: s.assessed,
+          eligibility: eligibilityNote(s),
+          failedMandatory: s.failedMandatory,
+          linesPriced: singleVendor(matrix, s.code).linesPriced,
         })),
         // A supplier who re-quoted is a fact about the numbers on screen, so
         // the analyst gets it in the first tool it calls rather than having to
         // know to ask. Silence here would let it answer "Zenith quoted X" with
         // no idea that Zenith quoted X twice.
         revisedQuotes: (payload.supersessions ?? []).map((s) => ({
-          supplier: VENDORS.find((v) => v.code === s.vendorId)?.name ?? s.vendorId,
+          supplier: nameOf(s.vendorId),
           revisionShown: s.revision,
           replaces: s.supersedesRef,
           linesWhosePriceChanged: s.changedLines.map((c) => ({
@@ -332,12 +451,12 @@ export async function runTool(
     }
 
     case "query_lines": {
-      const lineNos = (input.lineNos as number[] | undefined) ?? LINES.map((l) => l.no);
-      const vendors = (input.vendors as string[] | undefined) ?? VENDORS.map((v) => v.code);
+      const lineNos = (input.lineNos as number[] | undefined) ?? lines.map((l) => l.no);
+      const vendors = (input.vendors as string[] | undefined) ?? codesAll;
       const group = input.group as string | undefined;
       const onlyStatuses = input.onlyStatuses as string[] | undefined;
 
-      const rows = LINES
+      const rows = lines
         .filter((l) => lineNos.includes(l.no))
         .filter((l) => !group || l.group.toLowerCase().includes(group.toLowerCase()))
         .map((l) => {
@@ -371,15 +490,16 @@ export async function runTool(
 
     case "run_award_scenario": {
       if (input.mode === "single_vendor") {
-        const codes = (input.vendors as string[] | undefined) ?? VENDORS.map((v) => v.code);
+        const codes = (input.vendors as string[] | undefined) ?? codesAll;
         return {
           mode: "single_vendor",
           results: codes.map((c) => {
             const r = singleVendor(matrix, c, Boolean(input.includeUnconfirmed));
             return {
-              vendor: c, name: VENDORS.find((v) => v.code === c)?.name,
-              qualified: QUALIFICATION[c].qualified,
-              failedMandatory: QUALIFICATION[c].failed_mandatory,
+              vendor: c, name: nameOf(c),
+              qualified: suppliers.find((s) => s.code === c)?.qualified ?? true,
+              questionnaireRead: suppliers.find((s) => s.code === c)?.assessed ?? false,
+              failedMandatory: suppliers.find((s) => s.code === c)?.failedMandatory ?? [],
               total: money(r.totalInr),
               totalAfterTheirStatedDiscount: money(r.totalAfterStatedDiscountInr),
               statedDiscountPct: r.totalLevelDiscountPct,
@@ -393,7 +513,7 @@ export async function runTool(
         };
       }
 
-      const s = scenarioFrom(matrix, input as never);
+      const s = scenarioFrom(matrix, input as never, suppliers);
       for (const [n, p] of Object.entries(s.picks)) ctx.citedCells.add(`${p.vendor}:${n}`);
       return {
         mode: "cheapest_per_line",
@@ -401,8 +521,8 @@ export async function runTool(
         linesAwarded: s.linesAwarded,
         linesNoOneCanFill: s.unfilledLines,
         vendorsConsidered: input.qualifiedOnly
-          ? VENDORS.map((v) => v.code).filter((c) => QUALIFICATION[c].qualified)
-          : (input.vendors ?? VENDORS.map((v) => v.code)),
+          ? codesAll.filter((c) => suppliers.find((s) => s.code === c)?.qualified !== false)
+          : (input.vendors ?? codesAll),
         picks: Object.entries(s.picks).map(([n, p]) => ({
           lineNo: Number(n), vendor: p.vendor,
           unit: money(p.unitInr), extended: money(p.extendedInr),
@@ -413,7 +533,8 @@ export async function runTool(
     case "compare_scenarios": {
       const specs = input.scenarios as Array<Record<string, unknown>>;
       const built = specs.map((sp, i) =>
-        scenarioFrom(matrix, { ...sp, key: `s${i + 1}`, label: String(sp.label) } as never),
+        scenarioFrom(matrix, { ...sp, key: `s${i + 1}`, label: String(sp.label) } as never,
+                     suppliers),
       );
       const lfl = likeForLike(built);
       return {
@@ -455,8 +576,8 @@ export async function runTool(
     case "list_excluded_cells": {
       const limit = (input.limit as number) ?? 20;
       const out: unknown[] = [];
-      for (const v of VENDORS) {
-        for (const l of LINES) {
+      for (const v of suppliers) {
+        for (const l of lines) {
           const c = matrix[v.code][l.no];
           if (isAwardable(c.status)) continue;
           // What it would be worth if resolved, using the buyer's own estimate.
@@ -484,28 +605,72 @@ export async function runTool(
     }
 
     case "check_questionnaire": {
-      const codes = input.vendor ? [String(input.vendor)] : VENDORS.map((v) => v.code);
+      /**
+       * THE ANSWER IS READ. THE VERDICT IS COMPUTED. NEITHER IS TYPED.
+       *
+       * This tool used to return `passed: a.ok` and `finding: a.note` straight
+       * out of catalog.json, where `note` was a sentence somebody had written
+       * by hand: "FAILS MANDATORY. The answer says Yes; the attached
+       * certificate is expired and is against the superseded 2013 standard."
+       * The model was then asked "is Vector's certificate valid?" and dutifully
+       * reported the finding it had been handed. Real call, real tool loop,
+       * pre-written answer.
+       *
+       * Now `answer` and `attachedDocument` come from what the reader found in
+       * the supplier's document, and `passed` and `finding` come from
+       * `assessQuestionnaire`, which compares a revision year to the one asked
+       * for and an expiry date to today. Every `why` below is generated at
+       * request time from the evidence, and it is the same sentence the
+       * supplier panel shows the buyer, from the same source.
+       */
+      const codes = input.vendor ? [String(input.vendor)] : codesAll;
       const qs = payload.questionnaire as Array<Record<string, unknown>>;
-      const answers = payload.questionnaireAnswers as Record<string, Record<string, Record<string, unknown>>>;
       return {
-        suppliers: codes.map((c) => ({
-          vendor: c, name: VENDORS.find((v) => v.code === c)?.name,
-          qualified: QUALIFICATION[c].qualified,
-          failedMandatory: QUALIFICATION[c].failed_mandatory,
-          answers: qs.map((qq) => {
-            const a = answers[c]?.[String(qq.no)] ?? {};
-            return {
-              q: qq.no, mandatory: qq.kind === "M", question: qq.q,
-              answer: a.answer ?? null,
-              attachedDocument: a.doc ?? null,
-              passed: a.ok ?? null,
-              finding: a.note ?? null,
-            };
-          }),
-        })),
+        suppliers: codes.map((c) => {
+          const s = suppliers.find((x) => x.code === c);
+          const byNo = new Map((s?.assessments ?? []).map((a) => [a.questionNo, a]));
+          return {
+            vendor: c, name: nameOf(c),
+            qualified: s?.qualified ?? true,
+            questionnaireRead: s?.assessed ?? false,
+            eligibility: eligibilityNote(s ?? {
+              code: c, name: c, replyFormat: "", qualified: true,
+              assessed: false, failedMandatory: [], assessments: [],
+            }),
+            failedMandatory: s?.failedMandatory ?? [],
+            answers: qs.map((qq) => {
+              const a = byNo.get(String(qq.no));
+              return {
+                q: qq.no, mandatory: qq.kind === "M", question: qq.q,
+                // Null here means "this supplier's response does not address
+                // this question", which is different from an empty answer.
+                answer: a?.answer ?? null,
+                attachedDocument: a?.attachedDocument ?? null,
+                /**
+                 * "Nothing contradicts this answer", not "this is harmless".
+                 *
+                 * These are two different questions and they must not share a
+                 * field. An unanswered DESIRABLE question does not block an
+                 * award, so `!blocksAward` reported it as passed, and the
+                 * model could then say a supplier "passed Q3" when Q3 was
+                 * blank. `blocksAward` is still here, separately, because the
+                 * consequence matters too.
+                 */
+                passed: a ? a.status === "supported" : null,
+                blocksAward: a?.blocksAward ?? null,
+                status: a?.status ?? (s?.assessed ? "not_answered" : "not_read"),
+                // Generated from the evidence, at request time.
+                finding: a?.why ?? null,
+                readerConfidence: a?.confidence ?? null,
+              };
+            }),
+          };
+        }),
         note:
           "Where an answer and its attached document disagree, the document governs. " +
-          "A supplier failing any mandatory item cannot be awarded at any price.",
+          "A supplier failing any mandatory item cannot be awarded at any price. " +
+          "Every finding above was derived from the answer and the attached " +
+          "document's own contents; none of it is stored.",
       };
     }
 
