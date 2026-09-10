@@ -14,6 +14,17 @@
  * PGlite is a single embedded instance, so it is correct for local development
  * and wrong for Vercel, where each serverless invocation would get its own
  * empty copy. That is exactly why DATABASE_URL takes precedence.
+ *
+ * ONE THING TO KEEP IN STEP: the function region and the database region.
+ *
+ * The Neon HTTP driver makes one request per query, and this app makes around
+ * twenty of them to render a comparison. With the database in Singapore and the
+ * function on Vercel's US East default, every one of those crossed the Pacific
+ * twice and the page sat behind a loading skeleton for two seconds warm and
+ * eight cold. `vercel.json` pins the function to sin1 for that reason and no
+ * other. Move the database and you must move the function with it, or the same
+ * skeleton comes back and looks like a rendering problem rather than a
+ * geography one.
  */
 
 import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
