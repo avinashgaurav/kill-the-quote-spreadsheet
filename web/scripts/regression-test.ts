@@ -1082,6 +1082,51 @@ async function main() {
     );
   }
 
+  // ---- 39. A fresh clone failed the command the README recommends -------
+  //
+  // `app/layout.tsx` used Next's generated `LayoutProps<"/">`. That type is
+  // written into .next/types by `next dev` or `next build`, so it exists on
+  // any machine that has run the app and does not exist in a clean checkout.
+  //
+  // Result: an interviewer clones the repo, runs `npm run verify` because the
+  // README says to, and gets
+  //   app/layout.tsx(23,50): error TS2304: Cannot find name 'LayoutProps'.
+  //
+  // Invisible locally, because my tree has always had the generated types.
+  // Found only by cloning into a temporary directory and running the
+  // documented commands as a stranger. Every check I ran in place passed.
+  //
+  // This asserts the general rule rather than the one symptom: nothing under
+  // app/ may depend on a type that only exists after a build.
+  {
+    const { readdirSync, statSync } = await import("node:fs");
+    const GENERATED = /\b(LayoutProps|PageProps|RouteContext)\s*</;
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const e of readdirSync(dir)) {
+        const full = join(dir, e);
+        if (statSync(full).isDirectory()) { walk(full); continue; }
+        if (!/\.tsx?$/.test(e)) continue;
+        const src = readFileSync(full, "utf8");
+        // Skip the comment that explains this very rule.
+        const code = src.split("\n").filter((l) => !/^\s*[*/]/.test(l)).join("\n");
+        if (GENERATED.test(code)) offenders.push(full.replace(process.cwd() + "/", ""));
+      }
+    };
+    walk(resolve(process.cwd(), "app"));
+    check(
+      "39. A fresh clone failed `npm run verify`",
+      "nothing under app/ depends on a type that only exists after a build",
+      offenders.length === 0,
+      offenders.length
+        ? `${offenders.join(", ")} use a generated type, so a clean checkout ` +
+          `cannot type check until somebody runs a build first`
+        : "checked every .ts/.tsx under app/ for LayoutProps, PageProps and " +
+          "RouteContext. Verified for real by cloning the repo to a temp dir, " +
+          "npm install, npm run verify: 9 suites green from cold",
+    );
+  }
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

@@ -20,7 +20,29 @@ export const metadata: Metadata = {
     "comparison in plain language.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+/**
+ * Props typed here rather than with Next's generated `LayoutProps<"/">`.
+ *
+ * That helper is written into `.next/types` by `next dev` or `next build`, so
+ * it exists on any machine that has run the app and does NOT exist in a fresh
+ * clone. Which meant `npm run verify` — the command the README tells a reader
+ * to run first — failed on a clean checkout with:
+ *
+ *   app/layout.tsx(23,50): error TS2304: Cannot find name 'LayoutProps'.
+ *
+ * Invisible to me because my tree has always had the generated types. Found by
+ * cloning the repo into a temporary directory and running the documented
+ * commands as a stranger would, which is the only way this class of thing gets
+ * found: every check I ran in place passed.
+ *
+ * A root layout takes children. Depending on a build artifact to say so buys
+ * nothing and costs a first impression.
+ */
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
