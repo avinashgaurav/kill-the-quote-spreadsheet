@@ -38,7 +38,6 @@ import {
   activeRfx, storeExtraction, storeQuestionnaireAnswers,
 } from "@/lib/store";
 import catalog from "@/lib/data/catalog.json";
-import type { QuestionSpec } from "@/lib/questionnaire";
 
 export const maxDuration = 300;
 
@@ -260,7 +259,7 @@ export async function POST(request: Request) {
 
           const qr = await extractQuestionnaire({
             buf, filename: name, mimeType,
-            questions: catalog.questionnaire as unknown as QuestionSpec[],
+            questions: rfx.questions,
             attachments,
             cache,
           });

@@ -378,6 +378,36 @@ const Sep = () => <div className="w-px shrink-0 self-stretch bg-border" />;
  * available. This banner is what stops that convenience turning into a
  * dishonest demo: it cannot be dismissed, and it names the suppliers affected.
  */
+/**
+ * The screen is not live, and the buyer has to be told by the screen.
+ *
+ * Shown when `activeRfx()` could not read the database and fell back to the
+ * shipped example. That fallback supplies the hand-typed qualification table
+ * this product exists to remove, and if the failure is narrow, real extracted
+ * cells still load and get merged with it: live prices beside a hand-written
+ * verdict. The error was logged loudly on the server, which is no use to the
+ * person looking at the numbers.
+ *
+ * Deliberately louder than the test-data banner, because that one says "this
+ * data is fabricated but the system is working" and this one says "the system
+ * is not working and you cannot tell from the numbers".
+ */
+export function DegradedWarning({ reason }: { reason?: string | null }) {
+  if (!reason) return null;
+  return (
+    <div
+      role="alert"
+      className="flex shrink-0 flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-[var(--cell-caveat)] bg-[var(--cell-caveat-bg)] px-5 py-2.5 text-[11px]"
+    >
+      <span className="rounded-sm bg-[var(--cell-caveat)] px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-background uppercase">
+        Not live
+      </span>
+      <span className="font-semibold">Do not act on these numbers.</span>
+      <span className="text-muted-foreground">{reason}</span>
+    </div>
+  );
+}
+
 export function FixtureWarning({ vendors }: { vendors: string[] }) {
   if (!vendors.length) return null;
   return (

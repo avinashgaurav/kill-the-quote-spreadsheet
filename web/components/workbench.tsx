@@ -22,7 +22,8 @@ import { cn } from "@/lib/utils";
 import { shortName } from "@/lib/ui";
 import { ComparisonGrid, type GridVendor } from "./comparison-grid";
 import {
-  AppHeader, HeadlineNumbers, FixtureWarning, TrustBar, QualifiedToggle,
+  AppHeader, HeadlineNumbers, FixtureWarning, DegradedWarning, TrustBar,
+  QualifiedToggle,
 } from "./shell";
 import { Intake } from "./intake";
 import { ProvenancePanel } from "./provenance-panel";
@@ -79,6 +80,8 @@ interface Payload {
     string,
     Record<string, { answer: string | null; doc: string | null; ok: boolean; note?: string }>
   >;
+  /** Non-null when the database could not be read and the screen is not live. */
+  degraded?: string | null;
   /** Documents held per supplier, keyed by code. Empty until one is read. */
   attachments?: Record<string, Array<{
     filename: string;
@@ -324,6 +327,10 @@ export function Workbench({
           ) : null
         }
       />
+
+      {/* Before the test-data banner, because "the database is broken" outranks
+          "this data is fabricated but the system works". */}
+      {payload && <DegradedWarning reason={payload.degraded} />}
 
       {payload && (
         <FixtureWarning

@@ -820,6 +820,80 @@ async function main() {
     "mistake. Printing 'Yes' next to them makes it a claim about the supplier",
   );
 
+  // ---- 26. A fix that did not reach its callers ------------------------
+  //
+  // `singleVendor` was changed to take a supplier's discount from what was
+  // EXTRACTED rather than from catalog.terms keyed by vendor code, and
+  // buildComparisonPayload passes the derived context everywhere. Every call
+  // in lib/analyst.ts omitted the argument, so all of them silently fell back
+  // to `defaultContext()`, which is the shipped catalog: its discounts AND its
+  // thirty lines and quantities.
+  //
+  // Two consequences, and the second is worse. A buyer asking "what is
+  // Zenith's total after their stated discount" got a number out of the answer
+  // key. And on a self-drafted enquiry the analyst priced the buyer's lines
+  // against somebody else's quantities, silently, returning a figure that
+  // looked entirely reasonable.
+  //
+  // The lesson worth the test: a fix at the definition is not a fix. It has to
+  // reach every caller, and a defaulted parameter is exactly how it does not.
+  const analystSrc = readFileSync(resolve(process.cwd(), "lib/analyst.ts"), "utf8");
+  check(
+    "26. The analyst priced against the shipped catalog, not this enquiry",
+    "every calculator call from the analyst passes this enquiry's context",
+    /contextOf\(payload\)/.test(analystSrc)
+      && !/singleVendor\(matrix, s\.code\)/.test(analystSrc)
+      && !/cheapestPerLine\(matrix, codes, \{\s*excludeCaveats: o\.excludeCaveats,\s*includeUnconfirmed: o\.includeUnconfirmed,\s*key: o\.key \?\? "s",\s*label: o\.label \?\? "Cheapest per line",\s*\}\)/.test(analystSrc),
+    "rfxCtx is built from the payload and threaded into singleVendor, " +
+    "cheapestPerLine and scenarioFrom, so the discount comes from what was " +
+    "read and the lines are the ones the buyer actually asked for",
+  );
+
+  // ---- 27. Real answers graded against the demo's questions ------------
+  //
+  // The questionnaire the co-pilot drafted was written into the outbound
+  // workbook and never persisted, so every read was graded against the shipped
+  // demo's ten questions whatever enquiry was live. Draft your own questions,
+  // upload a supplier's real answers to them, and the reader dropped every one
+  // as an unknown question number and produced a verdict about questions
+  // nobody had asked.
+  //
+  // It survived because the LINE catalog was threaded correctly three lines
+  // away from the call that got this wrong.
+  const extractSrc = readFileSync(
+    resolve(process.cwd(), "app/api/extract/route.ts"), "utf8",
+  );
+  const clientSrc = readFileSync(resolve(process.cwd(), "lib/db/client.ts"), "utf8");
+  check(
+    "27. A drafted enquiry's own questionnaire was never stored",
+    "the questions the buyer asked are persisted and used to grade answers",
+    /ADD COLUMN IF NOT EXISTS questionnaire jsonb/.test(clientSrc)
+      && /questions: rfx\.questions/.test(extractSrc)
+      && !/questions: catalog\.questionnaire/.test(extractSrc),
+    "rfx.questionnaire is written on send, read by activeRfx, and used by both " +
+    "ingest routes, verdictFor and the payload",
+  );
+
+  // ---- 28. A broken database looked exactly like a cold start ----------
+  //
+  // activeRfx()'s fallback supplies QUALIFICATION, the hand-typed pass/fail
+  // table this product exists to remove. On a narrow failure the real
+  // extracted cells still load and get merged with it: live prices beside a
+  // hand-written verdict. The error was logged loudly on the server, which is
+  // no use at all to the person looking at the numbers.
+  {
+    const storeSrc = readFileSync(resolve(process.cwd(), "lib/store.ts"), "utf8");
+    const shellSrc = readFileSync(resolve(process.cwd(), "components/shell.tsx"), "utf8");
+    check(
+      "28. A database failure was invisible to the buyer",
+      "a degraded screen says so, in the screen, and says not to act on it",
+      /degraded:/.test(storeSrc) && /DegradedWarning/.test(shellSrc)
+        && /Do not act on these numbers/.test(shellSrc),
+      "set only when the DB actually failed, never on a normal cold start, so " +
+      "the two states are no longer indistinguishable from the outside",
+    );
+  }
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

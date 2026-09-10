@@ -94,7 +94,7 @@ async function main() {
     process.exit(1);
   }
 
-  let read = 0, failed = 0, cached = 0, docs = 0;
+  let read = 0, failed = 0, cached = 0;
   const started = Date.now();
   /**
    * Stop on the one failure that will not fix itself.
@@ -137,7 +137,6 @@ async function main() {
       }
 
       for (const f of j.results ?? []) {
-        docs += 1;
         if (!f.ok) {
           if (looksOutOfCredit(f.error)) {
             outOfCredit = true;

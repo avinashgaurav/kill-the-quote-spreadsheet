@@ -128,13 +128,21 @@ export async function POST(request: Request) {
     try {
       const query = await getQuery();
       await query(
-        `insert into rfx (id, title, buyer, terms, drafted_by_copilot, knowingly_ambiguous)
-         values ($1,$2,$3,$4,true,$5)
+        `insert into rfx
+           (id, title, buyer, terms, drafted_by_copilot, knowingly_ambiguous,
+            questionnaire)
+         values ($1,$2,$3,$4,true,$5,$6)
          on conflict (id) do update set title = $2, terms = $4,
-           drafted_by_copilot = true, knowingly_ambiguous = $5`,
+           drafted_by_copilot = true, knowingly_ambiguous = $5,
+           questionnaire = $6`,
         [
           id, draft.title, JSON.stringify({}), JSON.stringify(draft.terms),
           JSON.stringify(knowinglyAmbiguous),
+          // The questions THIS buyer asked. Without this every questionnaire
+          // read is graded against the shipped demo's questions, so a real
+          // supplier's real answers to real questions get dropped as unknown
+          // question numbers and the verdict describes an enquiry nobody sent.
+          JSON.stringify(draft.questionnaire ?? []),
         ],
       );
       for (const l of draft.lines) {

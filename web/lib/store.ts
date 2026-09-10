@@ -148,10 +148,18 @@ export async function seedRfx(): Promise<{ seeded: boolean; lines: number; vendo
  * The single place a qualification decision is made, so the grid, the award
  * note, the chase and the analyst cannot disagree about who is eligible.
  */
-export function verdictFor(row: Record<string, unknown>): Verdict {
+export function verdictFor(
+  row: Record<string, unknown>,
+  /**
+   * The questions the enquiry asked. Defaults to the shipped set only so that
+   * older callers and the seeded example still work: passing the enquiry's own
+   * questions is the correct thing to do, and `activeRfx` does.
+   */
+  questions: QuestionSpec[] = catalog.questionnaire as unknown as QuestionSpec[],
+): Verdict {
   const read = (row.read_answers ?? null) as ReadAnswer[] | null;
   return assessQuestionnaire({
-    questions: catalog.questionnaire as unknown as QuestionSpec[],
+    questions,
     answers: Array.isArray(read) ? read : [],
     supplierName: row.legal_name ? String(row.legal_name) : undefined,
   });
@@ -233,6 +241,10 @@ export async function activeRfx(): Promise<{
   isSeededExample: boolean;
   baselineTotalInr: number;
   questionnaireAnswers: Record<string, unknown>;
+  /** The questions this enquiry asked, not the shipped set. */
+  questions: QuestionSpec[];
+  /** Non-null only when the database failed and this is not live data. */
+  degraded: string | null;
   vendorRows: Array<Record<string, unknown>>;
 }> {
   const run = await q();
@@ -242,6 +254,23 @@ export async function activeRfx(): Promise<{
     isSeededExample: true,
     baselineTotalInr: BASELINE_TOTAL_INR,
     questionnaireAnswers: catalog.questionnaire_answers as Record<string, unknown>,
+    questions: catalog.questionnaire as unknown as QuestionSpec[],
+    /**
+     * Set only when we got here because the DATABASE FAILED, never on a normal
+     * cold start.
+     *
+     * The two states used to be indistinguishable from the outside, and that
+     * mattered more than it sounds. On a database error this object supplies
+     * `QUALIFICATION`, the hand-typed pass/fail table the whole product exists
+     * to remove. If the failure is narrow, real extracted cells still load and
+     * get merged with those catalog verdicts, so the screen shows live prices
+     * beside a hand-written verdict with nothing saying so. The error was
+     * logged loudly on the server, which is no use at all to the person
+     * looking at the numbers.
+     *
+     * A fallback the buyer cannot see is worse than no fallback.
+     */
+    degraded: null as string | null,
     vendorRows: [],
   };
 
@@ -274,6 +303,27 @@ export async function activeRfx(): Promise<{
     // verdict, which is exactly the thing being removed: the verdict has to be
     // derived from the stored answers whichever enquiry is on screen.
     const seededExample = rfxId === RFX_ID;
+
+    /**
+     * The questions THIS buyer asked, falling back to the shipped set.
+     *
+     * The fallback is right for the seeded example, whose questionnaire is
+     * part of the fabricated corpus, and it is the only honest option for an
+     * enquiry drafted before this column existed. It is NOT right as a general
+     * default, which is what it used to be: every questionnaire read was
+     * graded against the demo's ten questions whatever enquiry was live, so a
+     * supplier's real answers to a buyer's real questions were dropped as
+     * unknown question numbers and the verdict described an enquiry nobody
+     * sent.
+     */
+    const rfxRow = (await run(
+      `select questionnaire from rfx where id = $1`,
+      [rfxId],
+    )).rows?.[0];
+    const asked = rfxRow?.questionnaire;
+    const questions = (Array.isArray(asked) && asked.length
+      ? asked
+      : catalog.questionnaire) as unknown as QuestionSpec[];
 
     const lineRows = (await run(
       `select no, sku, group_name, description, spec, uom, pack_size, qty, hsn,
@@ -316,7 +366,7 @@ export async function activeRfx(): Promise<{
         // unassessed so it never reads as a pass.
         qualification: Object.fromEntries(
           vendorRows.map((v) => {
-            const verdict = verdictFor(v);
+            const verdict = verdictFor(v, questions);
             return [String(v.code), {
               qualified: verdict.assessed ? verdict.qualified : true,
             }];
@@ -349,6 +399,9 @@ export async function activeRfx(): Promise<{
         ),
       },
       isSeededExample: seededExample,
+      /** The questions this enquiry actually asked. Never the catalog's by default. */
+      questions,
+      degraded: null,
       baselineTotalInr: seededExample
         ? BASELINE_TOTAL_INR
         : lines.reduce((a, l) => a + Number(l.baseline_inr ?? 0) * Number(l.qty ?? 0), 0),
@@ -368,7 +421,14 @@ export async function activeRfx(): Promise<{
       "the shipped example. The screen may be showing stale qualification data:",
       e,
     );
-    return fallback;
+    return {
+      ...fallback,
+      degraded:
+        "The enquiry could not be read from the database, so this screen is " +
+        "showing the shipped example and its stored qualification verdicts " +
+        "rather than anything derived from what was read. Do not act on these " +
+        "numbers. " + String(e).slice(0, 160),
+    };
   }
 }
 
@@ -1093,7 +1153,7 @@ export async function buildComparisonPayload() {
   // Derived once, here, and handed to everything downstream so the grid, the
   // award note, the chase and the analyst cannot disagree about who is eligible.
   const verdicts = Object.fromEntries(
-    rfx.vendorRows.map((v) => [String(v.code), verdictFor(v)]),
+    rfx.vendorRows.map((v) => [String(v.code), verdictFor(v, rfx.questions)]),
   );
 
   return {
@@ -1101,6 +1161,13 @@ export async function buildComparisonPayload() {
     buyer: catalog.buyer,
     /** True when the screen is showing the shipped example rather than your own enquiry. */
     isSeededExample: rfx.isSeededExample,
+    /**
+     * Non-null when the database could not be read and this screen is NOT
+     * live. Rendered as an undismissable banner, for the same reason the test
+     * harness has one: the difference between real and stale must never be
+     * something a viewer has to infer.
+     */
+    degraded: rfx.degraded,
     lines: ctx.lines,
     vendors: all.map((code) => {
       const c = catalogVendor(code);
@@ -1126,7 +1193,10 @@ export async function buildComparisonPayload() {
         meta: loaded.vendorMeta[code] ?? null,
       };
     }),
-    questionnaire: catalog.questionnaire,
+    // The questions this enquiry asked. Was always the catalog's, so a drafted
+    // enquiry showed the demo's questionnaire in the supplier panel and the
+    // analyst reasoned about questions the buyer never sent.
+    questionnaire: rfx.questions,
     /**
      * Attachments actually held, per supplier, with what each one says.
      *

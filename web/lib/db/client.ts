@@ -387,6 +387,21 @@ const MIGRATIONS = [
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1`,
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS supersedes_id text`,
   `ALTER TABLE responses ADD COLUMN IF NOT EXISTS blanket_fallback jsonb`,
+  /*
+   * The questionnaire the buyer actually asked.
+   *
+   * It was drafted by the co-pilot, written into the outbound workbook, and
+   * then never persisted. So every questionnaire read was graded against the
+   * shipped demo's ten ISO-27001-and-turnover questions, whatever enquiry was
+   * live. Draft your own questions, invite a supplier, upload their real
+   * answers, and the reader would drop every one of them as an unknown
+   * question number and compute a verdict about questions nobody asked.
+   *
+   * The line catalog was threaded through correctly three lines away from the
+   * call that got this wrong, which is how it survived: `lines: rfx.ctx.lines`
+   * beside `questions: catalog.questionnaire`.
+   */
+  `ALTER TABLE rfx ADD COLUMN IF NOT EXISTS questionnaire jsonb`,
 ];
 
 async function connect(): Promise<{ db: Db; query: Query }> {

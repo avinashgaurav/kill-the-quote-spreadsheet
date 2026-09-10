@@ -6,8 +6,6 @@ import {
 import {
   extractQuestionnaire, looksLikeQuestionnaire,
 } from "@/lib/extract/questionnaire";
-import catalog from "@/lib/data/catalog.json";
-import type { QuestionSpec } from "@/lib/questionnaire";
 import { dbCache } from "@/lib/extract/cache";
 
 /**
@@ -145,7 +143,11 @@ export async function POST(request: Request) {
             buf,
             filename: file.name,
             mimeType: file.type || "application/octet-stream",
-            questions: catalog.questionnaire as unknown as QuestionSpec[],
+            // The questions THIS enquiry asked. The line catalog three lines
+            // below was threaded correctly and this was not, which is how it
+            // survived: a drafted enquiry graded its suppliers against the
+            // shipped demo's questions and dropped every real answer.
+            questions: rfx.questions,
             attachments: uploaded.filter((u) => u.filename !== file.name),
             cache,
           });

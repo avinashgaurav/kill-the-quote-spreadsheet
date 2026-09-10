@@ -26,7 +26,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import {
   cheapestPerLine, singleVendor, likeForLike, lineByNo, isAwardable,
   VENDORS, ASSUMPTIONS, PRIOR_PO,
-  inr, inrShort, type Matrix, type RfxLine,
+  inr, inrShort, type Matrix, type RfxLine, type RfxContext,
 } from "./normalise";
 import type { ComparisonPayload } from "./store";
 
@@ -362,6 +362,55 @@ const suppliersOf = (payload: ComparisonPayload): Supplier[] =>
 const linesOf = (payload: ComparisonPayload) => payload.lines as RfxLine[];
 
 /**
+ * The calculator context for THIS enquiry, which the analyst was not passing.
+ *
+ * `singleVendor` and `cheapestPerLine` both default to `defaultContext()` when
+ * no context is given, and that default is the shipped catalog: its thirty
+ * lines, its quantities, and its stated discounts. Every call in this file
+ * omitted the argument, so two things were wrong and one of them undid a fix
+ * made one layer down.
+ *
+ *   the discount   `singleVendor` was changed to read the discount the model
+ *                  actually extracted rather than `catalog.terms` keyed by
+ *                  vendor code. `buildComparisonPayload` passes the derived
+ *                  context everywhere. The analyst did not, so when a buyer
+ *                  asked "what is Zenith's total after their stated discount"
+ *                  the answer came back out of the answer key, on the one
+ *                  screen whose whole claim is that it does not do that.
+ *
+ *   the lines      worse for any real enquiry. An award total was computed by
+ *                  iterating the SHIPPED catalog's lines and quantities. Draft
+ *                  your own thirty lines and the analyst would price them
+ *                  against somebody else's, silently, and return a number that
+ *                  looked entirely reasonable.
+ *
+ * Derived per request from the payload, so there is one context and the grid,
+ * the exports and the analyst cannot disagree about what is being priced.
+ */
+function contextOf(payload: ComparisonPayload): RfxContext {
+  const suppliers = payload.vendors as Array<Record<string, unknown>>;
+  return {
+    lines: linesOf(payload),
+    vendors: suppliers.map((v) => ({ code: String(v.code) })),
+    qualification: Object.fromEntries(
+      suppliers.map((v) => [String(v.code), { qualified: Boolean(v.qualified) }]),
+    ),
+    // What each supplier's own document stated, as read. Absent means "we have
+    // not read a discount from them", which is not the same as "none offered".
+    statedDiscountPct: Object.fromEntries(
+      suppliers.flatMap((v) => {
+        const terms = ((v.meta as { terms?: Record<string, unknown> } | null)?.terms
+          ?? {}) as Record<string, unknown>;
+        const pct = terms.totalLevelDiscountPercent;
+        return typeof pct === "number"
+          ? [[String(v.code), pct] as [string, number]]
+          : [];
+      }),
+    ),
+  };
+}
+
+/**
  * How a supplier's eligibility should be DESCRIBED, not just whether it is true.
  *
  * Three states, never two. A supplier nobody has assessed is carried as
@@ -385,6 +434,7 @@ function scenarioFrom(
   o: { qualifiedOnly?: boolean; excludeCaveats?: boolean; vendors?: string[];
        includeUnconfirmed?: boolean; label?: string; key?: string },
   suppliers: Supplier[],
+  ctx: RfxContext,
 ) {
   const all = suppliers.map((s) => s.code);
   let codes = o.vendors?.length ? o.vendors : all;
@@ -398,6 +448,7 @@ function scenarioFrom(
     includeUnconfirmed: o.includeUnconfirmed,
     key: o.key ?? "s",
     label: o.label ?? "Cheapest per line",
+    ctx,
   });
 }
 
@@ -410,6 +461,9 @@ export async function runTool(
   const matrix = payload.matrix;
   const suppliers = suppliersOf(payload);
   const lines = linesOf(payload);
+  // THIS enquiry's lines, quantities and stated discounts. Never the catalog's.
+  // Named rfxCtx because `ctx` here is already the tool-execution context.
+  const rfxCtx = contextOf(payload);
   const codesAll = suppliers.map((s) => s.code);
   const nameOf = (c: string) => suppliers.find((s) => s.code === c)?.name ?? c;
 
@@ -434,7 +488,7 @@ export async function runTool(
           questionnaireRead: s.assessed,
           eligibility: eligibilityNote(s),
           failedMandatory: s.failedMandatory,
-          linesPriced: singleVendor(matrix, s.code).linesPriced,
+          linesPriced: singleVendor(matrix, s.code, false, rfxCtx).linesPriced,
         })),
         // A supplier who re-quoted is a fact about the numbers on screen, so
         // the analyst gets it in the first tool it calls rather than having to
@@ -504,7 +558,7 @@ export async function runTool(
         return {
           mode: "single_vendor",
           results: codes.map((c) => {
-            const r = singleVendor(matrix, c, Boolean(input.includeUnconfirmed));
+            const r = singleVendor(matrix, c, Boolean(input.includeUnconfirmed), rfxCtx);
             return {
               vendor: c, name: nameOf(c),
               qualified: suppliers.find((s) => s.code === c)?.qualified ?? true,
@@ -523,7 +577,7 @@ export async function runTool(
         };
       }
 
-      const s = scenarioFrom(matrix, input as never, suppliers);
+      const s = scenarioFrom(matrix, input as never, suppliers, rfxCtx);
       for (const [n, p] of Object.entries(s.picks)) ctx.citedCells.add(`${p.vendor}:${n}`);
       return {
         mode: "cheapest_per_line",
@@ -544,7 +598,7 @@ export async function runTool(
       const specs = input.scenarios as Array<Record<string, unknown>>;
       const built = specs.map((sp, i) =>
         scenarioFrom(matrix, { ...sp, key: `s${i + 1}`, label: String(sp.label) } as never,
-                     suppliers),
+                     suppliers, rfxCtx),
       );
       const lfl = likeForLike(built);
       return {
@@ -634,7 +688,7 @@ export async function runTool(
        * supplier panel shows the buyer, from the same source.
        */
       const codes = input.vendor ? [String(input.vendor)] : codesAll;
-      const qs = payload.questionnaire as Array<Record<string, unknown>>;
+      const qs = payload.questionnaire as unknown as Array<Record<string, unknown>>;
       return {
         suppliers: codes.map((c) => {
           const s = suppliers.find((x) => x.code === c);
