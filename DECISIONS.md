@@ -19,13 +19,13 @@ habit.
 we are ISO 27001 certified" and attaches a certificate for the withdrawn 2013
 revision. A model asked "did they pass?" says yes, because they said yes. So the
 certificate gets its own read, and comparing its expiry to today is left to
-code. Passed, failed, and **not assessed**: the third matters most, because
-without it a screen can claim a failure it has no evidence for.
+code. Passed, failed, and **not assessed**: without the third, a screen can
+claim a failure it has no evidence for.
 
 **3. Five kinds of nothing, not one dash.** Declined, never mentioned, cannot
 read it, not a price, needs your call. My first build drew all five identically,
-turning five different next actions into one shrug. They are five different
-conversations with five different suppliers, so they get five different marks.
+turning five different next actions into one shrug. Five conversations with five
+suppliers, so five marks.
 
 **4. Two correct numbers can still mislead.** The strict award looks ₹45.3 lakh
 cheaper than the eligible-suppliers award and is ₹5.0 lakh *dearer* on the lines
@@ -45,8 +45,8 @@ CFO, not to me.
 **The analyst was answering one of my own demo questions from a lookup table.**
 Its questionnaire tool served a pass/fail boolean and a hand-typed finding out
 of a catalog file, so *"is Vector's ISO 27001 certificate actually valid?"* was
-answered by handing the model my own conclusion. That is the one thing the brief
-forbids by name. Both are derived now.
+answered by handing the model my own conclusion. The one thing the brief forbids
+by name. Derived now.
 
 **The award recommendation did not add up.** Found while writing the other
 document. The tool gave the model thirty line amounts and no subtotal, so asked
@@ -81,7 +81,7 @@ harness had missed all of it by testing only the easiest and hardest images.
   ledger, and one analyst tool reads line descriptions from the catalogue.
 - **Scale.** 30 lines and 5 replies is what is tested, not 300 and 30.
 - **A rupee figure on each ambiguity hold.** The gate says what a supplier could
-  do with an ambiguous line. What it would cost is the better number. Not done.
+  do with an ambiguous line. What it would cost is the better number.
 
 ## The interesting problem was somewhere else
 
@@ -97,8 +97,8 @@ of email: 2 of 30 lines priced, no questionnaire, no terms. The 28 lines they
 left alone are worth **₹2.89 crore** at the cheapest bid on each. No amount of
 model quality fixes that. It is ₹2.89 crore behind a request nobody sent.
 
-So the system works out what each supplier still owes, asks for only that, with
-a deadline, and keeps "they never sent it" apart from "they sent something we
+So the system works out what each supplier still owes, asks for only that with a
+deadline, and keeps "they never sent it" apart from "they sent something we
 cannot use". The point is not the chasing. It is that **"their questionnaire is
 missing" and "we asked on the 10th, gave them until the 16th, and nothing came
 back" are different facts**, and only the second lets a buyer award around a
