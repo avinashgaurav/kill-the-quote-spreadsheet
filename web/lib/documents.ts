@@ -639,6 +639,38 @@ ${disqualified.map((v) => esc(v.name.split(" ")[0])).join(", ")} were never elig
 ${a.alternative ? `Alternative considered: ${esc(a.alternative)}. ` : ""}${esc(a.note)}</span></td>
 </tr>`).join("")}</tbody></table>
 
+<h2>Lines sent knowing they were ambiguous</h2>
+${(() => {
+  /**
+   * The reason the buyer typed to get past the ambiguity gate, next to the
+   * money it affected.
+   *
+   * This section is the entire argument for making the gate overridable. An
+   * unclickable button gets worked around by editing the draft until the check
+   * stops firing, and that leaves no record at all; a reason that is stored and
+   * then read by nothing is the same outcome with more typing. It has to
+   * surface here, in the document somebody defends the award with.
+   */
+  const ka = (p as { knowinglyAmbiguous?: Array<{
+    lineNo: number | null; issue: string; consequence: string;
+    reason: string; acceptedAt: string;
+  }> }).knowinglyAmbiguous ?? [];
+  if (!ka.length) {
+    return `<p class="muted">None. Every line went out with its pack size, its
+      quantity and its unit stated.</p>`;
+  }
+  return `<p>The gate held this enquiry and the buyer sent it anyway, with a reason.
+Each line below is one a supplier could legitimately answer in more than one way,
+so a cell on it may be marked not comparable further up this note.</p>
+<table><thead><tr><th class="n">Line</th><th>What was ambiguous</th>
+<th>The buyer's reason</th><th>Accepted</th></tr></thead><tbody>
+${ka.map((k) => `<tr><td class="n">${k.lineNo ?? "-"}</td>
+<td>${esc(k.issue)}<br><span class="muted">${esc(k.consequence)}</span></td>
+<td>${esc(k.reason)}</td>
+<td class="muted">${esc(String(k.acceptedAt).slice(0, 10))}</td></tr>`).join("")}
+</tbody></table>`;
+})()}
+
 <h2>Money deliberately not counted</h2>
 ${conditional.length ? `<p>The following were offered but depend on something outside the
 supplier's own price, so they are recorded and were not used in ranking.</p>

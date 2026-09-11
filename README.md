@@ -29,14 +29,14 @@ it, and two rows are PARTIAL on purpose.
 |---|---|
 | "A buyer **talks** an RFx into existence with an AI co-pilot: scope, line items, questionnaire, terms" | `lib/copilot.ts`, a real tool loop. Type anything, in any category. The four suggested openers are examples, not paths. |
 | "It goes out to vendors **over a channel you choose**" | `api/rfx/send` generates four real documents. The channel is consequential, not a label: WhatsApp cannot carry an attachment, so the pack goes as a link **and a supplier's certificate does not arrive**, which is why their questionnaire answer then has nothing behind it. Your choice at step 3 is the reason step 4 is harder. |
-| "Vendors reply **however they like**; nobody is forced into your template" | Five native shapes in `dataset/out`: an xlsx on the supplier's own template, a 3-page PDF, a docx with prices in sentences, a phone photograph, a five-line email. Plus odt, ods, csv, tsv, rtf, txt, and a 27-file awkward-format corpus. |
+| "Vendors reply **however they like**; nobody is forced into your template" | Five native shapes in `dataset/out`: an xlsx on the supplier's own template, a 3-page PDF, a docx with prices in sentences, a phone photograph, a five-line email. Plus a 31-file stress set: 22 awkward formats (odt, ods, csv, tsv, rtf, txt), 5 photographs of falling quality, and 4 deliberately broken files. |
 | "reads **every** response, whatever shape it arrives in" | `lib/extract/run.ts`. One forced tool, no others. A read that finds nothing **throws** rather than returning an empty column. `npm run sees -- <file>` shows exactly what reaches the model for any file, including yours. |
 | "a single side-by-side comparison: **same lines, same units, same currency**" | `lib/normalise.ts`, proven cell-for-cell against an independent Python implementation by 442 assertions. Aliases never change a number, conversions always do, and a conversion with no rule **refuses** instead of guessing. |
 | "**questionnaire answers and attached docs** sitting alongside the numbers" | Both read, both openable. A questionnaire form names a filename and nothing more, so the named document is opened and read **in its own right** and the document governs where the two disagree. Click it in the supplier panel to read the certificate yourself. |
 | "the buyer stops clicking and **starts asking**. Natural language, over the whole comparison" | `lib/analyst.ts`. Ten tools that compute, no `evaluate`, no SQL, no arithmetic in prose. Tools are bound to the **loaded** enquiry, so a supplier you uploaded is visible to every one of them. |
 | "**Text answers, tables, charts, exports**" | Text and markdown tables. Bar charts, coloured by group, so "who wins each of thirty lines" is one chart. Four exports: award note, xlsx with provenance in cell comments, CSV, and a JSON audit bundle. |
 | "**Real analysis on real extracted data**, all the way to a defensible award decision" | The award note leads with what the total rests on, why not the cheapest, the assumptions in force, the money deliberately not counted, and who was asked for what and whether they replied. |
-| "five vendors, thirty line items, a questionnaire, attached documents" | 30 lines, 10 suppliers of whom 5 reply, 10 questions of which 6 are mandatory, certificates and OEM letters. **PARTIAL as deployed:** the live database is empty until somebody presses Send, because populating it takes real model calls. |
+| "five vendors, thirty line items, a questionnaire, attached documents" | 30 lines, 10 suppliers of whom 5 reply, 10 questions of which 6 are mandatory, certificates and OEM letters. **Loaded as deployed:** all 150 cells are read in on the live site, so the comparison is there when you open it. Drafting and sending a fresh enquiry also works, and costs real model calls. |
 | "Fabricate a dataset a procurement person would nod at" | HSN codes per line, GSTIN and CIN, pack sizes that trap ("kit of 2", "box of 10", "box of 50"), MOQ, ex-works Singapore, a discount buried in footnote 3 on page 3, a prior-PO rate card, and a Rev 2 that supersedes a Rev 1. |
 | **One rule:** "the AI loops must be real ... don't hardcode the answers to your demo questions" | Six model call sites, no lookup tables, and **two violations of this found and fixed** rather than avoided. See below. |
 
@@ -46,9 +46,12 @@ sentence out of `catalog.json`, so the suggested question *"is Vector's ISO
 27001 certificate actually valid?"* was answered by handing the model my own
 conclusion. And the finding itself did not survive a real read at all: the
 revision year and the expiry date live inside an attached PDF that nothing ever
-opened, so a genuine read turned six mandatory failures into five. Both are now
-derived, and `regression-test` has three cases pinning the second, including
-one asserting that the **form alone must not** produce the finding.
+opened. Reading only the form, the honest answer to "does anything contradict
+them?" was no, so Vector's six mandatory failures dropped to five and the
+screen showed them passing the ISO question. Opening the attachment puts it
+back to six, which is what the live site reads today. Both are now derived, and
+`regression-test` has three cases pinning the second, including one asserting
+that the **form alone must not** produce the finding.
 
 ## Run it
 
@@ -82,7 +85,7 @@ pass?" might well say yes, because they said yes. Comparing a date to today is
 not a judgement call, so code does it, and every verdict carries the sentence
 that produced it.
 
-There are three qualification states, not two: passed, failed, and **not read**.
+There are three qualification states, not two: passed, failed, and **not assessed**.
 The third is the one that matters, because without it a screen can claim a
 failure it has no evidence for.
 
@@ -142,7 +145,7 @@ offline suites.
 | `contrast-test` | Every colour that carries meaning against its WCAG floor, both themes, oklch maths validated against a real browser first | no |
 | `cache-test` | The extraction cache stores, returns, and misses for the right reasons | no |
 | `sees` | What actually reaches the model for any document you give it | no |
-| `regression-test` | 62 bugs that actually shipped cannot come back unnoticed | no |
+| `regression-test` | 66 bugs that actually shipped cannot come back unnoticed | no |
 | `e2e-test` | 42 cases over HTTP, mostly sad paths, including an interviewer's own file | yes |
 | `accuracy` | Recall, price exactness, unit correctness, invention rate, and whether **confidence falls when accuracy falls** | yes |
 | `api-check` | Whether the model is reachable, and which of the three ways a key can be dead this is. Two tokens | yes |
@@ -152,7 +155,7 @@ offline suites.
 
 ```
 dataset/generators/   the fabricated corpus, and normalise.py: the REFERENCE calculator
-dataset/out/          five supplier replies in five shapes, a photo stress set, 27 awkward files
+dataset/out/          five supplier replies in five shapes, and a 31-file stress set
 web/lib/normalise.ts  the TypeScript calculator, proven against the Python one
 web/lib/extract/      readers per format, the extraction contract, the reader loop
 web/lib/chase.ts      what each supplier still owes, and how to ask for only that

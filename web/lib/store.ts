@@ -234,6 +234,16 @@ export function seedAnswersFor(code: string): ReadAnswer[] {
  * Falls back to the catalog if the database is empty or unreachable, so a cold
  * start still renders something rather than an error page.
  */
+/** One line sent past the ambiguity gate on purpose, with the buyer's reason. */
+export interface KnowinglyAmbiguous {
+  where: string;
+  lineNo: number | null;
+  issue: string;
+  consequence: string;
+  reason: string;
+  acceptedAt: string;
+}
+
 export async function activeRfx(): Promise<{
   rfxId: string;
   ctx: RfxContext;
@@ -246,6 +256,17 @@ export async function activeRfx(): Promise<{
   /** Non-null only when the database failed and this is not live data. */
   degraded: string | null;
   vendorRows: Array<Record<string, unknown>>;
+  /**
+   * Lines the buyer sent KNOWING they were ambiguous, and the reason they gave.
+   *
+   * Recorded at send time and carried all the way to the award note. It was
+   * stored and then read by nothing for a while, which quietly made the
+   * override pointless: the whole argument for letting a buyer past the gate
+   * with a typed reason is that the reason turns up later, next to the money,
+   * where a CFO asking "why is this line a mess" can find it. An override that
+   * disappears is just a dismissable warning with extra steps.
+   */
+  knowinglyAmbiguous: KnowinglyAmbiguous[];
 }> {
   const run = await q();
   const fallback = {
@@ -255,6 +276,8 @@ export async function activeRfx(): Promise<{
     baselineTotalInr: BASELINE_TOTAL_INR,
     questionnaireAnswers: catalog.questionnaire_answers as Record<string, unknown>,
     questions: catalog.questionnaire as unknown as QuestionSpec[],
+    // The shipped example was never sent past the gate by anybody.
+    knowinglyAmbiguous: [] as KnowinglyAmbiguous[],
     /**
      * Set only when we got here because the DATABASE FAILED, never on a normal
      * cold start.
@@ -317,7 +340,7 @@ export async function activeRfx(): Promise<{
      * sent.
      */
     const rfxRow = (await run(
-      `select questionnaire from rfx where id = $1`,
+      `select questionnaire, knowingly_ambiguous from rfx where id = $1`,
       [rfxId],
     )).rows?.[0];
     const asked = rfxRow?.questionnaire;
@@ -354,8 +377,13 @@ export async function activeRfx(): Promise<{
       [rfxId],
     )).rows ?? [];
 
+    const knowinglyAmbiguous = (Array.isArray(rfxRow?.knowingly_ambiguous)
+      ? rfxRow.knowingly_ambiguous
+      : []) as KnowinglyAmbiguous[];
+
     return {
       rfxId,
+      knowinglyAmbiguous,
       ctx: {
         lines: seededExample ? LINES : lines,
         vendors: vendorRows.map((v) => ({ code: String(v.code) })),
@@ -1161,6 +1189,11 @@ export async function buildComparisonPayload() {
     buyer: catalog.buyer,
     /** True when the screen is showing the shipped example rather than your own enquiry. */
     isSeededExample: rfx.isSeededExample,
+    /**
+     * Lines sent past the ambiguity gate on purpose, with the buyer's reason.
+     * Surfaced so the award note can say which ones and why.
+     */
+    knowinglyAmbiguous: rfx.knowinglyAmbiguous,
     /**
      * Non-null when the database could not be read and this screen is NOT
      * live. Rendered as an undismissable banner, for the same reason the test

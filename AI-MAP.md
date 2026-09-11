@@ -49,7 +49,7 @@ the shipped demo.
 ## The trade this costs me
 
 My code returns `unresolvable` where a model would have improvised a number.
-That is the deal: **31 of 150 cells carry no usable price**, and a model asked
+That is the deal: **40 of 150 cells carry no usable price**, and a model asked
 to fill them in would have produced something plausible for most of them. A
 plausible price is worse than an admitted gap, because a gap gets chased and a
 plausible price gets awarded.

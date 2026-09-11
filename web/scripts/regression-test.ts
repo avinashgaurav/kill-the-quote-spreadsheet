@@ -673,8 +673,9 @@ async function main() {
     /extractEvidence/.test(qn) && /EVIDENCE_TOOL/.test(qn)
       && /matchAttachment/.test(qn),
     "the questionnaire FORM names a filename and nothing more. The revision " +
-    "year and the expiry live inside the PDF, so a real read found nothing " +
-    "contradicting the answer and six mandatory failures became five",
+    "year and the expiry live inside the PDF, so reading the form alone found " +
+    "nothing contradicting the answer, and Vector's six mandatory failures " +
+    "dropped to five with the ISO question showing as passed",
   );
 
   // ---- 22. A verdict about a document nobody could open ----------------
@@ -1138,6 +1139,39 @@ async function main() {
       "a correct thirty-bar chart, already paid for and computed from the " +
       "cells, was replaced by an error because the model wrote no sentence " +
       "after it",
+    );
+  }
+
+  // ---- 45. The override reason was stored and read by nothing -------------
+  //
+  // The ambiguity gate is overridable on purpose: an unclickable button gets
+  // worked around by editing the draft until the check stops firing, and that
+  // leaves no record at all. The whole argument for letting a buyer past it
+  // with a typed reason is that the reason SURFACES LATER, next to the money,
+  // in the document somebody defends the award with.
+  //
+  // It was written to rfx.knowingly_ambiguous at send time and then read by
+  // nothing: not activeRfx, not the comparison payload, not the award note.
+  // So the override was a dismissable warning with extra typing, and the docs
+  // claimed it "turns up in the award note", which was simply false. Found by
+  // fact-checking the documentation against the code, not by any test.
+  {
+    const storeSrc = readFileSync(
+      resolve(process.cwd(), "lib/store.ts"), "utf8",
+    );
+    const docsSrc = readFileSync(
+      resolve(process.cwd(), "lib/documents.ts"), "utf8",
+    );
+    check(
+      "45. A buyer's override reason never reached the award note",
+      "the reason is read out of the enquiry and rendered in the note",
+      /knowingly_ambiguous from rfx/.test(storeSrc)
+        && /knowinglyAmbiguous: rfx\.knowinglyAmbiguous/.test(storeSrc)
+        && /Lines sent knowing they were ambiguous/.test(docsSrc)
+        && /knowinglyAmbiguous \?\? \[\]/.test(docsSrc),
+      "the column was written on send and selected by no query, so the one " +
+      "thing that makes an overridable gate better than an ignorable warning " +
+      "was missing, and a CFO asking why a line is a mess had nowhere to look",
     );
   }
 
