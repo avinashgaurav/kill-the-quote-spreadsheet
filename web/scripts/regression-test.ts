@@ -1175,6 +1175,38 @@ async function main() {
     );
   }
 
+  // ---- 46. The award split was added up in prose -------------------------
+  //
+  // run_award_scenario returned thirty line-level amounts and no subtotal per
+  // supplier, so "draft the award recommendation" left the model to add up
+  // thirty numbers in its answer. It did, and it was wrong: ₹1.48 cr and
+  // ₹2.49 cr against true subtotals of ₹1.85 cr and ₹1.46 cr, three parts
+  // summing to ₹4.70 cr against the ₹4.05 cr total it had quoted correctly two
+  // sentences earlier.
+  //
+  // The worst possible place for it. The award recommendation is the sentence
+  // a buyer defends to a CFO, and a per-supplier figure that does not tie to
+  // the headline is the confidently wrong number this whole product argues
+  // against.
+  //
+  // "The model must not do arithmetic" is only an instruction until the tool
+  // stops requiring it. The fix is a subtotal the model can quote, computed by
+  // the same code that computed the total, so the two cannot disagree.
+  {
+    const src = readFileSync(resolve(process.cwd(), "lib/analyst.ts"), "utf8");
+    check(
+      "46. The analyst added up each supplier's share itself",
+      "the award tool returns the split, so nothing is summed in prose",
+      /splitBySupplier: perSupplier/.test(src)
+        && /linesWon: won\.length/.test(src)
+        && /won\.reduce\(\(t, p\) => t \+ p\.extendedInr, 0\)/.test(src)
+        && /NEVER ADD UP A SUPPLIER'S SHARE YOURSELF/.test(src),
+      "the tool handed over thirty per-line amounts and no subtotal, so the " +
+      "one number a CFO would check first was produced by a language model " +
+      "doing mental arithmetic over thirty rows",
+    );
+  }
+
   // ---- 42. An answer opened a cell over itself ---------------------------
   //
   // The worst bug in the product, found by the person using it rather than by

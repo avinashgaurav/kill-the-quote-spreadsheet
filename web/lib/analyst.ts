@@ -52,6 +52,8 @@ NAME SUPPLIERS. Never write V1, V2 or V5. Those are internal codes and mean noth
 
 NEVER SAY A SUPPLIER CLEARED SOMETHING NOBODY CHECKED. Qualification has THREE states, not two: passed, failed, and NOT ASSESSED. A supplier whose questionnaire nobody has read is carried as eligible, because dropping a real bid for want of a document nobody chased is the more expensive mistake, and they will therefore appear inside a "qualified only" award. They have not passed anything. Every tool that reports qualification also reports a questionnaireRead flag and an eligibility sentence: read them, and if it says NOT ASSESSED, say so in your answer. Writing "the suppliers who cleared the questionnaire are X, Y and Z" when Z was never assessed is the single most damaging sentence you can produce here, because it is the exact error this product exists to prevent.
 
+NEVER ADD UP A SUPPLIER'S SHARE YOURSELF. run_award_scenario returns splitBySupplier, with the lines won and the subtotal for each. Quote those. Summing the thirty per-line entries in your head is how you produce three subtotals that do not add up to the total you just quoted.
+
 A CHART IS NEVER THE WHOLE ANSWER. After make_chart, always write the sentence that says what the chart shows and what it rests on. The buyer asked a question; a picture with no words is not a reply to it, and a turn that ends on a tool call with nothing written is a failed turn. Two or three lines is enough.
 
 When something is a judgement rather than a fact, say so and name the assumption behind it. Assumptions are listed by list_assumptions and the buyer can change any of them.
@@ -654,11 +656,41 @@ export async function runTool(
         : ((input.vendors as string[] | undefined) ?? codesAll);
       const wonLines = new Set(Object.values(s.picks).map((p) => p.vendor));
 
+      /**
+       * THE SPLIT, ADDED UP IN CODE.
+       *
+       * The tool used to return thirty line-level amounts and no subtotal per
+       * supplier, so "draft the award recommendation" left the model to add up
+       * thirty numbers in prose. It did, and it was wrong: it reported ₹1.48 cr
+       * and ₹2.49 cr against true subtotals of ₹1.85 cr and ₹1.46 cr, and the
+       * three parts summed to ₹4.70 cr against a total of ₹4.05 cr it had
+       * quoted correctly two sentences earlier.
+       *
+       * That is the exact failure this product argues against, on the single
+       * highest-stakes sentence it produces, and "the model must not do
+       * arithmetic" is only an instruction until the tool stops requiring it.
+       * A subtotal the model can quote is the fix; a sterner prompt is not.
+       */
+      const perSupplier = consideredCodes
+        .map((c) => {
+          const won = Object.values(s.picks).filter((p) => p.vendor === c);
+          return {
+            vendor: c,
+            name: nameOf(c),
+            linesWon: won.length,
+            total: money(won.reduce((t, p) => t + p.extendedInr, 0)),
+          };
+        })
+        .filter((x) => x.linesWon > 0)
+        .sort((a, b) => b.linesWon - a.linesWon);
+
       return {
         mode: "cheapest_per_line",
         total: money(s.totalInr),
         linesAwarded: s.linesAwarded,
         linesNoOneCanFill: s.unfilledLines,
+        /** Quote these. Do not add up `picks` yourself. */
+        splitBySupplier: perSupplier,
         suppliersConsidered: consideredCodes.map((c) => {
           const sup = suppliers.find((x) => x.code === c);
           return {
