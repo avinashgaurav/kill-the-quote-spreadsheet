@@ -2,40 +2,64 @@
 
 **Live:** https://kill-the-quote-spreadsheet.vercel.app
 
-A buyer talks an enquiry into existence. It goes out to suppliers on a channel
-they pick. Suppliers reply in any format they like. The system reads every reply
-into one comparison, same lines, same units, same currency, and the buyer then
-questions it in plain English and awards from it.
+A buyer talks an enquiry into existence. It goes out to suppliers on whatever
+channel they choose. Suppliers reply in any format they like. The system reads
+every reply into one comparison, same lines, same units, same currency, and the
+buyer questions it in plain English and awards from it.
 
-**The short version.** 150 cells read from five replies in five formats,
-including a phone photograph and a five-line email. One comparison, normalised
-to the asked unit and to rupees, where every cell can say where it came from and
-49 of them are deliberately excluded and labelled. The VP's question answers in
-twelve seconds: ₹4.05 cr across three suppliers, against ₹3.88 cr if you ignore
-the questionnaire, so compliance costs ₹16.7 lakh. It refuses to answer what it
-cannot source. The measured limit: on one degraded photograph the reader was 52%
-accurate and 90% confident, which is in this document because it is the honest
-edge of the claim.
+## The short version
 
-**Category:** enterprise IT hardware. **Personas:** a category buyer who owns
-the enquiry, a VP who asks the hard question late, and a CFO who has to accept
-the answer. **Size:** 30 line items, 10 suppliers invited of whom 5 reply, a
-10-question questionnaire with 6 mandatory, and attached certificates. The
-dataset is fabricated, as the brief asked.
+Five suppliers replied in five different formats, including a photograph of a
+printed rate card taken at an angle and an email five lines long. The system
+read all of it: **150 prices, and it can tell you where every single one came
+from.** 54 of them are deliberately left out of the total, each with a reason
+attached, because a number you cannot stand behind is worse than a gap you have
+labelled.
+
+Then the VP asks the question that used to cost a day. *Split it cheapest per
+line, but only among suppliers who cleared the quality questionnaire.* **It
+answers in ten seconds:** ₹4.05 crore across three suppliers, against ₹3.91
+crore if you ignore the questionnaire. Doing it properly costs ₹13.6 lakh, and
+now the buyer knows that before they sign rather than after.
+
+Ask it something it cannot source and it refuses, and says why.
+
+One number in this document is not flattering. On the fourth of five
+photographs, the reader was 52% accurate and 90% confident. It is here because a tool that
+handles ₹4 crore should be honest about its own edges, and because measuring
+that is what led me to stop trusting confidence scores at all.
+
+**Category:** enterprise IT hardware. **Who it is for:** a category buyer who
+owns the enquiry, a VP who asks the hard question late, and a CFO who has to
+accept the answer. **Size:** 30 line items, 10 suppliers invited of whom 5
+reply, a 10-question questionnaire with 6 mandatory, and attached certificates.
+The whole dataset is fabricated, as the brief asked.
 
 ---
 
 ## The four days this removes
 
-The buyer loses three days retyping five replies into Excel, then the VP asks
-one question and loses the fourth.
+Three days go into retyping five replies into Excel. Then the VP asks one
+question and the fourth day goes too.
 
-The retyping is the obvious target and the easy one. The fourth day is the
-valuable one, because *"split it cheapest per line, but only among suppliers who
-cleared the quality questionnaire"* is not a formatting problem. It needs the
-system to know who cleared the questionnaire, which needs somebody to have read
-the certificates, which nobody has. That question now takes twelve seconds, and
-so does the one after it.
+**The retyping is the easy day to win back.** Read the documents, put the numbers
+in one place, done. Most of the work in this build is not that.
+
+**The fourth day is the valuable one.** *"Split it cheapest per line, but only
+among suppliers who cleared the quality questionnaire"* is not a formatting
+problem. To answer it you need to know who actually cleared the questionnaire.
+To know that, somebody has to have opened the certificates and checked the dates
+on them. Nobody has. So the buyer spends a day opening PDFs, and still ends up
+trusting what each supplier said about themselves.
+
+**What the system does instead:** it reads the certificates as documents in
+their own right, compares what they say against what the supplier claimed, and
+holds the verdict against every award scenario. So the VP's question is not a
+day of work. It is one sentence, answered in ten seconds, with the
+qualification status of every supplier attached to the answer, including the two
+nobody has checked yet.
+
+The day the buyer gets back is not the typing day. It is the judgement day.
 
 ---
 
@@ -44,146 +68,239 @@ so does the one after it.
 **1. Draft it by talking.** The buyer types what they need in ordinary English:
 *"I need to refresh IT hardware for 14 retail sites in Tamil Nadu. Laptops for
 the store managers, a small server per region, network switches. Delivered in
-phases from March."* The co-pilot returns scope, line items, a supplier
-questionnaire and commercial terms. It asks about what it cannot guess, assumes
-defaults for the rest, and says which ones it assumed. It has no price field at
-all, so it cannot invent a number.
+phases from March."* Four things then happen:
 
-**2. A gate before it leaves the building.** The enquiry is held if a line says
-"box" without saying how many are inside, or is missing a quantity, a unit or a
-line number. Each hold says what a supplier could legitimately do with the
-ambiguity. The buyer can override any hold by typing a reason, and that reason
-is printed in the award note. An unclickable button just gets worked around by
-editing the draft until the check stops firing, which leaves no record at all.
+- The co-pilot writes the **scope**, the **line items** with units and
+  quantities, a **supplier questionnaire**, and the **commercial terms**.
+- It asks about anything it cannot reasonably guess, rather than inventing it.
+- It fills sensible defaults for the rest, and tells the buyer which ones it
+  assumed, so nothing is silently decided.
+- It has no field for a price anywhere, so it cannot put a number in the
+  buyer's mouth.
 
-**3. Choose a channel.** Email, a portal link, or WhatsApp, per supplier. The
-choice has consequences: WhatsApp cannot carry an attachment, so the pack goes
-as a link, and on the way back whichever supplier you invited that way has their
-certificate stripped too. Their answer to *"are you ISO 27001 certified?"* then
-has nothing behind it, and the reason is a choice the buyer made two steps
-earlier.
+The buyer can then change anything by talking to it again. Four documents come
+out of this: scope, line items, questionnaire, terms.
 
-**4. Replies arrive in whatever shape.** Nobody is forced into a template.
+**2. A quality check before it goes out.** Some mistakes cannot be fixed later,
+so the system stops them leaving the building. It holds the enquiry if a line:
+
+- says "box" or "kit" without saying how many pieces are inside,
+- is missing a unit, a quantity, or a line number,
+- shares a line number with another line,
+- or the questionnaire has no mandatory question, or has a mandatory question
+  that requires no supporting document.
+
+Each hold explains the consequence in plain terms. For the "box" case: *one
+supplier will price the box and another will price a single piece; the second
+bid looks several times cheaper while being dearer, and both of them answered
+the question you actually asked.* Where the correction is obvious, the fix is one
+click.
+
+**The buyer can always send it anyway, by typing a reason.** That is deliberate.
+A block that cannot be overridden just gets worked around, usually by editing
+the line until the warning stops appearing, and then there is no record that
+anyone ever noticed. Here the reason is stored and printed in the award note, so
+the decision is visible later to the person who has to sign it off.
+
+**3. Choose how it goes out.** Email, a portal link, or WhatsApp, chosen per
+supplier. **This choice has a real consequence, and it comes back to bite
+later.** WhatsApp cannot carry an attachment. So that supplier gets a link
+instead of the document pack, and when they reply, their certificate does not
+come through either. Their answer to *"are you ISO 27001 certified?"* then has
+nothing behind it that anyone can check.
+
+That is not a flaw in the demo. It is the medium behaving normally, and the
+system traces the gap back to the buyer's own choice two steps earlier, instead
+of blaming the supplier.
+
+**4. Replies arrive in whatever shape suits the supplier.** Nobody is forced
+into a template. These are the five replies in the dataset, and they are the
+formats the brief describes:
 
 | Supplier | What they sent | Lines priced |
 |---|---|---|
-| Zenith | Their own xlsx template, plus a Rev 2 that supersedes their Rev 1 | 30 of 30 |
-| Cygnus | A 3-page PDF, nine lines in USD, discount in a footnote on page 2 | 24 of 30 |
-| Orbit | A docx with the commercials written into sentences | 24 of 30 |
-| Vector | A photograph of a printed rate card, taken at an angle on a phone | 21 of 30 |
-| Helios | A five-line email: two lines priced, no questionnaire, no terms | 5 of 30 |
+| Zenith | Their own Excel template, ignoring ours entirely | 30 of 30 |
+| Cygnus | A 3-page PDF, nine lines priced in USD, discount buried in a footnote on page 2 | 24 of 30 |
+| Orbit | A Word document with the commercials written into sentences | 24 of 30 |
+| Vector | A photograph of a printed rate card, taken at an angle on a phone | 16 of 30 |
+| Helios | A five-line email pricing two lines, no questionnaire, no terms | 2 of 30 |
 
-**5. One comparison.** 150 cells, 30 lines by 5 suppliers, in one screen. Same
+Behind those five sits a stress set of 31 more files, to prove the readers are
+not tuned to the demo: 22 awkward formats, 5 photographs of falling quality, and
+4 files that are deliberately broken.
+
+**5. One comparison.** 150 prices, 30 lines by 5 suppliers, on one screen. Same
 lines, same units, same currency, with questionnaire answers and attached
-documents beside the numbers.
+documents sitting beside the numbers.
 
-**6. Go back and ask.** Where a figure could not be read, or a mandatory
-question was left blank, the buyer asks again for only that, with a deadline,
-without re-sending the whole enquiry. The system works out what each supplier
-still owes and drafts the message. It separates two things that look identical
-on screen and are not the same conversation: **a gap** (they never sent it) and
-**a dispute** (they sent something that cannot be used as it stands). Eight
-reasons to go back: no price, unreadable price, not a price, a price derived
-from a prior order, a price carried forward, a question unanswered, a question
-answered with no document, and a term not stated. The buyer closes each with a
-reason; nothing closes itself.
+**6. Go back and ask.** When a price could not be read, or a mandatory question
+was left blank, the buyer chases it without re-sending the whole enquiry. The
+system works out exactly what each supplier still owes and drafts the message
+asking for only that, with a deadline. It keeps two situations apart that look
+identical on screen: **they never sent it**, and **they sent something we cannot
+use**. Those are different conversations with different suppliers. Eight reasons
+to go back are tracked, and the buyer closes each one with a reason. Nothing
+closes itself.
 
 **7. Then stop clicking and start asking.** Plain English, over the whole
 comparison. Text, tables and charts, and four exports.
 
 ---
 
+## What it does
+
+**Drafting.** Write an enquiry by describing it, in any category. Ambiguous
+lines are held before they go out, with a one-click fix or an override you have
+to justify in writing. Four documents generated per enquiry.
+
+**Sending and receiving.** Three channels, each with real consequences. Invite
+any subset of a 10-supplier roster. Replies read from Excel, PDF, Word, email,
+photographs, and seven more formats. Upload a quotation from a company that
+appears nowhere in the dataset and it gets its own column. Send a revision and
+it replaces the original, and reports what moved.
+
+**The comparison.** Every price shows the original quote, the rule applied to
+it, the final comparable figure, and the sentence it was read from. Five
+different marks for five different kinds of blank. A summary bar that is checked
+to add up. Questionnaire answers and certificates beside the numbers. The whole
+grid is one keyboard stop, so you arrow around it instead of tabbing 150 times.
+
+**Chasing.** A per-supplier list of what is still owed, split into what never
+arrived and what arrived unusable, with a drafted message asking for only the
+missing items and a deadline attached.
+
+**Asking.** Plain-English questions across the whole comparison. Answers come
+back as text, tables and charts, listing the exact cells they used, which you
+can click through to the source. Four award scenarios. An assumption list, each
+entry with its source and the alternative I rejected. And it refuses, with a
+reason, rather than answering anything it cannot source.
+
+**Exports.** An award note that leads with what the total rests on and why it is
+not the cheapest. An Excel file with the reasoning inside the cell comments. A
+CSV. And a full JSON audit trail.
+
+---
+
 ## The ugly edges
 
-The brief names four. Here is what the system does with each, and what the buyer
-sees.
+The brief names four. Here is what happens on each one, and what the buyer sees.
 
-| The edge | What it does | What the buyer sees |
-|---|---|---|
-| **The angled photo** | Vector's rate card is a phone photograph. The eight highest-value numbers on it get a second, independent read of just that crop, on a different model that is not shown the first answer | The number, the crop it came from, and the result of the second read. If the two disagree, confidence is forced down and the cell moves to "needs your call" |
-| **The supplier who quoted 27 of 30 lines** | Four of the five did this: they priced 24, 24, 21 and 5 of 30. Nothing is interpolated, estimated or filled in | The missing cells are marked, counted and excluded from every total. Only Zenith priced all 30, so the answer says the others cannot be compared on an overall total and gives the per-line split instead |
-| **The one who quoted in USD** | Cygnus priced nine lines in USD. Converted at 88.4, the supplier's own stated rate from page 1 of their quote | The rupee figure, the rate, where the rate came from, and a warning that the quote is ex-works Singapore so it is not a delivered cost and is not comparable with a FOR-destination price |
-| **"Per box" is someone else's "per 100 pieces"** | Line 13 asks for a 32GB matched kit of 2x16GB. Vector quoted ₹9,600 per DIMM. The kit is two DIMMs, so the comparable figure is ₹19,200 | ₹9,600 is the cheapest number on that row and the wrong one. The cell shows ₹19,200, the doubling, and the sentence it was read from |
+**The angled photo.** Vector sent a photograph of a printed rate card. The eight
+biggest numbers on it are read a second time, independently, from a cropped
+close-up, on a different model that is never shown the first answer. **When the
+two reads disagree, the price is taken out of every total and put in front of a
+person**, carrying both readings. Five of Vector's prices are in that state
+right now, and the disagreements are not subtle: 84,000 against 99,500, and
+61,800 against 268.
 
-All four edges meet on line 13:
+**The supplier who priced 27 of 30 lines.** Four of our five did exactly this:
+they usably priced 24, 24, 16 and 2 of the 30. Nothing is guessed or filled in.
+The missing prices are marked and counted, and the system says plainly that a
+supplier who priced 2 of 30 cannot be compared on an overall total, then gives
+the per-line comparison instead.
 
-| Supplier | What they wrote | Comparable figure |
+**The one who quoted in USD.** Cygnus priced nine lines in dollars. The system
+converts at 88.4, which is Cygnus's own stated rate from page 1 of their own
+quote, and shows the rupee figure, the rate, and where the rate came from. It
+also flags that the quote is ex-works Singapore, so it excludes freight and duty
+and is not comparable with a delivered price.
+
+**"Per box" versus "per piece".** Line 13 asks for a 32GB memory kit made of two
+16GB sticks. Vector quoted ₹9,600 per stick. The kit is two sticks, so the real
+comparable price is ₹19,200. On screen, ₹9,600 is the cheapest number on that
+row and completely wrong, and this is the error nobody catches by reading,
+because ₹9,600 is a perfectly believable price for memory.
+
+**All four meet on line 13:**
+
+| Supplier | What they wrote | What it actually costs |
 |---|---|---|
 | Zenith | ₹18,900 per kit | ₹18,900 |
-| Cygnus | USD 198 per kit | ₹17,503, flagged ex-works |
-| Orbit | ₹19,200 "per kit" | ₹19,200, unit synonym, number unchanged |
-| Vector | ₹9,600 per DIMM, off the photograph | ₹19,200, doubled |
-| Helios | "rest we'll match Zenith" | Not a price. Excluded |
+| Cygnus | USD 198 per kit | ₹17,503, but ex-works, so freight is on you |
+| Orbit | ₹19,200 "per kit" | ₹19,200, same unit written differently, number untouched |
+| Vector | ₹9,600 per stick, read off a photograph | ₹19,200, doubled |
+| Helios | "rest we'll match Zenith" | Not a price. Left out |
 
-**Where there is no rule, it refuses.** Five cells could not be converted
-safely, and the trace on each says *"refused rather than guessed at a factor"*.
-They are excluded from every total and put in front of a human. A wrong number
-that looks right is worse than a gap that is labelled.
+**Suppliers invent their own lines, and those are kept too.** Cygnus priced
+their laptops without the warranty we asked for, and put the warranty on a line
+of their own invention: *"Warranty uplift years 1-3, onsite NBD, laptop lines
+1-3"*, ₹7,900 each. It matches no line in our enquiry, so it is held separately
+with its page reference, and the three laptop prices it affects are marked as
+not comparable rather than compared as if they included the cover. Dropping that
+line would have made Cygnus look cheaper than they are.
 
-**The confidence score is not the safeguard, and I can prove it.** I read the
-same rate card as five photographs of falling quality. The fourth came back 52%
-accurate, at 0.90 confidence on every wrong digit. So the second read is not
-triggered by low confidence, which would never have fired on that image. It is
-triggered by **money**: the eight largest numbers on any photograph get checked
-independently, whatever the model claims about them, and a disagreement
-overrides the confidence rather than the other way round. What remains open is
-that a cell below that threshold can still be read, plausible and wrong, and
-nothing on the screen would know. That is the top open risk in this build.
+**And when there is no rule, it refuses.** Eleven prices are sitting with a
+person right now, for four different reasons. Two are conversions with no rule:
+Orbit quoted "per box of ten" and "per box of fifty", nothing maps those to the
+unit we asked for, so the system says *"refused rather than guessed at a
+factor"*. Three are Cygnus prices that exclude a warranty they quoted on a line
+of their own. Five are the contested photograph reads above. One is a price that
+exists on the page and could not be read. None is guessed, and none is counted.
+
+**Why I stopped trusting the confidence score.** I read the same rate card as
+five photographs of falling quality. The fourth came back 52% accurate, and
+reported 90% confidence on every digit it got wrong. A safety check that only
+looks at low-confidence numbers would have sailed straight past it.
+
+So the second read is not triggered by confidence. **It is triggered by money.**
+The eight largest numbers on any photograph get checked independently, however
+confident the first read claims to be, and if the two disagree, the disagreement
+wins and the price leaves the total.
+
+A smaller number, below the largest eight, could still be read wrong and look
+right, and nothing on the screen would know. That is the biggest risk left in
+this build, and I would rather write it down than let you find it.
 
 ---
 
 ## What earns the trust
 
-A buyer with ₹4 crore on the line needs to know what the total does and does not
-rest on before they act on it.
+A buyer with ₹4 crore on the line needs to know what the total rests on before
+they act on it. Four things do that work.
 
-**Every cell is in exactly one of five buckets, and they are checked to add up.**
-101 + 6 + 3 + 40 + 0 = 150, asserted on every run.
+**Every price is in exactly one of five states, and they are checked to add up.**
+96 + 11 + 3 + 40 + 0 = 150, verified on every run.
 
-| Bucket | Cells | What it means |
+| State | Count | What it means |
 |---|---|---|
-| Usable | 101 | In the total. 14 of them off-spec but counted |
-| No price | 40 | Declined, never mentioned, or not a rankable price |
-| Needs a human | 6 | 5 refused conversions, and 1 price that exists and could not be read |
-| Derived, awaiting supplier | 3 | Taken from a prior order, not counted until confirmed |
-| Not read | 0 | Ours to fix, not theirs |
+| In the total | 96 | Counted. 14 carry a caveat and are flagged: 9 are Cygnus's ex-works USD prices, 5 are substitutions, a below-spec offer or a spec note |
+| No price given | 40 | They declined, never mentioned it, or wrote something that is not a price |
+| Needs a person | 11 | 5 contested photograph reads, 3 missing a warranty adjustment, 2 conversions with no rule, 1 price that could not be read |
+| Waiting on the supplier | 3 | Taken from a previous order, not counted until they confirm |
+| Not read yet | 0 | Our problem, not theirs |
 
-That reconciles with the reply table above: 104 cells carry a number (101 usable
-plus 3 awaiting confirmation), and 46 do not (40 with no price, 6 needing a
-person).
+99 prices carry a number and 51 do not. Of those 99, three are still waiting on
+a supplier to confirm, so 96 go into the total and 54 stay out of it.
 
-**Three qualification states, not two.** Passed, failed, and **not assessed**.
-Vector sent a questionnaire and a certificate, both were read, and they failed
-all six mandatory questions. Cygnus and Helios never sent a questionnaire, so
-they are carried as **not assessed**: not passed, not failed, and the system
-says so every time it names them. Dropping a real bid because nobody chased a
-document is the expensive mistake; claiming a failure you have no evidence for
-is the dangerous one.
+**Nobody is accused of failing something nobody checked.** Vector sent a
+questionnaire and a certificate, both were read, and they failed all six
+mandatory questions. Orbit failed three. Cygnus and Helios never sent a
+questionnaire at all, so they are carried as **not assessed**. Not passed, not failed, and the system
+says so every time it names them.
 
-**The attachment governs.** A supplier answers *"yes, we are ISO 27001
-certified"* and attaches a certificate for the withdrawn 2013 revision. The
-certificate gets its own read, and where the answer and the document disagree,
-the document wins. A model asked "did they pass?" says yes, because they said
-yes, so comparing a date to today is left to code.
+**The certificate beats the claim.** A supplier says *"yes, we are ISO 27001
+certified"* and attaches a certificate for the 2013 version of the standard,
+which was withdrawn. Ask a model "did they pass?" and it says yes, because they
+said yes. So the certificate is read as its own document, and comparing its date
+to today is left to code, which cannot be talked into a different answer.
 
-**Eight assumptions, each with its source, each changeable.** The FX rate of
-88.4, sourced to Cygnus's own quote page 1, with the RBI reference rate as the
-stated alternative. Comparison at the asked quantity. Cygnus's warranty basis.
-Cygnus's footnote discount and Vector's handwritten early-payment discount, both
-excluded. Zenith's 2.5%, applied at total level only. Ex-GST throughout. Freight
-and duty excluded. The buyer changes any of them and the total moves.
+**Every assumption is visible, sourced, and changeable.** Eight of them: the USD
+rate of 88.4 and whose quote it came from, comparison at the quantity we asked
+for, Cygnus's warranty basis, two discounts excluded and one applied at total
+level, ex-GST throughout, freight and duty excluded. Each one names the
+alternative I rejected, so a buyer who disagrees can see exactly what is at
+stake. Editing them from the screen is the next step and is not built yet.
 
-**Nothing is added up in prose.** Ten tools compute: overview, query lines, run
-an award scenario, compare scenarios, check the questionnaire, list excluded
-cells, list conditional offers, list assumptions, get provenance, make a chart.
-No calculator tool you can hand two numbers to, and no SQL. Every figure in an
-answer came from one of those ten, and the answer lists the cells it used.
+**No number in any answer was worked out in prose.** Ten tools do the
+calculating. There is no general calculator the model can hand two numbers to,
+and no database access. Every figure in an answer came from one of those ten
+tools, and the answer lists the exact cells behind it.
 
 ---
 
 ## The award it produces
 
-Cheapest per line among suppliers who can actually be awarded:
+Cheapest per line, among suppliers who can actually be awarded:
 
 | Supplier | Lines | Value |
 |---|---|---|
@@ -192,36 +309,37 @@ Cheapest per line among suppliers who can actually be awarded:
 | Helios Enterprise Solutions | 1 | ₹73.4 lakh |
 | **Total** | **30** | **₹4.05 cr** |
 
-Against ₹3.88 cr if you take the cheapest from anyone, so **doing it properly
-costs ₹16.7 lakh, 4.3%.** The cheaper number was never available: it sat inside
-Vector, who cannot be awarded at any price.
+Take the cheapest from anyone and it is ₹3.91 cr. **So doing this properly costs
+₹13.6 lakh, or 3.5%.** That cheaper number was never really available: it sat
+inside Vector, who cannot be awarded at any price.
 
-**And two correct numbers can still mislead.** The strict award, which drops
-substitutions and below-spec offers, looks ₹45.3 lakh cheaper and is ₹5.0 lakh
-*dearer* on the lines they share, because it covers 28 lines instead of 30. Both
-numbers are right, which is why a careful person misses it. So whenever two
-scenarios cover different lines, the system says so and restates both on the
-common basis before showing either total.
+**And two correct numbers can still mislead you.** The strict award, which drops
+every price carrying a caveat, including Cygnus's nine ex-works USD lines, looks
+₹45.3 lakh cheaper. On the lines they
+both cover, it is ₹5.0 lakh more expensive. The difference is coverage: 28 lines
+against 30. Both totals are right, which is precisely why a careful person picks
+the wrong one. So whenever two scenarios cover different lines, the system says
+so and restates both on the common lines, before it shows either headline.
 
 ---
 
 ## The analyst conversation
 
-These are the questions I chose, and why each one is on the list.
+These are the questions I chose, and why each one earns its place.
 
-| The question | Why it is worth asking |
+| The question | Why it matters |
 |---|---|
-| Is Vector's ISO 27001 certificate actually valid? | The answer and its own evidence disagree. Tests whether the attachment was really opened |
-| Split it cheapest per line, but only among suppliers who cleared the quality questionnaire | The VP's question from the brief, verbatim. The one that cost the fourth day |
-| What did that change against taking the cheapest from anyone? | Makes the system price its own compliance, and lead with coverage before money |
-| Which numbers are you least sure about, biggest rupee impact first? | Asks the system to rank its own uncertainty by money |
-| What would we save by dropping the ISO 27001 requirement? | A question with an uncomfortable answer, to see whether it computes it anyway |
+| Is Vector's ISO 27001 certificate actually valid? | Their answer and their own evidence disagree. Proves the certificate was really opened |
+| Split it cheapest per line, but only among suppliers who cleared the quality questionnaire | The VP's question from the brief, word for word. The one that cost the fourth day |
+| What did that change against taking the cheapest from anyone? | Makes the system put a price on its own compliance |
+| Which numbers are you least sure about, biggest rupee impact first? | Asks it to rank its own uncertainty by money, not by count |
+| What would we save by dropping the ISO 27001 requirement? | An uncomfortable question, to see whether it answers anyway |
 | Chart the split award by supplier | Thirty lines, coloured by winner, in one picture |
-| Draft the award recommendation and say what it rests on | The defensible award decision the brief ends on |
-| Which of these suppliers has the best reputation in the market? | It must refuse. This is the most persuasive moment in the demo |
+| Draft the award recommendation and say what it rests on | The defensible decision the brief ends on |
+| Which of these suppliers has the best reputation in the market? | It has to refuse. This is the most persuasive moment in the demo |
 
-The answer to the VP's question is the award table above, and it arrives with
-this attached to it, unprompted:
+The answer to the VP's question is the award table above, and this arrives
+attached to it without being asked:
 
 > **Important Qualification Note:** While Zenith was assessed and passed the
 > questionnaire, **Cygnus and Helios were NOT ASSESSED**. Nobody has read their
@@ -244,97 +362,69 @@ That paragraph is the product. Two more, shortened:
 
 ## The one rule: nothing is hardcoded
 
-The brief says *don't fake the extraction, don't fake the reasoning, don't
-hardcode the answers to your demo questions.* Only the delivery hop is stubbed.
-Nothing is emailed and no mailbox is polled. The four enquiry documents are
-really generated, and everything that arrives is really read. Extraction is
-cached on the model, the prompt and the file, so change one byte of a supplier's
-document and it reads it again.
+The brief is strict about this. *Don't fake the extraction, don't fake the
+reasoning, don't hardcode the answers to your demo questions.*
 
-There are no branches on question text, no stored pass or fail verdict, and no
-arithmetic rule keyed to a supplier or a line number.
+**Only the delivery is faked.** No email is sent and no mailbox is polled. The
+four enquiry documents are genuinely written, and every document that arrives is
+genuinely read. Reading is cached against the file itself, so change one byte of
+a supplier's quote and it reads it again.
 
-**Two violations of this were found and fixed, and finding them is the point.**
-The analyst's questionnaire tool used to serve a pass/fail boolean and a
-hand-typed finding out of a catalog file, so the suggested demo question *"is
+**There are no shortcuts anywhere.** No branches on the wording of a question.
+No stored pass or fail verdict. No calculation rule keyed to a supplier name or
+a line number.
+
+**Two breaches of this were found and fixed, and finding them is the point.**
+The analyst's questionnaire tool used to read a pass/fail flag and a hand-typed
+sentence out of a data file, which meant the suggested demo question *"is
 Vector's ISO 27001 certificate actually valid?"* was answered by handing the
-model my own conclusion. And that finding did not survive a real read either:
-the revision year lives inside the attached PDF, which nothing ever opened, so
-reading the form alone made Vector look like it passed the ISO question. Both
-are derived now, and three regression tests pin them, including one asserting
-that the form alone must not produce the finding.
+model my own conclusion. And that conclusion could not even survive a real read:
+the version year sits inside the attached PDF, which nothing had ever opened, so
+reading the form alone made Vector look like it passed. Both are worked out from
+the evidence now, with three tests pinning them.
 
 **Six model calls, and nothing else in the product talks to a model.**
 
-| # | The call | What it is asked | What it may not do |
+| # | The call | What it is asked | What it is not allowed to do |
 |---|---|---|---|
 | 1 | Draft the enquiry | Turn a sentence into scope, lines, questionnaire and terms | Invent a price. There is no price field |
-| 2 | Read a quotation | What does this document say, line by line, in the supplier's own unit and currency | Convert, multiply, discount, add or rank |
-| 3 | Re-read a crop | Read the number in this crop, on a cheaper model | See the first read's answer |
+| 2 | Read a quotation | What does this document say, line by line, in the supplier's own units | Convert, multiply, discount, add or rank |
+| 3 | Re-read a crop | Read the number in this close-up, on a cheaper model | See the first read's answer |
 | 4 | Read a questionnaire | What did they answer, and what did they attach | Decide whether it passes |
-| 5 | Read an attached document | What does this certificate actually say | Be told what the answer claimed |
-| 6 | The analyst | Answer the buyer's question using these ten tools | Do arithmetic. Every number comes from a tool |
+| 5 | Read an attached certificate | What does this document actually say | Be told what the supplier claimed |
+| 6 | The analyst | Answer the buyer using these ten tools | Do arithmetic. Every number comes from a tool |
 
-**The AI reads. The code counts.** Every arithmetic step happens in ordinary
-code, and I wrote that calculator twice, in Python and in TypeScript, so the
-total cannot drift between two runs. A test proves the two agree on all 150
-cells.
-
----
-
-## Features
-
-**Drafting** · talk an enquiry into existence, in any category · underspecified
-lines held before send · override with a reason that reaches the award note ·
-four documents generated per enquiry
-
-**Sending and receiving** · three channels with real per-channel consequences ·
-invite any subset of a 10-supplier roster · replies in xlsx, pdf, docx, eml,
-photographs, odt, ods, csv, tsv, rtf, txt · upload a quotation from a company
-that appears nowhere in the dataset and it gets its own column · a revision
-supersedes an earlier quote and reports what moved
-
-**The comparison** · per-cell provenance: raw quote, rule applied, landed
-figure, the sentence it came from · five distinct marks for five kinds of
-missing · trust bar checked to sum to the total · questionnaire answers and
-attached documents alongside · the whole grid is one keyboard tab stop, not 150
-
-**Chasing** · per-supplier list of what is owed · gap versus dispute · drafted
-message asking for only the missing items, with a deadline · closed by the
-buyer with a reason
-
-**Asking** · plain-English questions · text, tables, bar charts · answers cite
-the cells they used, clickable to source · four award scenarios · a changeable
-assumption ledger · refuses, with a reason, rather than answering from outside
-the data
-
-**Exports** · award note: the total, why not the cheapest, what it rests on, the
-assumptions, the money deliberately not counted, who was asked for what and
-whether they replied · xlsx with the provenance in cell comments · CSV · JSON
-audit bundle
+**The model reads. The code counts.** Every calculation happens in ordinary
+code, and I wrote that calculator twice, in two languages, so the total cannot
+drift between runs. A test proves the two agree on all 150 prices.
 
 ---
 
 ## How I know the reading is right
 
-The readers are scored against a held-out answer key the running app never
-touches. Across five formats and 107 of 107 lines: **100% on price, 100% on
-unit, nothing invented.** Then the same rate card as five photographs of falling
-quality, where the fourth scored 52%. That number is in this document because it
-is the honest limit of the claim.
+Most demos ask you to take the extraction on faith. This one is measured.
 
-Nine further suites run offline with no API key: the two independent calculators
-agreed cell-for-cell across 442 assertions, 47 reader cases cover every format
-and all 11 photographs (Vector's rate card, five quality variants of it, and
-five more in a 31-file stress set that includes 4 deliberately broken files), 16
-questionnaire cases cover expired and superseded certificates, and 67 regression
-tests hold one case for every bug that actually shipped.
+The readers are scored against an answer key the running product never touches.
+Across five formats and 107 of 107 lines: **100% on price, 100% on unit, and
+nothing invented.** Then the same rate card as five photographs of falling
+quality, where the worst scored 52%. That number is in this document because it
+is the honest edge of the claim, and because finding it is what changed the
+design.
+
+Nine more checks run offline, with no API key and no network. The two
+independent calculators were compared cell by cell across 442 assertions. The
+readers run against every format and all 11 photographs. Sixteen cases cover how a questionnaire
+verdict is reached, including expired and superseded certificates. And 67 tests hold one case for every bug
+that has ever shipped in this build, each with a sentence saying what it broke.
 
 ---
 
 ## Stack
 
-Next.js App Router, React, Tailwind, shadcn/ui, hosted on Vercel. Postgres,
-embedded locally with no setup and Neon in production. Model-agnostic by design,
-Anthropic or Gemini behind one interface, so a suspect read can be retested on a
-different model.
+Next.js, React and Tailwind, hosted on Vercel. Postgres, embedded locally so it
+runs with no setup and managed in production. Deliberately model-agnostic:
+Claude or Gemini behind a single interface, so a suspect read can be retested on
+a different model rather than argued about. The comparison you are looking at
+was read by Gemini 3.1 Pro, with a cheaper, faster model doing the independent
+second read of photograph crops, because the value of that check is that it is
+independent, not that it is clever.

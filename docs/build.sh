@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 USABLE_PRODUCT=17.2   # A4 minus 1.9cm margins each side
-USABLE_NOTE=17.8      # A4 minus 1.6cm margins each side, so the note fits one page
+USABLE_NOTE=18.3      # A4 minus 1.35cm margins each side, so the note fits one page
 
 build () {
   local src="$1" out="$2" ref="$3" usable="$4"

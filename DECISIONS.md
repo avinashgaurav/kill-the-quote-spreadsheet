@@ -2,107 +2,151 @@
 
 **Kill the Quote Spreadsheet** · https://kill-the-quote-spreadsheet.vercel.app
 
-**I picked IT hardware.** Of the four categories offered, it has the most unit
-traps per line: kits, boxes of 10, boxes of 50, per-piece, per-DIMM. A unit trap
-is the edge that survives review, because the wrong number still looks right.
+**I picked IT hardware** because it has the most unit traps of the four
+categories offered: kits, boxes of 10, boxes of 50, per-piece, per-DIMM. A unit
+trap is the dangerous kind of error, because the wrong number still looks like a
+sensible price. Nobody catches it by reading the screen.
 
 ## Five decisions
 
-**1. The AI reads. The code counts.** The model reports what a document says, in
-the supplier's own unit and currency. It never multiplies, converts, discounts
-or adds. I wrote the calculator twice, in Python and in TypeScript, so the total
-cannot drift, and a test proves the two agree on all 150 cells. No number can be
-stored without saying where it came from; that is a database constraint, not a
-habit.
+**1. The model reads. The code does the maths.**
+The model only reports what a document says, in the supplier's own words and
+currency. Every calculation happens in ordinary code.
+*Why:* you cannot prove a model will add up the same way twice. You can prove
+code does. So I wrote the calculator twice, in two languages, and a test checks
+they agree on all 150 cells.
+*The pro:* the total cannot quietly drift between two runs, and every number on
+the screen can point at the sentence it came from.
 
-**2. The attachment governs, and there are three states.** A supplier says "yes,
-we are ISO 27001 certified" and attaches a certificate for the withdrawn 2013
-revision. A model asked "did they pass?" says yes, because they said yes. So the
-certificate gets its own read, and comparing its expiry to today is left to
-code. Passed, failed, and **not assessed**: without the third, a screen can
-claim a failure it has no evidence for.
+**2. Three answers to "did they qualify", not two.**
+Passed, failed, and **nobody has checked yet**.
+*Why:* a supplier whose questionnaire nobody has opened is not a supplier who
+failed. Merging those two is how a real bid gets dropped by mistake.
+*The pro:* the screen can never accuse a supplier of failing something it has no
+evidence for, and the buyer can see exactly which suppliers still need checking.
 
-**3. Five kinds of nothing, not one dash.** Declined, never mentioned, cannot
-read it, not a price, needs your call. My first build drew all five identically,
-turning five different next actions into one shrug. Five conversations with five
-suppliers, so five marks.
+**3. Five kinds of blank, not one dash.**
+A missing cell is one of five things: the supplier declined, never mentioned it,
+we could not read it, they wrote something that is not a price, or it needs the
+buyer's judgement. Each gets its own mark.
+*Why:* my first build drew all five the same way, which turned five different
+next actions into one shrug.
+*The pro:* the buyer knows what to do about each blank. Chase this supplier,
+ignore that one, look at this one yourself. A single dash tells you nothing.
 
-**4. Two correct numbers can still mislead.** The strict award looks ₹45.3 lakh
-cheaper than the eligible-suppliers award and is ₹5.0 lakh *dearer* on the lines
-they share, because it covers 28 lines instead of 30. Both are right, which is
-why a careful person misses it. So when two scenarios cover different lines, the
-system says so and restates both on the common basis first.
+**4. When two totals are not comparable, say so before showing them.**
+The strict award looks ₹45.3 lakh cheaper than the eligible-suppliers award. On
+the 28 lines they both cover, it is actually ₹5.0 lakh **more expensive**. The
+gap is coverage: one covers 28 lines, the other 30.
+*Why:* both numbers are correct, which is exactly why a careful person picks the
+wrong one. No amount of care catches this; only the system can.
+*The pro:* whenever two scenarios cover different lines, the buyer is told, and
+both totals are restated on the lines they share, before either headline appears.
 
-**5. The gate is overridable on purpose.** The enquiry is held if a line says
-"box" without saying how many are inside. Overridable with a typed reason rather
-than a hard block, because an unclickable button gets worked around by editing
-the draft until the check stops firing, and that leaves no record at all. The
-reason prints in the award note, so the buyer who overrode it answers to the
-CFO, not to me.
+**5. The quality gate can be overridden, on purpose.**
+The enquiry is held if a line says "box" without saying how many are inside. The
+buyer can send it anyway by typing a reason.
+*Why:* a hard block does not stop anyone. It just gets worked around by editing
+the enquiry until the warning disappears, and that leaves no record at all.
+*The pro:* the buyer stays in control, and the reason they typed prints in the
+award note. So the override is on the record, and they explain it to their CFO
+rather than to me.
 
-## What I got wrong
+## Three things I got wrong
 
 **The analyst was answering one of my own demo questions from a lookup table.**
-Its questionnaire tool served a pass/fail boolean and a hand-typed finding out
-of a catalog file, so *"is Vector's ISO 27001 certificate actually valid?"* was
-answered by handing the model my own conclusion. The one thing the brief forbids
-by name. Derived now.
+*What was wrong:* the tool that checked the questionnaire read a pass/fail flag
+and a hand-typed sentence out of a data file. So *"is Vector's ISO 27001
+certificate actually valid?"* was answered by handing the model my own
+conclusion, which is the one thing the brief forbids by name.
+*How I fixed it:* the verdict is now worked out from the supplier's actual
+answer and the certificate attached to it, every time it is asked.
 
-**The award recommendation did not add up.** Found while writing the other
-document. The tool gave the model thirty line amounts and no subtotal, so asked
-to draft the award it summed them in prose: ₹1.48 cr and ₹2.49 cr against true
-figures of ₹1.85 cr and ₹1.46 cr, three parts totalling ₹4.70 cr against the
-₹4.05 cr it had quoted correctly two sentences earlier. On the one sentence a
-buyer defends to a CFO. "The model must not do arithmetic" is only an
-instruction until the tool stops requiring it, so the tool now returns the split
-and the model quotes it.
+**The award recommendation did not add up.**
+*What was wrong:* the tool gave the model thirty line-by-line amounts and no
+totals per supplier, so when asked to draft the award it added them up itself
+and got them wrong: ₹1.48 cr and ₹2.49 cr against real figures of ₹1.85 cr and
+₹1.46 cr. Its three parts came to ₹4.70 cr against the ₹4.05 cr it had quoted
+correctly two sentences earlier. On the one sentence a buyer shows a CFO.
+*How I fixed it:* "the model must not do maths" is only a wish until the tool
+stops making it necessary. The tool now returns each supplier's total, worked
+out by the same code that worked out the headline, and the model quotes it.
 
-**Confidence was the wrong trigger.** I read one rate card as five photographs
-of falling quality. The fourth came back 52% accurate, at 0.90 confidence on
-every wrong digit, so a low-confidence check would never have fired. The second
-read is triggered by money now: the eight largest numbers on any photograph get
-checked independently whatever the model claims. A cell below that threshold can still be
-read, plausible and wrong, and that is the top open risk in the build. My
-harness had missed all of it by testing only the easiest and hardest images.
+**The safety net on photographs caught nothing.** This is the one I would lead
+with, because it is the brief's own question: what does it show the buyer when
+it isn't sure?
 
-## What I deliberately left out
+*What was wrong, in two layers.* I read one rate card as five photographs of
+falling quality. The fourth came back 52% accurate while reporting 0.90
+confidence on every wrong digit, so any check that fires on low confidence would
+never have fired. I switched the trigger to money: the eight largest numbers on
+any photograph get read a second time, independently, on a different model. Five
+of Vector's prices then disagreed badly. 84,000 against 99,500. 61,800 against
+268. And **all five stayed in the total and won their line in the award.** The
+disagreement was recorded, shown on screen, and changed nothing, because it only
+lowered a confidence score and the calculator has never read confidence. The
+cache made it worse: it rebuilt every price from the model's raw answer on each
+reload, so even the confidence downgrade was thrown away. The first read of a
+document was safe and every read after it was not, which is the worst shape a
+bug can have, because it disappears the moment you go looking with a fresh file.
 
-- **Real email transport.** Stubbed, as permitted. The documents are genuinely
-  generated; only delivery is faked. The channel choice is not faked: invite a
-  supplier on WhatsApp and their certificate genuinely does not arrive.
-- **Letting the buyer correct a cell.** They can change any assumption and
-  chase a supplier for a better answer. They cannot type over a number the
-  reader got wrong. That is the right next feature, and it needs an audit trail
-  rather than a text box.
-- **Per-enquiry tenancy.** Supplier codes are globally unique. Fine for one
-  buyer, wrong for a real tenant model.
-- **Full independence from the shipped example.** You can draft your own
-  enquiry and it works, but it still borrows the example's buyer and assumption
-  ledger, and one analyst tool reads line descriptions from the catalogue.
-- **Scale.** 30 lines and 5 replies is what is tested, not 300 and 30.
-- **A rupee figure on each ambiguity hold.** The gate says what a supplier could
-  do with an ambiguous line. What it would cost is the better number.
+*How I fixed it.* A contested price is now excluded outright and put in front of
+a person, carrying both readings. The comparison moved the day I fixed it:
+cheapest-from-anyone went from ₹3.88 cr to ₹3.91 cr, which is the honest number.
+What is still open is that a smaller price, outside the largest eight, could be
+read wrong and look right. That is the top risk left in the build. I found all
+of this by fact-checking my own documentation, which claimed the price was
+pulled from the total. The claim was right about what should happen and wrong
+about what did.
 
-## The interesting problem was somewhere else
+## What I left out, and why
 
-Every ugly edge traces back to **a line that was ambiguous when it left the
-building.** "32GB DDR5 RDIMM" without "as a matched kit of 2x16GB" comes back
-three different ways from three suppliers, however good the extraction gets. So
-I built the gate that holds an enquiry until the line says how many are in the
-box.
+- **Real email sending.** Stubbed, as the brief permits, because the plumbing
+  proves nothing and the reading proves everything. The channel choice is not
+  faked: invite a supplier on WhatsApp and their certificate really does not
+  arrive, because that is what the medium does.
+- **Letting the buyer correct the system.** They can chase a supplier for a
+  better answer, and every assumption is shown with its source and the
+  alternative I rejected. But they cannot overwrite a price, and they cannot
+  edit an assumption from the screen. Both are the right next features and both
+  need an audit trail: an editable grid with no record of who changed what
+  quietly destroys the one thing this product sells, which is that every number
+  can say where it came from.
+- **Multi-tenancy.** Supplier codes are unique across the whole system rather
+  than per enquiry. Correct for one buyer, wrong for a real customer base. Not
+  worth building before there is a second buyer.
+- **Cutting the last ties to the shipped example.** You can draft your own
+  enquiry and it works end to end, but it still borrows the example's buyer
+  details and assumption list. Visible only to someone who drafts a second
+  enquiry, so it lost to work the interviewer will actually see.
+- **Scale.** Tested at 30 lines and 5 replies, not 300 and 30. The brief asked
+  for the size where it hurts, and that size is about judgement, not volume.
+- **Pricing each ambiguity warning.** The gate tells the buyer what a supplier
+  could do with a vague line. What that vagueness would cost in rupees is the
+  better warning, and I ran out of time before building it.
 
-Then a better problem appeared, and I think it is the real one. **The reading
-was never the bottleneck. The incomplete response is.** Helios sent five lines
-of email: 2 of 30 lines priced, no questionnaire, no terms. The 28 lines they
-left alone are worth **₹2.89 crore** at the cheapest bid on each. No amount of
-model quality fixes that. It is ₹2.89 crore behind a request nobody sent.
+## The problem I think matters more
 
-So the system works out what each supplier still owes, asks for only that with a
-deadline, and keeps "they never sent it" apart from "they sent something we
-cannot use". The point is not the chasing. It is that **"their questionnaire is
-missing" and "we asked on the 10th, gave them until the 16th, and nothing came
-back" are different facts**, and only the second lets a buyer award around a
-supplier and defend it to a CFO.
+**The obvious problem.** Almost every mess in this data starts with a vague line
+in the enquiry. Ask for "32GB DDR5 RDIMM" without saying "as a matched kit of
+two 16GB sticks" and three suppliers price three different things. Better AI
+never fixes that, because all three of them answered the question you actually
+asked. So I built the gate that holds the enquiry until the line is clear.
 
-Get good at reading documents and stay bad at closing the loop, and buyers end
-up with beautiful comparisons of incomplete data. Another week goes there.
+**The better problem.** Building that, I noticed something bigger. Reading
+documents was never the bottleneck. **Incomplete replies are.**
+
+Helios sent a five-line email. Two of thirty lines priced, no questionnaire, no
+terms. The 28 lines they ignored are worth **₹2.92 crore**. No model, however
+good, can read a price that was never written. That is ₹2.92 crore of the deal
+sitting behind a follow-up nobody sent.
+
+So the system works out exactly what each supplier still owes, asks for only
+that with a deadline, and records the ask. And it keeps two things apart that
+look identical on a screen: *"we never got it"* and *"we asked on the 10th, gave
+them until the 16th, and nothing came back"*. Only the second one lets a buyer
+award the business to somebody else and defend that decision afterwards.
+
+Get very good at reading documents and stay bad at closing the loop, and all you
+have built is a beautiful comparison of incomplete information. That is where I
+would spend the next week.
