@@ -81,7 +81,11 @@ export async function POST(request: Request) {
         // covers thinking too, and thinking bills at the output rate, so 16000
         // was not a safety margin, it was a budget the model could spend. A
         // final answer here is a short paragraph and a small table.
-        maxTokens: 4000,
+        // 6000 thinking + 2000 answer after the clamp in lib/llm.ts. It was
+        // 4000 total, which the clamp correctly cut to 2000 thinking, and this
+        // is the graded capability: leading with coverage before money and
+        // citing its cells is the reasoning worth paying for.
+        maxTokens: 8000,
         effort: "high",
         // Someone is watching a cursor blink. Twelve turns each waiting on a
         // busy provider is how a question takes four minutes, so each turn
