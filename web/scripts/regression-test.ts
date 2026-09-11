@@ -1103,6 +1103,44 @@ async function main() {
     );
   }
 
+  // ---- 44. A computed chart was thrown away ------------------------------
+  //
+  // "chart the split by supplier": the model called run_award_scenario, called
+  // make_chart with a real thirty-bar series, decided the picture was the
+  // reply, and ended its turn with no text. The route saw no tool calls and no
+  // text, returned 502 "The model returned nothing at all", and discarded a
+  // chart that had already been computed from the extracted cells.
+  //
+  // Non-deterministic: the same question answers in full most of the time. It
+  // failed in a live demo.
+  //
+  // Fixed at both ends. The prompt and the make_chart tool result now say a
+  // chart is never the whole answer, which is what stops it happening; and if
+  // the model does it anyway, the chart is shown with an honest line saying no
+  // summary was written. What the route must never do is write the missing
+  // summary itself, because prose from the route is indistinguishable from
+  // prose from the model and the panel's whole claim is that its sentences are
+  // accountable to its tools.
+  {
+    const routeSrc = readFileSync(
+      resolve(process.cwd(), "app/api/analyst/route.ts"), "utf8",
+    );
+    const analystSrc = readFileSync(
+      resolve(process.cwd(), "lib/analyst.ts"), "utf8",
+    );
+    check(
+      "44. A chart the tools computed was discarded as 'nothing at all'",
+      "a silent model loses its summary, not its chart",
+      /!truncated && ctx\.charts\.length/.test(routeSrc)
+        && /did not write a\s*\n?\s*"?\s*\+?\s*"?summary/.test(routeSrc)
+        && /A CHART IS NEVER THE WHOLE ANSWER/.test(analystSrc)
+        && /not the answer on its/.test(analystSrc),
+      "a correct thirty-bar chart, already paid for and computed from the " +
+      "cells, was replaced by an error because the model wrote no sentence " +
+      "after it",
+    );
+  }
+
   // ---- 42. An answer opened a cell over itself ---------------------------
   //
   // The worst bug in the product, found by the person using it rather than by

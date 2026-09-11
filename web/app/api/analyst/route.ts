@@ -123,6 +123,31 @@ export async function POST(request: Request) {
          */
         const truncated = /max_tokens|MAX_TOKENS|length/i.test(String(response.stopReason));
         if (truncated || !response.text.trim()) {
+          /**
+           * A chart already drawn is not nothing.
+           *
+           * Asked to chart something, the model would sometimes call
+           * make_chart, treat the picture as the reply and end its turn with
+           * no text. That is a real failure of the answer, but the chart
+           * itself was computed by run_award_scenario from the extracted
+           * cells and is exactly as true as it would have been with a
+           * paragraph above it. Discarding it returned "the model returned
+           * nothing at all" over a correct, already-paid-for computation, and
+           * the buyer saw an error where a chart should have been.
+           *
+           * So: say plainly that no summary was written, and show the chart.
+           * What is NOT done here is invent the missing sentence. A summary
+           * assembled by this route would read exactly like one the model
+           * wrote, and the whole claim of the panel is that its prose is
+           * accountable to its tools.
+           */
+          if (!truncated && ctx.charts.length) {
+            answer =
+              "The chart below was computed, but the model did not write a " +
+              "summary to go with it. The figures in it come from the tools " +
+              "listed, not from prose. Ask again for the summary in words.";
+            break;
+          }
           return Response.json({
             ok: false,
             error: truncated
