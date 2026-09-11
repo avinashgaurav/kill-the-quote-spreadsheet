@@ -339,7 +339,9 @@ export function normaliseCell(
 
   let price = raw.price;
   let unit = raw.uom ?? line.uom;
-  const ccy = raw.ccy ?? "INR";
+  // Normalised before it is compared. A model emitting "usd" or "$" instead of
+  // "USD" is not a failure of the read, and must not become a wrong number.
+  const ccy = String(raw.ccy ?? "INR").trim().toUpperCase();
 
   trace.push({
     rule: "raw value",
@@ -416,17 +418,52 @@ export function normaliseCell(
     );
   }
 
-  // 3. Currency
-  if (ccy === "USD") {
-    const fx = fxRate();
+  /**
+   * 3. Currency.
+   *
+   * THE REFUSAL MATTERS MORE THAN THE CONVERSION. This was
+   * `if (ccy === "USD") { convert }` with no else, so every other currency
+   * fell straight through and was treated as rupees. A supplier quoting
+   * EUR 1,200 for a laptop landed as Rs 1,200, won the line outright, and the
+   * audit trail said "landed :: Rs 1,200 per nos" as though a conversion had
+   * happened. Case variants did the same: "usd" and "$" passed through at 1:1
+   * where "USD" multiplied by 88.4.
+   *
+   * The unit step four lines up has always refused an unknown unit rather than
+   * guessing (see the `needs_review` return there). Currency had the same
+   * problem and none of the same defence, on the axis where being wrong is
+   * eighty-eight times worse. Every test in scripts/ used INR or USD, so
+   * nothing caught it.
+   *
+   * The ledger holds exactly one rate, and it is sourced to a supplier's own
+   * quotation. An unknown currency is not a number we can produce, so it is
+   * one we decline to produce.
+   */
+  if (ccy !== "INR") {
+    const rates: Record<string, number> = { USD: fxRate() };
+    const fx = rates[ccy];
+
+    if (fx === undefined) {
+      flags.push(
+        `quoted in ${ccy} and no rate for it is on the assumption ledger`,
+        `cannot be compared with rupee bids until somebody supplies a dated ` +
+        `rate, and guessing one would be inventing the price`,
+      );
+      trace.push({
+        rule: `unknown currency ${ccy}`,
+        basis: "the assumption ledger holds a rate for USD only",
+        result: "refused rather than treated as rupees",
+      });
+      return out("needs_review");
+    }
+
     price = Math.round(price * fx);
-    flags.push(`converted from USD at ${fx} (vendor's own stated reference rate)`);
+    flags.push(`converted from ${ccy} at ${fx} (vendor's own stated reference rate)`);
     trace.push({
       rule: `FX x${fx}`,
       basis: String(ASSUMPTIONS.fx_usd_inr.source),
       result: `INR ${price.toLocaleString("en-IN")}`,
     });
-
   }
 
   // 4. Scope: put a partial offer onto the same footing as a complete one.

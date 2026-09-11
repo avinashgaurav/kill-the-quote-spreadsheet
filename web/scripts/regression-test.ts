@@ -1127,6 +1127,45 @@ async function main() {
     );
   }
 
+  // ---- 40. Any currency but USD was silently treated as rupees ---------
+  //
+  // `if (ccy === "USD") { convert }` with no else. Every other currency fell
+  // through and became rupees, and the audit trail said "landed :: Rs 1,200
+  // per nos" as though a conversion had happened. A supplier quoting EUR 1,200
+  // for a laptop would have won the line outright at a 1:1 rate.
+  //
+  // Case variants did it too: "usd" and "$" passed through where "USD"
+  // multiplied by 88.4. The unit step directly above has always refused an
+  // unknown unit rather than guessing; currency had the same problem and none
+  // of the same defence, on the axis where being wrong is 88 times worse.
+  // Every test in scripts/ used INR or USD, so nothing caught it.
+  {
+    const { buildMatrix } = await import("../lib/normalise");
+    const cell = (ccy: string, price: number) => {
+      const m = buildMatrix({
+        V1: { "1": { status: "quoted", price, uom: "nos", ccy } },
+      } as never);
+      return m.V1?.[1];
+    };
+    const usdUpper = cell("USD", 6180);
+    const usdLower = cell("usd", 6180);
+    const eur = cell("EUR", 1200);
+    const dollar = cell("$", 6180);
+
+    check(
+      "40. Any currency but the exact string USD became rupees",
+      "an unknown currency refuses; a case variant of a known one converts",
+      usdUpper?.unitInr === 546312
+        && usdLower?.unitInr === usdUpper?.unitInr
+        && eur?.status === "needs_review" && eur?.unitInr === null
+        && dollar?.status === "needs_review",
+      `USD ${usdUpper?.unitInr}, usd ${usdLower?.unitInr} (same, so case is ` +
+      `normalised), EUR ${eur?.status}, "$" ${dollar?.status}. The ledger holds ` +
+      `one rate and it is sourced to a supplier's own quotation, so an unknown ` +
+      `currency is a number we decline to produce rather than one we guess`,
+    );
+  }
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`

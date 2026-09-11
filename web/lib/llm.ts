@@ -407,8 +407,27 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
        * is a budget here and a level on Anthropic.
        */
       thinkingConfig: {
+        /**
+         * NEVER ZERO. The Pro model refuses it outright:
+         *
+         *   Gemini 400: "Budget 0 is invalid. This model only works in
+         *   thinking mode."
+         *
+         * "low" meant 0 when this was written, which was fine on Flash and
+         * broke Pro for every caller that asked for low effort. Caught by
+         * api-check the moment credit was restored, which is exactly what that
+         * script exists for: it was the first call made on a working key and
+         * it failed on the main tier while the cheap tier answered.
+         *
+         * Had the crop re-read ever been pointed at the main model, eight
+         * calls per photograph would have failed mid-demo with a 400 that
+         * reads like a bug in the request rather than a budget.
+         *
+         * 128 is the floor rather than a guess at what it needs: low effort
+         * means "do not deliberate", not "cannot think at all".
+         */
         thinkingBudget:
-          req.effort === "low" ? 0
+          req.effort === "low" ? 128
           : req.effort === "medium" ? 2048
           : 8192,
         // Thought summaries are not needed and would be billed.
