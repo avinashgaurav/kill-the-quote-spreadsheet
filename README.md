@@ -22,8 +22,8 @@ attached documents, and a roster of ten suppliers of whom five reply.
 
 ## The brief, clause by clause
 
-Checked against the code rather than asserted. Every YES below has a file behind
-it, and two rows are PARTIAL on purpose.
+Checked against the code rather than asserted. Every row names the file behind
+it.
 
 | The brief asks for | Where it lives |
 |---|---|
@@ -36,7 +36,7 @@ it, and two rows are PARTIAL on purpose.
 | "the buyer stops clicking and **starts asking**. Natural language, over the whole comparison" | `lib/analyst.ts`. Ten tools that compute, no `evaluate`, no SQL, no arithmetic in prose. Tools are bound to the **loaded** enquiry, so a supplier you uploaded is visible to every one of them. |
 | "**Text answers, tables, charts, exports**" | Text and markdown tables. Bar charts, coloured by group, so "who wins each of thirty lines" is one chart. Four exports: award note, xlsx with provenance in cell comments, CSV, and a JSON audit bundle. |
 | "**Real analysis on real extracted data**, all the way to a defensible award decision" | The award note leads with what the total rests on, why not the cheapest, the assumptions in force, the money deliberately not counted, and who was asked for what and whether they replied. |
-| "five vendors, thirty line items, a questionnaire, attached documents" | 30 lines, 10 suppliers of whom 5 reply, 10 questions of which 6 are mandatory, certificates and OEM letters. **Loaded as deployed:** all 150 cells are read in on the live site, so the comparison is there when you open it. Drafting and sending a fresh enquiry also works, and costs real model calls. |
+| "five vendors, thirty line items, a questionnaire, attached documents" | 30 lines, 10 suppliers of whom 5 reply, 10 questions of which 6 are mandatory, certificates and OEM letters. |
 | "Fabricate a dataset a procurement person would nod at" | HSN codes per line, GSTIN and CIN, pack sizes that trap ("kit of 2", "box of 10", "box of 50"), MOQ, ex-works Singapore, a discount buried in footnote 3 on page 3, a prior-PO rate card, and a Rev 2 that supersedes a Rev 1. |
 | **One rule:** "the AI loops must be real ... don't hardcode the answers to your demo questions" | Six model call sites, no lookup tables, and **two violations of this found and fixed** rather than avoided. See below. |
 

@@ -11,14 +11,14 @@ right.
 
 **1. The AI reads. The code counts.** The model reports what the document says,
 in the supplier's own unit and currency. It never multiplies, converts,
-discounts or adds. Two independent calculators, one in Python and one in
-TypeScript, are proven to agree on all 150 cells. The cost of this: my code
-returns `unresolvable` where a model would have guessed.
+discounts or adds. Two independent calculators, one Python and one TypeScript,
+are proven to agree on all 150 cells. The cost: my code returns `unresolvable`
+where a model would have guessed.
 
 **2. Absence has to be earned.** If a document plainly has prices and the read
-returns none, the code raises an error instead of returning an empty column. A
-weaker model silently returned nothing and reported no problem, and an empty
-column reads as "this supplier didn't quote".
+returns none, the code raises an error rather than an empty column. A weaker
+model silently returned nothing and reported no problem, and an empty column
+reads as "this supplier didn't quote".
 
 **3. Provenance is a NOT NULL column, not a convention.** A number that cannot
 say where it came from physically cannot be stored.
@@ -34,9 +34,9 @@ five different next actions into one shrug.
 
 **6. Two correct numbers can still mislead.** The strict award looks ₹45.3 lakh
 cheaper than the eligible-suppliers award and is ₹5.0 lakh dearer on the lines
-they share, because it covers 28 lines instead of 30. Both numbers are right,
-which is why a careful person misses it. So whenever two scenarios cover
-different lines, the system says so and restates both on the common basis.
+they share, because it covers 28 lines instead of 30. Both are right, which is
+why a careful person misses it. So whenever two scenarios cover different lines,
+the system says so and restates both on the common basis.
 
 ## What I deliberately left out
 
@@ -47,11 +47,13 @@ faked: pick WhatsApp and a certificate genuinely does not arrive.
 **Per-enquiry tenancy.** Supplier codes are globally unique. Fine for one buyer,
 wrong for a real tenant model.
 
-**Full independence from the shipped example.** Lines, suppliers, questionnaire
+**Full independence from the shipped enquiry.** Lines, suppliers, questionnaire
 and verdicts are all per-enquiry, but a drafted enquiry still borrows the
 example's buyer and assumption ledger, and `get_provenance` reads line
-descriptions from the shipped catalog. Any category runs; not every corner of it
-is clean yet.
+descriptions from the shipped catalog.
+
+**Scale.** 30 lines and 5 replies is what is tested. Nothing has been run at 300
+lines or 30 suppliers.
 
 **A rupee figure on each ambiguity hold.** The gate says what a supplier could
 do with an ambiguous line, in words. What it would cost is the harder and more
@@ -67,12 +69,11 @@ real work, not a one-line flag.
 lines, the reader scored 100% on price, 100% on unit, and invented nothing. Then
 I read the same rate card as five photographs of falling quality, and the fourth
 came back **52% accurate, at 0.90 confidence on every wrong digit**. 59900 for
-57900. 5600 for 9600. This is the failure the whole design is meant to prevent,
-and it is the honest answer to "what does the screen show when it isn't sure":
-on that photograph, it showed certainty. My harness had missed it by testing
-only the easiest and hardest images, so a 48-point drop in the middle never
-showed up. It scores every row now. Both figures come from `npm run accuracy`,
-which is in the repo and needs an API key.
+57900. 5600 for 9600. This is the failure the design exists to prevent, and it
+is the honest answer to "what does the screen show when it isn't sure": on that
+photograph, it showed certainty. My harness had missed it by testing only the
+easiest and hardest images, so a 48-point drop in the middle never showed up. It
+scores every row now. Both figures come from `npm run accuracy`, in the repo.
 
 ## The problem is one step upstream
 
