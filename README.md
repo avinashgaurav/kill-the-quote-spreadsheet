@@ -14,10 +14,10 @@ attached documents, and a roster of ten suppliers of whom five reply.
 
 | | |
 |---|---|
-| **[WHAT-I-BUILT.md](WHAT-I-BUILT.md)** | The flow and every feature, in plain English. Start here. |
-| **[THE-NOTE.md](THE-NOTE.md)** | One page: what I decided, what I left out, and the better problem. |
+| **[WHAT-I-BUILT.md](WHAT-I-BUILT.md)** | The product: the workflow end to end, every feature, and what each ugly edge does. Start here. |
+| **[DECISIONS.md](DECISIONS.md)** | The one-page note: what I decided, what I left out, and the better problem. |
 | **[AI-MAP.md](AI-MAP.md)** | Every model call, what it is asked, and what it may not do. Six of them. |
-| [DECISIONS-v2.md](DECISIONS-v2.md) | Every decision with its cost, the alternative I rejected, and what I got wrong. |
+| [DECISION-LOG.md](DECISION-LOG.md) | The long version: every decision with its cost, the alternative I rejected, and what I got wrong. |
 | [RFX-SETS.md](RFX-SETS.md) | The same four parts in three categories, to show the model is not IT-specific. |
 
 ## The brief, clause by clause
