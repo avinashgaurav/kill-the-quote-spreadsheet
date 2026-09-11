@@ -886,6 +886,21 @@ export async function loadComparison(
       ref_sku: ref?.refSku ?? undefined,
       uplift_pct: ref?.upliftPct ?? undefined,
       rival: ref?.rival ?? undefined,
+      /**
+       * A disagreement between the two independent reads of a photographed
+       * number. Stored on the cell at extraction time, and handed to the
+       * calculator here, because the calculator is the only place that can
+       * keep the number out of a total.
+       */
+      contested: (() => {
+        const v = row.verification as Array<{
+          agreed?: boolean; firstRead?: number | null; secondRead?: number | null;
+        }> | null;
+        const bad = (v ?? []).find((x) => x.agreed === false);
+        return bad
+          ? { first: bad.firstRead ?? null, second: bad.secondRead ?? null }
+          : undefined;
+      })(),
     };
     const k = `${vendor}:${lineNo}`;
     provenance[k] = row.provenance as unknown as CellProvenance;

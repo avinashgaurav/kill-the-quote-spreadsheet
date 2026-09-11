@@ -189,9 +189,28 @@ export async function extractDocument(opts: {
   const hit = await cache.get(key);
   if (hit) {
     const { issues, rows } = validateExtraction(hit.extraction, validLineNos);
+    /**
+     * RE-APPLY THE CROP CHECK. A cache hit used to undo it.
+     *
+     * The cache stores the model's raw tool output, and rows are rebuilt from
+     * it on every hit. The crop re-read's confidence downgrade is not in that
+     * output, it is applied afterwards, so rebuilding the rows silently threw
+     * it away while the evidence of the disagreement stayed visible in `meta`.
+     * The first read of a document was safe and every read after it was not,
+     * which is the worst possible shape for a bug like this: it disappears
+     * exactly when you go looking for it with a fresh file.
+     */
+    const verified = rows.map((r) => {
+      const bad = (hit.meta.verification ?? []).find(
+        (v) => v.rfxLineNo === r.rfxLineNo && !v.agreed,
+      );
+      return bad
+        ? { ...r, confidence: Math.min(r.confidence, bad.secondRead === null ? 0.6 : 0.35) }
+        : r;
+    });
     return {
       extraction: hit.extraction,
-      rows,
+      rows: verified,
       meta: { ...hit.meta, cached: true, ms: Date.now() - started, validationIssues: issues },
     };
   }

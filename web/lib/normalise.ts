@@ -88,6 +88,15 @@ export interface RawQuote {
   desc?: string;
   qty?: number;
   /**
+   * Two independent reads of the same printed number disagreed.
+   *
+   * Set for photographed documents, where the largest figures are read a
+   * second time from a cropped close-up on a different model. A disagreement
+   * is the single strongest signal we have that a number is wrong, and it is
+   * the only one that does not depend on the model's opinion of itself.
+   */
+  contested?: { first: number | null; second: number | null };
+  /**
    * This price excludes something the enquiry asked for, and the supplier
    * quoted that something separately under THIS label in their own response.
    *
@@ -267,6 +276,40 @@ export function normaliseCell(
   }
 
   // --- paths that yield no comparable number, resolved first ---------------
+
+  /**
+   * TWO READS DISAGREED, SO NOBODY GETS TO USE THIS NUMBER.
+   *
+   * The largest figures on a photographed document are read twice, the second
+   * time from a cropped close-up on a different model that is never shown the
+   * first answer. When those two disagree, one of them is wrong and there is
+   * no way to tell which from the pixels alone.
+   *
+   * This used to lower a confidence score and nothing else, which meant the
+   * calculator never saw it: `confidence` is not an input to this function and
+   * never was. So five Vector cells whose two reads disagreed by as much as
+   * 61,800 against 268 sat in the comparison marked comparable, at 0.95
+   * confidence, and every one of them WON its line in the cheapest-per-line
+   * award. The disagreement was recorded, displayed, and had no consequence.
+   *
+   * A contested number is exactly the case this product exists to catch, so it
+   * is treated like any other number we cannot stand behind: out of every
+   * total, and in front of a person.
+   */
+  if (raw.contested) {
+    const { first, second } = raw.contested;
+    flags.push(
+      `two independent reads of this figure disagreed: ${first ?? "unreadable"} ` +
+      `against ${second ?? "unreadable"}. One of them is wrong and the document ` +
+      `cannot say which, so it is not counted`,
+    );
+    trace.push({
+      rule: "contested read",
+      basis: "the second read saw only a crop of this number, on a different model",
+      result: "excluded from every total and raised for a person",
+    });
+    return out("needs_review");
+  }
 
   if (raw.status === "omitted") {
     flags.push("silently missing: no price, no decline, no mention");

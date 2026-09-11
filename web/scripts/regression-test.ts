@@ -26,7 +26,7 @@ import {
 } from "../lib/store";
 import {
   buildMatrix, trustSummary, likeForLike, cheapestPerLine, singleVendor,
-  LINES, VENDORS, QUALIFICATION,
+  normaliseCell, LINES, VENDORS, QUALIFICATION,
 } from "../lib/normalise";
 import { buildComparisonPayload } from "../lib/store";
 import { awardNote } from "../lib/documents";
@@ -1204,6 +1204,61 @@ async function main() {
       "the tool handed over thirty per-line amounts and no subtotal, so the " +
       "one number a CFO would check first was produced by a language model " +
       "doing mental arithmetic over thirty rows",
+    );
+  }
+
+  // ---- 47. A contested number was counted anyway --------------------------
+  //
+  // The answer to "what does it do when it isn't sure" was, on the live site,
+  // "it shows you and counts it anyway".
+  //
+  // The largest figures on a photograph are read twice, the second time from a
+  // crop on a different model that never sees the first answer. Five of
+  // Vector's cells disagreed, by as much as 61,800 against 268. All five were
+  // status `comparable`, at 0.95 confidence, in the total, and every one of
+  // them WON its line in the cheapest-per-line award.
+  //
+  // Two independent faults, and the second hid the first:
+  //
+  //  1. A disagreement only lowered `confidence`, and `confidence` is not an
+  //     input to normaliseCell and never was. Nothing downstream could act on
+  //     it. The prompt told the model "confidence below 0.8 routes the value to
+  //     a person", which was not true of any code.
+  //  2. The extraction cache stores the model's raw tool output and rebuilds
+  //     rows from it on every hit, so even the confidence downgrade was thrown
+  //     away on the second read of any document. The first read of a file was
+  //     safe and every read after it was not, which is the worst shape for a
+  //     bug: it disappears when you go looking for it with a fresh file.
+  //
+  // A contested number is now `needs_review`: out of every total, in front of
+  // a person, carrying both readings.
+  {
+    const norm = readFileSync(resolve(process.cwd(), "lib/normalise.ts"), "utf8");
+    const storeSrc = readFileSync(resolve(process.cwd(), "lib/store.ts"), "utf8");
+    const runSrc = readFileSync(resolve(process.cwd(), "lib/extract/run.ts"), "utf8");
+
+    const line = LINES[0];
+    const contested = normaliseCell("V4", line.no, {
+      status: "quoted", price: 84000, uom: line.uom,
+      contested: { first: 84000, second: 99500 },
+    } as never);
+    const clean = normaliseCell("V4", line.no, {
+      status: "quoted", price: 84000, uom: line.uom,
+    } as never);
+
+    check(
+      "47. A number two reads disagreed on was still counted",
+      "a contested read is excluded and raised, not merely marked low-confidence",
+      contested.status === "needs_review"
+        && contested.unitInr === null
+        && clean.status === "comparable"
+        && /raw\.contested/.test(norm)
+        && /contested: \(\(\) =>/.test(storeSrc)
+        && /RE-APPLY THE CROP CHECK/.test(runSrc),
+      `contested -> ${contested.status} (was comparable and in the total); ` +
+      `an uncontested read of the same number still -> ${clean.status}. ` +
+      `The cache hit re-applies the check, so the second read of a document is ` +
+      `no longer safer than the first`,
     );
   }
 
