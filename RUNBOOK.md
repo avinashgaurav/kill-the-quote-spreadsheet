@@ -1,434 +1,299 @@
-# The runbook
+# Runbook
 
-*Every keystroke and every click, in order, with what appears after each one.
-Every number and label below was read from the live payload, not remembered.*
+**Every number and cell below was read from a live model run on 11 Sep, not
+remembered.** If something on your screen disagrees with this file, tell me.
 
-Read this one, not WALKTHROUGH.md, when you are actually doing it. WALKTHROUGH.md
-explains *why* each question is on the list; this one tells you what to press.
-
-**Live:** https://kill-the-quote-spreadsheet.vercel.app
+Live: https://kill-the-quote-spreadsheet.vercel.app · Local: http://localhost:3000
 
 ---
 
-# PART A · Before you touch anything (5 minutes, no recording)
+# 1 · Before you record
 
-### A1. Is the credit actually live?
+Three commands. Do them in order.
 
 ```bash
 cd /Users/raramuri/Desktop/Personal/AC/web
 npm run api-check
 ```
-
-**What you want to see:**
-```
-provider gemini
-cheap gemini-flash-latest        WORKS   in=12 out=3  said "OK"
-main  gemini-3.1-pro-preview     WORKS   in=12 out=4  said "OK"
-Both tiers reachable.
-```
-
-**If it still says `OUT OF CREDIT`**, the top-up has not reached the project the
-key belongs to. Nothing else will work. Costs two tokens and takes 1.4 seconds,
-so run it again rather than guessing.
-
-### A2. Are the offline suites green?
+Want: `Both tiers reachable.` Two tokens, 1.4 seconds.
 
 ```bash
 npm run verify
 ```
-
-Forty seconds, no API. You want `59/59` at the end and no red. If anything is
-red, stop and tell me before spending anything.
-
-### A3. Load the demo for real
+Want: `62/62` and nothing red. Forty seconds, free.
 
 ```bash
-npm run demo:load -- --live
+npm run demo:load
+```
+Want: `8 document(s) read, 0 failed` and `Demo loaded.`
+**~$0.67 the first time, free every time after** (cached on the file's hash).
+
+**The one line to watch for**, because the best 90 seconds of the demo depends
+on it:
+
+```
+opened VDS_ISO27001.pdf   it states ISO/IEC 27001:2013, expires 2025-11-30
 ```
 
-**~$0.67.** This reads all eight documents through real model calls against the
-deployed site. Watch for these lines, in this order:
+That is the system opening the certificate itself. If it is not there, stop and
+tell me.
 
-```
-V1 Zenith Infotech Solutions Pvt Ltd
-  Zenith_Quotation_...xlsx        xlsx, 30 of 30 lines priced, 14.2s
-  Zenith_Questionnaire_...xlsx    10 answers
-V2 Cygnus Technologies India Pvt Ltd
-  Cygnus_Quotation_...pdf         pdf, 27 of 30 lines priced, 22.1s
-V3 Orbit Systems & Services
-  Orbit_Offer_...docx             docx, 26 of 30 lines priced
-  Orbit_Questionnaire_...docx     10 answers
-V4 Vector Digital Systems
-  IMG_2026...jpg                  photo, 21 of 30 lines priced
-  Vector_Questionnaire_...pdf     10 answers + 1 attached doc(s) opened
-    opened VDS_ISO27001.pdf       it states ISO/IEC 27001:2013, expires 2025-11-30
-V5 Helios Enterprise Solutions Pvt Ltd
-  helios_reply_...eml             eml, 2 of 30 lines priced
-```
-
-**The line that matters most** is `opened VDS_ISO27001.pdf — it states ISO/IEC
-27001:2013, expires 2025-11-30`. That is the system reading the certificate
-itself rather than trusting the form. If you do not see it, the money moment in
-Part D will not land and you should tell me.
-
-At the end:
-```
-the comparison now rests on 106 of 150 cells, 0 not read
-  V1  Zenith ...    qualified
-  V2  Cygnus ...    qualified
-  V3  Orbit  ...    fails 3 mandatory
-  V4  Vector ...    fails 6 mandatory
-  V5  Helios ...    fails 6 mandatory
-Demo loaded.
-```
-
-**If any read fails**, it says which and why in a sentence. Nothing partial is
-stored, so a failure leaves a gap rather than a half-filled column. Re-run it;
-successful reads are cached and cost nothing the second time.
+Then open http://localhost:3000. **It lands on Compare**, with the grid full.
 
 ---
 
-# PART B · Your UI test (free, take as long as you like)
+# 2 · Your UI test — free, click everything
 
-Open https://kill-the-quote-spreadsheet.vercel.app and land on **Compare**.
+Nothing here costs money except typing in the Ask box (~$0.19 a question).
 
-**Everything in this section costs nothing.** Reads are cached, the grid is
-local. Only typing into the Ask box costs money (~$0.19 a question).
-
-Work through this list and tell me anything that looks wrong:
-
-| # | Do this | You should see |
+| # | Click / do | You should see |
 |---|---|---|
-| 1 | Read the four numbers across the top | ₹4.27 cr estimate · ₹3.88 cr "cheapest, ignoring the questionnaire" · ₹4.07 cr "what you would commit" · **+₹18.6 L cost of compliance, 4.8% more** |
-| 2 | Click **Explain** next to the cost of compliance | Why the cheaper number was never available |
-| 3 | Read the trust bar | "Award computed on 106 of 150 cells", "44 cells left out", and chips for what is blocked on whom |
-| 4 | Click **2 cells need your call** | The review queue, ordered by rupees at risk, not by count |
-| 5 | Click **17 off-spec but counted** | The cells that are in the total but where the supplier offered something different |
-| 6 | Click **8 assumptions behind these totals** | The FX rate, the tax basis, the freight assumption. Every total depends on these and you can see them |
-| 7 | Click **where the model is used** | Six model calls, and beside each one what it may **not** do |
-| 8 | Click **Vector, line 22 (PC-CAT6A)** | ₹13,400 with the original **₹268** struck through beneath it. They quoted per piece; you asked per box of 50. **Fifty times out, and the number still looked reasonable** |
-| 9 | Click **Vector, line 6 (MON-27)** | A `?`. "A price is there and we cannot read it." Then the actual cropped pixels from their photograph |
-| 10 | In that same panel, click **Ask them to confirm this figure** | It writes: *"the figure is present on the document you sent but we cannot read it with confidence. Please confirm it in writing, or send a clearer copy."* Not "you did not provide pricing" |
-| 11 | Click **Cygnus, line 24 (UPS-10K)** | `NQ`. They declined. That is an answer, and there is no chase button, because asking again would be asking them to change their mind |
-| 12 | Look down the **Helios** column | 25 cells marked `~`. Their whole reply was five lines of email ending "rest we'll match Zenith" |
-| 13 | Click **Helios, line 5 (MON-24)** | ₹10,100, marked as **derived from a prior PO**, and kept out of every total until they confirm it |
-| 14 | Click the **Vector** column header | NOT ASSESSED becomes "fails Q1, Q2, Q4, Q5, Q6, Q7", each with the sentence that produced it |
-| 15 | In that panel, find **VDS_ISO27001.pdf** and click it | The certificate opens. Beneath the link: *"the document itself states ISO/IEC 27001:2013, valid to 2025-11-30"* |
-| 16 | Click **All 30 lines / 22 to check / 39 with no price / 15 converted** | The grid filters. "15 converted" is every cell the calculator moved |
-| 17 | Click **Hide originals** | The struck-through raw values disappear and come back |
-| 18 | Press **Tab** until focus reaches the grid, then use **arrow keys** | One tab stop for the whole grid; arrows move cell to cell, Home/End for the row, Ctrl+End for the last cell. **Enter** opens the panel |
-| 19 | Click **Award note** | A printable recommendation. Read the section on what was asked for and whether they replied |
-| 20 | Click **Comparison (csv)** and open it | Every rate with a status column. A blank rate beside a status is **not** a zero |
-| 21 | Click **Audit bundle (json)** | Every cell, source and calculation step |
-| 22 | Go to **Responses**, drag in any random file from your machine | It refuses rather than guessing, and asks whose it is |
-| 23 | Go to **Draft** | The four example openers, and a box you can type anything into |
+| 1 | Look at the top | **₹4.27 cr** estimate · **₹3.88 cr** "cheapest, ignoring the questionnaire" · **₹4.07 cr** "what you would commit" · **+₹18.6 L, 4.8% more** |
+| 2 | **Explain** | Why the cheaper number was never available |
+| 3 | Trust bar | "Award computed on **97 of 150** cells" |
+| 4 | **2 cells need your call** | Review queue, ordered by rupees at risk |
+| 5 | **8 assumptions behind these totals** | The FX rate, the tax basis. Every total rests on these |
+| 6 | **where the model is used** | Six model calls, and what each may **not** do |
+| 7 | **Vector, line 22 (PC-CAT6A)** | **₹13,400** with **₹268** struck through. They wrote per PC; you asked per box of 50 |
+| 8 | **Vector, line 13 (RAM-32K)** | ₹19,200 from ₹9,600 per DIMM. A kit is two DIMMs |
+| 9 | **Cygnus, line 12 (SRV-2U)** | USD 6,180 → ₹5,46,312, **and** an ex-works warning: duty and freight fall on you |
+| 10 | **Orbit, line 30 (WTY-EXT)** | A **?**. "A price is there and we cannot read it" |
+| 11 | Same panel → **Ask them to confirm this figure** | *"the figure is present on the document you sent but we cannot read it with confidence"* |
+| 12 | **Cygnus, line 24 (UPS-10K)** | **NQ**. They declined. No chase button, because that is an answer |
+| 13 | **Cygnus, line 1 (LT-BUS-14)** | Refused: they priced 1-year warranty and put 3-year on "line 30A", which does not map. It will not compare on an unequal basis |
+| 14 | Scroll to **Helios** | **25** cells marked `~`. Five lines of email ending "rest we'll match Zenith" |
+| 15 | **Helios, line 5 (MON-24)** | ₹10,100 **derived from a prior PO**, kept out of every total until they confirm |
+| 16 | **Vector** column header | fails **Q1, Q2, Q4, Q5, Q6, Q7**, each with the sentence that produced it |
+| 17 | Same panel → **VDS_ISO27001.pdf** | The certificate opens. Below it: *"the document itself states ISO/IEC 27001:2013, valid to 2025-11-30"* |
+| 18 | **Zenith** column header | Note the documents it **cites but we do not hold** — an honest different state |
+| 19 | The four filters | All 30 lines / to check / no price / converted |
+| 20 | **Tab** to the grid, then **arrow keys** | One tab stop; arrows move, **Enter** opens |
+| 21 | **Award note** | Read the chase section |
+| 22 | **Comparison (csv)** | Every rate with a status column |
+| 23 | **Responses** → drag any random file in | Refused, and it asks whose it is |
 
 ---
 
-# PART C · Set up to record
-
-Install **Recordly** from https://github.com/webadderallorg/Recordly/releases
-(macOS 14+). Record the **window**, not the full screen. Turn its auto-zoom on:
-the interesting things here are small.
-
-Then reset to a clean start so the story begins from nothing:
+# 3 · Reset before recording
 
 ```bash
 curl -s -X POST 'http://localhost:3000/api/dev/fixture?clear=all'
+npm run demo:load
 ```
 
-Use **localhost** for the recording, not the live URL. It is faster and the
-database is yours to reset between takes.
-
-Have this file open on a second screen.
+Record the **window**, not the screen. Recordly's auto-zoom on.
 
 ---
 
-# PART D · The recording (9 minutes)
+# 4 · The recording — 9 minutes
 
-Everything below is literal. **Bold** is what you type or click. *Italic* is what
-to say.
+**Bold = type or click.** *Italic = say.*
 
----
+## Part 1 · Draft · 90s
 
-## Take 1 · Draft (90 seconds)
-
-**Click:** `Draft`
-
-**Type this, exactly** (deliberately not one of the four examples, so nobody
-wonders whether they are special):
+**Click `Draft`.** Type:
 
 > **I need to refresh IT hardware for 14 retail sites in Tamil Nadu. Laptops for the store managers, a small server per region, network switches. Delivered in phases from March.**
 
-**Press:** `Send`
+**Click `Send`** — the button, not the Enter key.
 
-*Say while it thinks:* "It is asking about what it cannot guess and assuming
-defaults for what it can, and telling me which it assumed. It has no view on
-what things cost, so it will not invent a price."
+*While it thinks:* "It asks about what it cannot guess and assumes defaults for
+what it can, and tells me which it assumed. It has no view on what things cost,
+so it will not invent a price."
 
-**Wait for the four parts to appear on the right.** Scope, line items,
-questionnaire, terms.
+**Find the amber hold** about a unit with no count inside it.
 
-**Then find the held line.** Look for the amber warning about a unit. It will
-say something like *"line N says 'box' without saying how many are inside"*.
+*Say:* "This is the whole product in one screen. One supplier prices the box,
+the next prices a single piece, and the second bid looks five times cheaper
+while being dearer. **Both of them answered the question I actually asked.**"
 
-*Say this:* "This is the whole product in one screen. One supplier prices the
-box, the next prices a single piece, and the second bid looks five times cheaper
-while being dearer. **Both of them answered the question I actually asked.**
-Nothing downstream can fix that, so it gets fixed here."
-
-**Now click the override, and type a reason:**
+**Click the override. Type:**
 
 > **Going out today, chasing the March window. Will confirm pack size with bidders directly.**
 
-*Say this:* "And this is the more interesting half. An unclickable button gets
-worked around by editing the draft until the check stops firing, and that leaves
-no record at all. That reason stays on the enquiry and turns up in the award
-note."
+*Say:* "And this is the more interesting half. An unclickable button gets worked
+around by editing the draft until the check stops firing, and that leaves no
+record at all. That reason stays on the enquiry and turns up in the award note."
 
----
+## Part 2 · Send · 60s
 
-## Take 2 · Send (60 seconds)
+**Click `Responses`.** **Deselect one supplier who would reply; select one who
+would not** (Trilok, Meghdoot, Arunoday, Kadamba or Sahyadri).
 
-**Click:** `Responses`
-
-**On the roster of ten: deselect one supplier that would reply, and select one
-that would not** (`Trilok`, `Meghdoot`, `Arunoday`, `Kadamba` or `Sahyadri`).
-
-*Say:* "Ten on the panel. I am picking deliberately badly, because every
-interesting state in this product is one where somebody did not reply."
-
-**Click:** `Whatsapp`
+**Click `Whatsapp`.**
 
 *Say:* "WhatsApp cannot carry an attachment. So the pack goes out as a link, the
 supplier who gets a link on their phone is the one who replies with a
-photograph, and **on the way back their certificate does not arrive either.**
-Watch what that costs me in two minutes."
+photograph, and **on the way back their certificate does not arrive either.**"
 
-**Click:** `Send to N suppliers`
-
-**Point at the supplier you invited who has nothing on file.** It says *"no
+**Click `Send to N suppliers`.** Point at the one who sent nothing: *"no
 response. Invited, sent nothing."*
 
-*Say:* "That is not a gap in my dataset. You invite ten and five answer, and
-that state is what the chase step exists for."
-
-*Say, once, precisely:* "**Exactly one thing here is faked: the delivery.**
+*Say once, precisely:* "**Exactly one thing here is faked: the delivery.**
 Nothing was emailed and no mailbox was polled. Everything that arrived was then
-read for real, through the same path as a file I drag in. A button that makes
-prepared answers appear is a scripted demo. A button that makes real documents
-arrive, which are then genuinely read, is a stubbed transport. The screen says
-which one it is doing."
+read for real. A button that makes prepared answers appear is a scripted demo. A
+button that makes real documents arrive, which are then genuinely read, is a
+stubbed transport."
 
----
+## Part 3 · The grid · 2 min
 
-## Take 3 · The grid (2 minutes)
+**Click `Compare`.** Three cells. Do not narrate the rest.
 
-**Click:** `Compare`
+**1. Vector, line 22 (PC-CAT6A).** ₹13,400, with ₹268 struck through.
 
-*Do not narrate the grid.* Click exactly three cells.
+*Say:* "They wrote two hundred and sixty-eight rupees. Per piece. I asked per box
+of fifty. **The number is fifty times out and it still looks completely
+reasonable.**"
 
-**Click: Vector, line 22, `PC-CAT6A`**
+**2. Orbit, line 30 (WTY-EXT).** A `?`.
 
-You will see **₹13,400** with **₹268** struck through beneath it.
+*Say:* "A price is on that document and the reader could not read it." **Click
+`Ask them to confirm this figure`** and read it out: *"the figure is present on
+the document you sent but we cannot read it with confidence."*
 
-*Say:* "They quoted two hundred and sixty-eight rupees. Per piece. I asked per
-box of fifty. **The number is fifty times out and it still looks completely
-reasonable.** The calculator moved it, so the cell is marked as one it touched,
-and the original is right there underneath."
+*Say:* "Not 'you did not provide pricing'. They did. Telling a supplier otherwise
+reads as though nobody opened their file."
 
-**Click: Vector, line 6, `MON-27`**
+**3. Scroll to Helios.**
 
-*Say:* "A question mark. A price is on that document and the reader could not
-read it." **Point at the crop.** "Those are the actual pixels from their
-photograph, not a claim about them."
-
-**Click: `Ask them to confirm this figure`**
-
-**Read the message out loud:** *"the figure is present on the document you sent
-but we cannot read it with confidence. Please confirm it in writing, or send a
-clearer copy."*
-
-*Say:* "Not 'you did not provide pricing'. They did. Telling a supplier
-otherwise reads as though nobody opened their file, and it burns the goodwill
-you need for the items that matter."
-
-**Scroll to the Helios column.**
-
-*Say:* "Twenty-five of these are tildes. Their entire reply was five lines of
+*Say:* "Twenty-five of these are tildes. Their whole reply was five lines of
 email ending 'rest we'll match Zenith'. **They have bid on everything and priced
-almost nothing.** And three of their five figures were worked out from a prior
+almost nothing.** Three of their five figures were worked out from a prior
 purchase order, marked as derived, and kept out of every total until they
-confirm them. You cannot award against an offer nobody made."
+confirm. You cannot award against an offer nobody made."
 
-**Point at the trust bar.** *"One hundred and six of a hundred and fifty cells
-are in that total, and the forty-four that are not are split by whose problem
-each one is."*
+## Part 4 · The money moment · 90s
 
----
+*Say:* "Three-point-eight-eight crore, labelled 'cheapest, ignoring the
+questionnaire', because it includes suppliers who cannot be awarded at any
+price. It stays on screen, because hiding it would be its own kind of
+dishonesty.
 
-## Take 4 · The money moment (90 seconds)
+The real number is **four-point-oh-seven crore**. Doing this properly costs
+**eighteen point six lakh, four point eight per cent.** The cheaper number was
+never available."
 
-**Point at the three numbers.**
-
-*Say:* "Three-point-eight-eight crore. And it is labelled 'cheapest, ignoring
-the questionnaire', because it includes suppliers who cannot be awarded at any
-price. It stays on the screen, because hiding it would be its own kind of
-dishonesty."
-
-*Say:* "The real number is **four-point-oh-seven crore**. Doing this properly
-costs **eighteen point six lakh, four point eight per cent**. The cheaper number
-was never available."
-
-**Click the Vector column header.** Point at *fails Q1, Q2, Q4, Q5, Q6, Q7*.
-
-**Now the sentence to get right, in the Ask box, type:**
+**In the Ask box, type:**
 
 > **Is Vector's ISO 27001 certificate actually valid?**
 
-**While it answers, click into the Vector panel and click `VDS_ISO27001.pdf`.**
+**While it answers: click the Vector column, then click `VDS_ISO27001.pdf`.**
 
-*Say this, slowly:* "Vector answered **Yes**. They attached a certificate. Their
-questionnaire response is a **form**, and a form has room for a filename and
-nothing else. So if you only read the form, you get 'answered yes, attached
-something, nothing contradicts it' — **a pass.**
+*Say slowly:* "Vector answered **Yes**. They attached a certificate. Their
+response is a **form**, and a form has room for a filename and nothing else. Read
+only the form and you get 'answered yes, attached something, nothing contradicts
+it' — **a pass.**
 
 The contradiction is inside the PDF. So the system opens the attachment and
-reads it as a document in its own right: **ISO/IEC 27001:2013, expired the
-thirtieth of November 2025.** I asked for the 2022 revision.
+reads it in its own right: **ISO/IEC 27001:2013, expired the thirtieth of
+November 2025.** I asked for the 2022 revision.
 
-And where the form and the document disagree, **the document governs.** A model
-asked 'did they pass?' says yes, because they said yes. Comparing a date to
-today is not a judgement call, so code does it, and the verdict is recomputed on
-every read rather than stored. A certificate that expires next week changes the
-answer without anybody editing a row."
+Where the form and the document disagree, **the document governs.** A model asked
+'did they pass?' says yes, because they said yes. Comparing a date to today is
+not a judgement call, so code does it, and the verdict is recomputed on every
+read. A certificate that expires next week changes the answer without anybody
+editing a row."
 
-**Then click:** `Ask them to resolve these 6`
+**Click `Ask them to resolve these 6`.**
 
-*Say:* "So the failure has an action attached to it, not just a red badge."
+## Part 5 · The interrogation · 3 min
 
----
-
-## Take 5 · The interrogation (3 minutes)
-
-Type these into the Ask box, one at a time. **Do not click the suggested
-buttons** — typing makes it obvious nothing is canned.
+Type each one. Do not click the suggested buttons.
 
 **1.** > **Split it cheapest per line, but only among suppliers who cleared the quality questionnaire**
 
-*Point at the tool calls.* "It computes. It does not add up in prose. There is
-deliberately no calculator tool it can hand two numbers to."
+*"It computes. It does not add up in prose. There is deliberately no calculator
+tool it can hand two numbers to."*
 
 **2.** > **What did that change against taking the cheapest from anyone?**
 
-*Say:* "Watch it lead with **coverage** before money, unprompted. Two totals
-over different sets of lines are not comparable, and the one covering fewer
-lines usually looks cheaper for that reason alone."
+*"Watch it lead with coverage before money, unprompted."*
 
 **3.** > **Which numbers are you least sure about, biggest rupee impact first?**
 
-*Say:* "Ordered by money, not by count. A tool that can rank its own uncertainty
-is a different kind of tool."
+*"Ordered by money, not by count."*
 
 **4.** > **What would we save by dropping the ISO 27001 requirement?**
 
-*Say nothing first. Let it answer.* Then: "I asked a question with an
-uncomfortable answer and it computed it, and told me what I would be giving up.
-Do not skip this one because the answer is awkward."
+*Let it answer.* "I asked a question with an uncomfortable answer and it computed
+it, and told me what I would be giving up."
 
 **5.** > **Chart the split award by supplier**
 
-Thirty bars, coloured by who wins each line.
-
 **6.** > **Draft the award recommendation and say what it rests on**
 
-**Click:** `Award note`. **Scroll to the chase section.**
+**Click `Award note`**, scroll to the chase section.
 
-*Say:* "'Their questionnaire is missing' and 'we asked on the tenth, gave them
-until the sixteenth, and nothing came back' are **different facts**. Only the
-second one lets a buyer award around a supplier and defend it to a CFO."
+*"'Their questionnaire is missing' and 'we asked on the tenth, gave them until
+the sixteenth, and nothing came back' are **different facts**. Only the second
+lets a buyer award around a supplier and defend it to a CFO."*
 
-**7.** Now ask it something it cannot do:
+**7.** > **Which of these suppliers has the best reputation in the market?**
 
-> **Which of these suppliers has the best reputation in the market?**
+*"It refuses, and says why. **That refusal is the most persuasive thing in this
+recording.**"*
 
-*Say:* "It refuses, and says why. It answers from the extracted data or it does
-not answer. **That refusal is the most persuasive thing in this recording.**"
+## Part 5b · The question they will ask · 30s
 
----
+**Click `where the model is used`.**
 
-## Take 5b · The question they will ask anyway (30 seconds)
-
-**Click:** `where the model is used`
-
-*Say:* "Six model calls. Nothing else in this tool talks to a model. And beside
-each one, what it may **not** do: drafting may not invent a price, reading may
-not convert or rank, the questionnaire reader may not decide whether anybody
-passed, and the analyst may not compute at all.
+*"Six model calls. Nothing else talks to a model. And beside each one, what it
+may **not** do: drafting may not invent a price, reading may not convert or rank,
+the questionnaire reader may not decide whether anybody passed, the analyst may
+not compute at all.
 
 **The model reads. The code counts.** Two implementations of that calculator,
-one in Python and one in TypeScript, proven to agree on all hundred and fifty
-cells by four hundred and forty-two assertions. You cannot do that to a model.
+Python and TypeScript, proven to agree on all hundred and fifty cells by four
+hundred and forty-two assertions.
 
 What it costs me: my code returns 'cannot resolve' where a model would have
-improvised. Thirty-one of a hundred and fifty cells carry no usable price. **A
-plausible price is worse than an admitted gap**, because a gap gets chased and a
-plausible price gets awarded."
+improvised. **A plausible price is worse than an admitted gap**, because a gap
+gets chased and a plausible price gets awarded."*
 
----
+## Part 6 · Break it · 60s
 
-## Take 6 · Break it on purpose (60 seconds)
+**Drag any file from Downloads into `Responses`.** Refused, not guessed. **Name a
+supplier** and watch the column appear, NOT ASSESSED.
 
-**Do this last. Do not cut it.**
+**Drag in something absurd.** Refused with instructions.
 
-**Go to `Responses`. Drag in any file from your Downloads folder.**
-
-*Say:* "It refuses rather than guessing, because a price in the wrong column is a
-mistake nobody downstream can detect." **Then name a supplier and watch the
-column appear**, marked NOT ASSESSED, chaseable, visible to the analyst, and
-present in the award note.
-
-**Drag in something absurd** — a screenshot, a `.zip`, anything.
-
-*Say:* "Refused with instructions rather than half-read. And a read that finds
-nothing **throws**, rather than quietly putting an empty column in front of
-somebody who would read it as 'this supplier didn't quote'."
-
-**Close on this, and say it plainly:**
+**Close on this:**
 
 *"One last thing, and it is the honest answer to 'what does it show you when it
 isn't sure'. I read the same rate card as five photographs of falling quality.
-The fourth one came back **fifty-two per cent accurate, at nought point nine
+The fourth came back **fifty-two per cent accurate, at nought point nine
 confidence on every single wrong digit.** Fifty-nine thousand nine hundred for
 fifty-seven thousand nine hundred.
 
-That is the exact failure this whole design exists to prevent, and on that
-photograph it showed me certainty. My own test harness had missed it, because it
-was only comparing the easiest and hardest images and the bad one was in the
-middle. It scores every row now.
+That is the exact failure this design exists to prevent, and on that photograph
+it showed me certainty. My own harness had missed it, because it only compared
+the easiest and hardest images and the bad one was in the middle. It scores
+every row now.
 
 I would rather hand you a measured failure than an unmeasured claim."*
 
 ---
 
-# What not to do on camera
+# 5 · Don't
 
-- Do not read the legend aloud. Click cells.
-- Do not narrate a passing test suite. Show it once in the terminal, move on.
-- Do not apologise for the stubbed transport. Name it once, precisely, continue.
-- Do not use the four example openers or the eight suggested questions verbatim.
-  They exist so the tool is usable cold; typing them makes a live demo look
-  rehearsed.
-- Do not say "as you can see". Point at the thing.
+- Read the legend aloud. Click cells.
+- Narrate a passing test suite.
+- Apologise for the stubbed transport. Name it once, continue.
+- Use the four example openers or the eight suggested questions verbatim.
+- Say "as you can see". Point at the thing.
 
 ---
 
-# If something breaks mid-take
+# 6 · If it breaks
 
-| Symptom | Do this |
+| Symptom | Fix |
 |---|---|
-| A question returns "the model provider is rate limiting or the account is out of credit" | The top-up ran out. `npm run api-check` confirms in 1.4s |
-| A read fails | It says which document and why. Re-run `npm run demo:load`; successful reads are cached and free |
-| The grid is empty and says "not read yet" | The database was cleared. Run `npm run demo:load` again |
-| A banner says "NOT LIVE — do not act on these numbers" | The database could not be read. Reload; if it persists, tell me |
-| You want to start the recording over | `curl -s -X POST 'http://localhost:3000/api/dev/fixture?clear=all'` |
+| "the model provider is rate limiting or the account is out of credit" | Credit ran out. `npm run api-check` confirms in 1.4s |
+| A read fails | It names the file and why. Re-run `npm run demo:load`; successful reads are cached and free |
+| Grid empty, "not read yet" | `npm run demo:load` |
+| Banner: "NOT LIVE — do not act on these numbers" | The database could not be read. See the next row |
+| Every API returns `RuntimeError: Aborted()` | The embedded Postgres is corrupt. `kill $(pgrep -f "next dev")`, `mv web/.pglite /tmp/`, restart `npm run dev`, then `npm run demo:load`. Costs one re-read |
+| Start a take over | `curl -s -X POST 'http://localhost:3000/api/dev/fixture?clear=all'` then `npm run demo:load` |
+
+**Do not edit any file while recording.** A config change mid-run restarts the
+server, and a restart during a database write is what corrupted it once today.
