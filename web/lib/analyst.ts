@@ -556,7 +556,16 @@ export async function runTool(
             if (!c) continue;
             if (onlyStatuses && !onlyStatuses.includes(c.status)) continue;
             ctx.citedCells.add(`${v}:${l.no}`);
-            cells[v] = {
+            /**
+             * KEYED BY NAME, not by code.
+             *
+             * This was `cells[v]`, so the model saw {"V2": {...}} and wrote
+             * "V2 on Line 1 (LT-BUS-14): Rs 77.4 L impact" at a buyer who has
+             * no idea what V2 is. The code is kept inside each cell, because
+             * citations need it; the KEY is what the model reads back.
+             */
+            cells[nameOf(v)] = {
+              vendor: v,
               status: c.status,
               awardable: isAwardable(c.status),
               raw: c.raw ? `${c.raw.ccy ?? "INR"} ${c.raw.price ?? "-"} per ${c.raw.uom ?? "?"}` : null,
@@ -709,7 +718,8 @@ export async function runTool(
       ctx.citedCells.add(`${v}:${n}`);
       const k = `${v}:${n}`;
       return {
-        vendor: v, lineNo: n, line: lineByNo(n).desc,
+        vendor: v, supplier: nameOf(v),
+        lineNo: n, line: lineByNo(n).desc,
         status: cell.status, awardable: isAwardable(cell.status),
         raw: cell.raw, landedUnit: money(cell.unitInr),
         source: payload.provenance[k] ?? null,
@@ -730,7 +740,14 @@ export async function runTool(
           // What it would be worth if resolved, using the buyer's own estimate.
           const impact = l.qty * l.baseline_inr;
           out.push({
-            vendor: v.code, lineNo: l.no, sku: l.sku, status: c.status,
+            // The NAME, always, beside the code. This tool returned codes
+            // only, and the model read them straight back out to a buyer:
+            // "V2 on Line 1 (LT-BUS-14): Rs 77.4 L impact". A buyer does not
+            // know what V2 is. Fixed in run_award_scenario and missed here,
+            // which is why it is now done for every tool that names a
+            // supplier rather than for the one that was caught.
+            vendor: v.code, supplier: v.name,
+            lineNo: l.no, sku: l.sku, status: c.status,
             why: c.flags[0] ?? c.status,
             rupeeImpactIfResolved: money(impact),
             _sort: impact,
