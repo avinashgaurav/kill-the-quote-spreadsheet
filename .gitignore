@@ -27,3 +27,13 @@ node_modules/
 *.log
 npm-debug.log*
 .gstack/
+
+# Working material kept out of the repo on purpose: planning docs, recording
+# scripts and superseded drafts. Useful to me, noise to a reader.
+/Relevant yet not on repo/
+
+# Local tool config. Stays on disk so the CLI and the dev preview keep working,
+# but it is this machine's linkage, not part of the project.
+.vercel/
+.claude/
+/web/.agents/

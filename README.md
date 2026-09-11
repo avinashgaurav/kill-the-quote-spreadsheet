@@ -14,11 +14,9 @@ attached documents, and a roster of ten suppliers of whom five reply.
 
 | | |
 |---|---|
-| **[WORKFLOW.md](WORKFLOW.md)** | The end-to-end flow, plain English. Start here. |
+| **[WHAT-I-BUILT.md](WHAT-I-BUILT.md)** | The flow and every feature, in plain English. Start here. |
 | **[THE-NOTE.md](THE-NOTE.md)** | One page: what I decided, what I left out, and the better problem. |
 | **[AI-MAP.md](AI-MAP.md)** | Every model call, what it is asked, and what it may not do. Six of them. |
-| **[RUNBOOK.md](RUNBOOK.md)** | Every keystroke and click for the demo, and what appears after each. |
-| **[WALKTHROUGH.md](WALKTHROUGH.md)** | The recorded walkthrough, and why each question is on the list. |
 | [DECISIONS-v2.md](DECISIONS-v2.md) | Every decision with its cost, the alternative I rejected, and what I got wrong. |
 | [RFX-SETS.md](RFX-SETS.md) | The same four parts in three categories, to show the model is not IT-specific. |
 
