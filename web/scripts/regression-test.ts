@@ -1049,6 +1049,44 @@ async function main() {
     );
   }
 
+  // ---- 42. An answer opened a cell over itself ---------------------------
+  //
+  // The worst bug in the product, found by the person using it rather than by
+  // any test: "when I ask a question it shows me a cell and doesn't answer".
+  //
+  // `onCitedCells` fired the moment an answer came back and opened the detail
+  // drawer for cells[0]. A good answer cites thirty cells, so the better the
+  // answer, the more certainly it was buried. On the narrow layout it also
+  // called setAskOpen(false), closing the Ask panel before the text rendered:
+  // the buyer typed a question, waited, and got a cell for line 1 of a
+  // supplier they had not asked about.
+  //
+  // The server was never at fault. Every one of those questions is in
+  // analyst_turns with a real answer, real tool calls and a real chart series.
+  // The UI threw the answer away on arrival.
+  //
+  // Citing cells is the provenance story and worth keeping, so the cells are
+  // now chips the buyer clicks. An answer never navigates on its own.
+  {
+    const chatSrc = readFileSync(
+      resolve(process.cwd(), "components/analyst-chat.tsx"), "utf8",
+    );
+    const benchSrc = readFileSync(
+      resolve(process.cwd(), "components/workbench.tsx"), "utf8",
+    );
+    check(
+      "42. An answer opened a cell on top of itself",
+      "arriving at an answer never navigates; citations are clickable",
+      !/onCitedCells/.test(chatSrc)
+        && !/onCitedCells/.test(benchSrc)
+        && /onOpenCell\?\.\(cell\)/.test(chatSrc)
+        && /onClick=\{\(\) => onOpenCell/.test(chatSrc),
+      "the answer to a 30-cell question was covered by the drawer for the " +
+      "first of the 30, and on the narrow layout the Ask panel was closed " +
+      "outright, so the buyer saw a cell and no answer at all",
+    );
+  }
+
   // ---- 38. The cheap tier was the frontier model on one provider --------
   //
   // `anthropic: { main: "claude-opus-5", cheap: "claude-opus-5" }`. The whole

@@ -69,11 +69,16 @@ function friendlyError(raw: unknown): string {
 }
 
 export function AnalystChat({
-  suggestions, onCitedCells, disabled, disabledReason, pendingQuestion,
+  suggestions, onOpenCell, disabled, disabledReason, pendingQuestion,
   onPendingConsumed,
 }: {
   suggestions: string[];
-  onCitedCells?: (cells: string[]) => void;
+  /**
+   * Open one cited cell, and only when the buyer clicks it. An answer that
+   * cites thirty cells must never choose one of them on the buyer's behalf:
+   * doing that covered the answer they had just asked for.
+   */
+  onOpenCell?: (cell: string) => void;
   disabled?: boolean;
   disabledReason?: string;
   /** A question pushed in from elsewhere in the UI, e.g. the Explain button. */
@@ -138,7 +143,6 @@ export function AnalystChat({
           toolCalls: json.toolCalls,
           citedCells: json.citedCells,
         }]);
-        if (json.citedCells?.length) onCitedCells?.(json.citedCells);
       }
     } catch (e) {
       setTurns((t) => [...t, {
@@ -226,6 +230,30 @@ export function AnalystChat({
                     <p className="mt-1.5 pl-2.5 text-[10px] text-muted-foreground">
                       Every number above came from these. No maths happened in the text.
                     </p>
+                    {t.citedCells?.length ? (
+                      <div className="mt-2 pl-2.5">
+                        <p className="text-[10px] text-muted-foreground">
+                          Open a cell to see the document the figure was read from.
+                        </p>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {t.citedCells.slice(0, 24).map((cell) => (
+                            <button
+                              key={cell}
+                              type="button"
+                              onClick={() => onOpenCell?.(cell)}
+                              className="rounded border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            >
+                              {cell}
+                            </button>
+                          ))}
+                          {t.citedCells.length > 24 ? (
+                            <span className="px-1 py-0.5 text-[10px] text-muted-foreground">
+                              and {t.citedCells.length - 24} more
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
                   </details>
                 )}
               </div>

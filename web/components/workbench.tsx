@@ -469,10 +469,10 @@ export function Workbench({
                 onPendingConsumed={() => setPendingQuestion(null)}
                 disabled={!payload.hasAnyExtraction}
                 disabledReason="Read the supplier responses first, then ask."
-                onCitedCells={(cells) => {
-                  const first = cells[0]?.split(":");
-                  if (first?.length === 2) {
-                    setDrawer({ kind: "cell", vendor: first[0], lineNo: Number(first[1]) });
+                onOpenCell={(cell) => {
+                  const parts = cell.split(":");
+                  if (parts.length === 2) {
+                    setDrawer({ kind: "cell", vendor: parts[0], lineNo: Number(parts[1]) });
                   }
                 }}
               />
@@ -630,12 +630,12 @@ export function Workbench({
                   suggestions={suggestions}
                   pendingQuestion={pendingQuestion}
                   onPendingConsumed={() => setPendingQuestion(null)}
-                  onCitedCells={(cells) => {
-                    const first = cells[0]?.split(":");
-                    if (first?.length === 2) {
+                  onOpenCell={(cell) => {
+                    const parts = cell.split(":");
+                    if (parts.length === 2) {
                       setAskOpen(false);
                       setDrawer({
-                        kind: "cell", vendor: first[0], lineNo: Number(first[1]),
+                        kind: "cell", vendor: parts[0], lineNo: Number(parts[1]),
                       });
                     }
                   }}
