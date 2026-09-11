@@ -215,6 +215,17 @@ Click the **Cygnus** or **Helios** column header. Both say **NOT ASSESSED**.
 > not excluded — dropping a real bid because nobody chased a document is the more
 > expensive mistake. But the screen never calls that a pass."
 
+**Watch for this in Part 5.** When you ask the first question, the analyst
+volunteers the same caveat itself, unprompted:
+
+> *"the questionnaires for Cygnus and Helios have not been assessed. They are
+> included because unread questionnaires are treated as eligible by default to
+> avoid dropping valid bids, but they have not actually cleared the quality
+> checks yet."*
+
+If it says that, **point at it and stop talking.** The tool correcting your
+question is worth more than you explaining the rule.
+
 ---
 
 # Part 5 · Ask it things · 3 minutes
