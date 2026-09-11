@@ -426,10 +426,31 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
          * 128 is the floor rather than a guess at what it needs: low effort
          * means "do not deliberate", not "cannot think at all".
          */
-        thinkingBudget:
-          req.effort === "low" ? 128
-          : req.effort === "medium" ? 2048
-          : 8192,
+        thinkingBudget: (() => {
+          /**
+           * CLAMPED AGAINST maxOutputTokens, which is the whole point.
+           *
+           * On this model maxOutputTokens covers thinking AND the answer out
+           * of one pool. An unclamped 8192 against the analyst's 8000 meant
+           * the model could spend the entire budget deliberating and return
+           * no text at all, and the route could only say "the model returned
+           * nothing". It is not deterministic, which is why it survived: the
+           * same question answers fine most of the time and dies on the turn
+           * that thinks hardest. That is the worst possible failure mode for
+           * a live demo, and it is how the ask failed during one.
+           *
+           * The reserve is what the answer needs, not what is left over: a
+           * paragraph, a small table and a tool call with a chart series.
+           */
+          const wanted =
+            req.effort === "low" ? 128
+            : req.effort === "medium" ? 2048
+            : 8192;
+          const ceiling = req.maxTokens ?? 16000;
+          const ANSWER_RESERVE = 2000;
+          // Never below 128: this model refuses a budget of 0 outright.
+          return Math.max(128, Math.min(wanted, ceiling - ANSWER_RESERVE));
+        })(),
         // Thought summaries are not needed and would be billed.
         includeThoughts: false,
       },

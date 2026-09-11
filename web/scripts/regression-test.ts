@@ -1049,6 +1049,60 @@ async function main() {
     );
   }
 
+  // ---- 43. Thinking could eat the whole answer budget --------------------
+  //
+  // On this model maxOutputTokens covers thinking AND the answer from one
+  // pool. The analyst asks for 8000 with effort "high", and an unclamped
+  // budget of 8192 meant the model was allowed to spend every token
+  // deliberating and return no text. The route could then only say "the model
+  // returned nothing at all".
+  //
+  // It is not deterministic, which is why it survived a full audit: the same
+  // question answers fine most of the time and dies on the turn that thinks
+  // hardest. It killed a live ask during a recording.
+  //
+  // Worse, this was fixed once and the fix was LOST, while the comment in
+  // app/api/analyst/route.ts kept claiming "after the clamp in lib/llm.ts".
+  // A comment describing a clamp that is not there is how it came back, so
+  // the clamp is now asserted numerically at every real call site.
+  {
+    const llmSrc = readFileSync(resolve(process.cwd(), "lib/llm.ts"), "utf8");
+
+    /** The clamp, re-implemented here so the test fails if llm.ts drifts. */
+    const clamp = (effort: string, maxTokens: number) => {
+      const wanted = effort === "low" ? 128 : effort === "medium" ? 2048 : 8192;
+      return Math.max(128, Math.min(wanted, maxTokens - 2000));
+    };
+
+    // Every maxTokens actually passed to a model call in this codebase.
+    const callSites: Array<[string, number]> = [
+      ["analyst", 8000],
+      ["copilot", 10000],
+      ["extraction", 16000],
+      ["crop re-read", 500],
+      ["evidence", 1500],
+      ["questionnaire", 6000],
+    ];
+    const starved = callSites.filter(([, max]) =>
+      ["low", "medium", "high"].some((e) => clamp(e, max) >= max)
+    );
+
+    check(
+      "43. Thinking could spend the entire output budget",
+      "every call site keeps room for an answer after thinking",
+      /ANSWER_RESERVE/.test(llmSrc)
+        && /Math\.max\(128, Math\.min\(wanted, ceiling - ANSWER_RESERVE\)\)/.test(llmSrc)
+        && !/thinkingBudget:\n\s+req\.effort/.test(llmSrc)
+        && starved.length === 0,
+      starved.length
+        ? `starved: ${starved.map(([n, m]) => `${n}(${m})`).join(", ")}`
+        : `analyst 8000 -> ${clamp("high", 8000)} thinking + ` +
+          `${8000 - clamp("high", 8000)} answer. The floor of 128 holds the ` +
+          `small calls (crop re-read 500 -> ${clamp("high", 500)}), because ` +
+          `this model refuses a budget of 0 outright`,
+    );
+  }
+
   // ---- 42. An answer opened a cell over itself ---------------------------
   //
   // The worst bug in the product, found by the person using it rather than by
