@@ -178,15 +178,49 @@ const fxRate = (): number => Number(ASSUMPTIONS.fx_usd_inr.value);
  * Kept strictly separate from conversion below. Conflating the two tables is
  * precisely how a system silently multiplies a price by 5: "pack" and
  * "pack of 5" mean the same thing, while "per pc" and "pack of 5" do not.
+ *
+ * MATCHED LOOSELY ON SHAPE, STRICTLY ON MEANING. The comparison used to be
+ * exact string equality, and the first real read against a live model refused
+ * 42 of 150 cells because suppliers write "NOS" and "per unit" where the
+ * enquiry says "nos". Both are the same unit by any reading; neither matched.
+ *
+ * Worse than merely refusing: Vector went from 21 priced lines to ZERO
+ * awardable, and the screen said "cannot normalise" about a document it had
+ * read perfectly. The reader was right and the comparison was too literal.
+ *
+ * So: case is ignored, surrounding whitespace is ignored, and a leading "per "
+ * is stripped, because "per unit" and "unit" are the same word with a
+ * preposition. Nothing else is guessed.
+ *
+ * WHY THIS CANNOT REINTRODUCE THE UNIT TRAP. Aliases are looked up in the
+ * table keyed by the ASKED unit, so a quote of "per pc" against a line asked
+ * in "nos" resolves (a piece is a unit), and the same "per pc" against a line
+ * asked in "box of 50" finds nothing in that key's list and falls through to
+ * the conversion table, where it is multiplied by 50 and flagged. The
+ * structure does the protecting, not the strictness of the match.
  */
+const uomKey = (u: string) =>
+  u.trim().toLowerCase().replace(/^per\s+/, "").replace(/\s+/g, " ");
+
 export function canonicalUom(quoted: string, asked: string): string {
-  if (quoted === asked) return asked;
-  if ((UOM_ALIASES[asked] ?? []).includes(quoted)) return asked;
+  const q = uomKey(quoted);
+  const a = uomKey(asked);
+  if (q === a) return asked;
+  if ((UOM_ALIASES[asked] ?? []).some((x) => uomKey(x) === q)) return asked;
+  // Aliases are keyed by the asked unit, so try the canonical spelling of the
+  // asked unit too, in case the catalog key itself is cased differently.
+  const key = Object.keys(UOM_ALIASES).find((k) => uomKey(k) === a);
+  if (key && (UOM_ALIASES[key] ?? []).some((x) => uomKey(x) === q)) return asked;
   return quoted;
 }
 
+// Matched on the same normalised shape as the aliases above, for the same
+// reason: a supplier writing "per pc" must hit the same conversion rule as one
+// writing "pc". The rule itself, and the factor, are unchanged.
 const conversionFor = (from: string, to: string) =>
-  UOM_CONVERSIONS.find((c) => c.from_uom === from && c.to_uom === to);
+  UOM_CONVERSIONS.find(
+    (c) => uomKey(c.from_uom) === uomKey(from) && uomKey(c.to_uom) === uomKey(to),
+  );
 
 // ---------------------------------------------------------------------------
 // The core: normalise one vendor x line cell

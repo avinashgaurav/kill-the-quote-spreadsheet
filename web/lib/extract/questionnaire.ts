@@ -38,7 +38,28 @@ const readAnswerSchema = z.object({
   confidence: z.number().min(0).max(1).nullish().transform((v) => v ?? 0.5),
   provenance: z.object({
     locator: z.string().min(1),
-    citedText: z.string().min(1),
+    /**
+     * MAY BE EMPTY, and that is the whole point.
+     *
+     * This was `.min(1)`, which demands a quotation for an answer that does
+     * not exist. Four of Vector's mandatory questions are deliberately blank,
+     * so the reader correctly returned an empty citedText for each, Zod
+     * rejected the object, and the ENTIRE questionnaire was discarded:
+     *
+     *   too_small: expected string to have >=1 characters
+     *   at answers[2].provenance.citedText
+     *
+     * Which killed the finding the demo turns on. Vector came back NOT
+     * ASSESSED instead of failing six mandatory items, because the one
+     * document that proves they fail could not be stored.
+     *
+     * The rule that matters is that a value must say WHERE it came from, and
+     * `locator` still carries that: "row 4 of the response table, blank" is
+     * real provenance. Demanding text that is not on the page confuses "cite
+     * your source" with "produce a quotation", and an unanswered mandatory
+     * question is exactly the case this product exists to surface.
+     */
+    citedText: z.string(),
   }),
 });
 
@@ -158,7 +179,12 @@ export const QUESTIONNAIRE_TOOL = {
                 },
                 citedText: {
                   type: "string",
-                  description: "The supplier's own words at that spot, verbatim.",
+                  description:
+                    "The supplier's own words at that spot, verbatim. Use an " +
+                    "EMPTY STRING when the question appears and they left it " +
+                    "blank: there is nothing to quote, and an invented " +
+                    "quotation would be worse than none. The locator above " +
+                    "still says where you looked.",
                 },
               },
             },

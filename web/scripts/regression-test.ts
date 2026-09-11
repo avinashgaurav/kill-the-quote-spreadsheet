@@ -1166,6 +1166,57 @@ async function main() {
     );
   }
 
+  // ---- 41. The unit match was too literal for real model output --------
+  //
+  // canonicalUom compared strings exactly. The first real read against a live
+  // model refused 42 of 150 cells, because suppliers write "NOS" and
+  // "per unit" where the enquiry says "nos". Both are the same unit by any
+  // reading. Vector went from 21 priced lines to ZERO awardable and the screen
+  // said "cannot normalise" about a document it had read perfectly.
+  //
+  // The reader was right; the comparison was too literal. Invisible against
+  // the seeded fixture, whose raw quotes were hand-authored in the catalog's
+  // own spelling, which is exactly the kind of thing only a real read finds.
+  //
+  // The second half of this test is the one that matters: loosening the match
+  // must NOT reintroduce the unit trap.
+  {
+    const { buildMatrix } = await import("../lib/normalise");
+    const at = (lineNo: number, uom: string, price: number) => {
+      const m = buildMatrix({
+        V1: { [String(lineNo)]: { status: "quoted", price, uom, ccy: "INR" } },
+      } as never);
+      return m.V1?.[lineNo];
+    };
+
+    // Line 1 asks "nos". Every one of these is the same unit: same number.
+    const sameUnit = ["nos", "NOS", "Nos", " nos ", "per unit", "unit", "each",
+                      "pc", "per pc", "PCS"]
+      .map((u) => at(1, u, 57900)?.unitInr);
+    check(
+      "41. A case variant of the asked unit was refused",
+      "spelling and case do not change whether a unit matches",
+      sameUnit.every((v) => v === 57900),
+      `NOS, Nos, "per unit", each, "per pc" against a line asked in nos all ` +
+      `resolve to 57900 without touching the number. Got ${JSON.stringify(sameUnit)}`,
+    );
+
+    // Line 22 asks "box of 50", line 13 asks "kit" (of 2). A loose match must
+    // still convert these, because a piece is not a box.
+    const box = at(22, "per pc", 268);
+    const kit = at(13, "per DIMM", 9600);
+    check(
+      "41b. Loosening the unit match must not swallow the unit trap",
+      "a genuinely different unit still converts and is still flagged",
+      box?.unitInr === 13400 && kit?.unitInr === 19200
+        && (box?.flags ?? []).some((f) => /unit mismatch/.test(f)),
+      `"per pc" against a box of 50 is still x50 (268 -> ${box?.unitInr}) and ` +
+      `"per DIMM" against a kit is still x2 (9600 -> ${kit?.unitInr}), both ` +
+      `flagged. Aliases are keyed by the ASKED unit, so the structure protects ` +
+      `this rather than the strictness of the match`,
+    );
+  }
+
   console.log(
     failures
       ? `\n${R}${B}${failures} regression(s) have come back${X}\n`
