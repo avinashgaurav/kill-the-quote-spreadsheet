@@ -309,7 +309,9 @@ Cheapest per line, among suppliers who can actually be awarded:
 | Helios Enterprise Solutions | 1 | ₹73.4 lakh |
 | **Total** | **30** | **₹4.05 cr** |
 
-Take the cheapest from anyone and it is ₹3.91 cr. **So doing this properly costs
+Take the cheapest from anyone and it is ₹3.91 cr. (These are the live site's
+figures, from real reads with contested photo prices excluded. The offline
+reference data, which has no contested readings, gives ₹3.88 cr.) **So doing this properly costs
 ₹13.6 lakh, or 3.5%.** That cheaper number was never really available: it sat
 inside Vector, who cannot be awarded at any price.
 
@@ -406,7 +408,8 @@ Most demos ask you to take the extraction on faith. This one is measured.
 
 The readers are scored against an answer key the running product never touches.
 Across five formats and 107 of 107 lines: **100% on price, 100% on unit, and
-nothing invented.** Then the same rate card as five photographs of falling
+nothing invented.** These figures are from a local run on Gemini 3.1 Pro, first
+recorded on 2026-09-10; the results are not yet committed. See EVALS.md (planned). Then the same rate card as five photographs of falling
 quality, where the worst scored 52%. That number is in this document because it
 is the honest edge of the claim, and because finding it is what changed the
 design.

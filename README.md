@@ -23,7 +23,7 @@ of ten made-up suppliers of whom five reply. No real company, supplier or price 
 ![Access-code dialog shown before any model call on the public demo](docs/screenshots/access-code.png)
 *On the public demo, every model call asks for an access code first; browsing and exports stay open.*
 
-Screenshots use the fictional dataset loaded through the local test harness, so the "test data" banner is expected.
+Screenshots use the fictional dataset loaded through the local test harness, so the "test data" banner is expected. Its totals differ from the live site's: the harness holds every price as typed (cheapest from anyone ₹3.88 cr), while the live site reads the documents and excludes contested photo prices (₹3.91 cr).
 
 ## Read these first
 
