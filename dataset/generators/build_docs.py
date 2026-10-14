@@ -8,7 +8,7 @@ Each vendor writes the way that kind of firm actually writes:
        text, notes below the table, a grand total that does not equal the sum
        of the lines, plus a Rev 2 sent two days later that supersedes Rev 1
   V2   a PDF on letterhead, part INR part USD, with the real discount in
-       footnote 3 on page 2
+       footnote 3 on page 3
   V3   a Word letter with the commercials in prose
   V5   five lines of email that price by reference to last year
 
@@ -465,7 +465,7 @@ def build_v2():
                           ("LINEABOVE", (0, 0), (-1, 0), 0.6, colors.HexColor("#0B3C5D"))])))
     fl.append(PageBreak())
 
-    # ---- page 2: terms, and the footnote that actually matters -----------
+    # ---- terms page (renders as page 3), and the footnote that matters ---
     fl.append(Paragraph("<font size=9 color='#0B3C5D'><b>CYGNUS TECHNOLOGIES INDIA "
                         "PVT LTD</b></font>  <font size=7>CTI-Q-2026-0918</font>", small))
     fl.append(Spacer(1, 8))

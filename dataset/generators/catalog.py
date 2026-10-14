@@ -583,7 +583,7 @@ TERMS = {
         footnote_discount_pct=4.5,
         footnote_discount_scope="OEM-branded lines only, subject to deal registration approval",
         footnote_discount_note=(
-            "Buried in footnote 3 on page 2. Not reflected in any unit price. "
+            "Buried in footnote 3 on page 3. Not reflected in any unit price. "
             "Conditional on an approval the vendor does not yet hold."),
     ),
     "V3": dict(

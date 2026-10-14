@@ -32,7 +32,7 @@ The model extracts what a document says, in the supplier's own unit and currency
 
 ## Success metrics
 
-**North star: time to award-ready.** Hours from the last supplier reply to a comparison with no unresolved cells and a drafted award note. **Target: under one working day per sourcing event (target, not yet measured).** The status quo of about four days is the unvalidated assumption above.
+**North star: time to award-ready.** Hours from the last supplier reply to a comparison with no unresolved cells and a drafted award note. **Target: under one working day per sourcing event (target, not yet measured).** The status quo of about three to four days is the unvalidated assumption above.
 
 | Supporting metric | Definition | Target | Where it stands |
 |---|---|---|---|
@@ -42,7 +42,7 @@ The model extracts what a document says, in the supplier's own unit and currency
 
 **Unit cost (estimates from `npm run cost-model`, not measured spend).** Priced at Gemini 3.1 Pro published rates ($2 per million input tokens, $12 per million output and thinking tokens), with thinking at about 35% of its budget. The app defaults to Claude Opus 5, which the script does not price.
 
-- Read one supplier quotation: about **$0.09** (five quotations, $0.44)
+- Read one supplier quotation: about **$0.09** (five quotations, $0.44; Gemini pricing, chars/4 token estimate)
 - One analyst question: about **$0.19** (roughly three model turns)
 - One full demo (four drafting turns, every reply and the certificate read, eight questions): about **$2.58**, ceiling $4.90
 - One accuracy pass (`npm run accuracy -- --all`, ten reads): about **$0.87**

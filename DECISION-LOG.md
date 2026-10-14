@@ -150,9 +150,10 @@ system says so and restates both on the common basis before anyone compares them
 **Why.** Scenario (c), the strictest one, has a headline about ₹45.3 lakh **lower** than
 scenario (b). It looks like discipline saves money. It does not: it is lower because it
 awards 28 lines instead of 30. On the 28 lines all scenarios can fill, it is about
-₹5.0 lakh **dearer**. (Live-site figures. The offline reference data gives ₹77.5 lakh,
-27 lines and ₹4.1 lakh; `npm run doc-numbers` prints those.)
+₹5.0 lakh **dearer**.
 Both numbers are individually correct, which is exactly why a careful human misses it.
+(Live-site figures. The offline reference data gives ₹77.5 lakh, 27 lines and ₹4.1 lakh;
+`npm run doc-numbers` prints those.)
 
 **What it costs.** A guard that fires and an explanation the buyer must read. It makes
 the screen less punchy.

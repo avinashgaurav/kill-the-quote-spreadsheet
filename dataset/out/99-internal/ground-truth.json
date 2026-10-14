@@ -7,7 +7,7 @@
   "assumptions": {
     "fx_usd_inr": {
       "value": 88.4,
-      "source": "Vendor V2's own stated reference rate, quote page 1",
+      "source": "Vendor V2's own stated reference rate, quote page 2",
       "alternative": "RBI reference rate on bid-due date",
       "note": "V2's terms say conversion happens at the rate on the INVOICE date, not the bid date. Any INR total for V2 is therefore an estimate, not an offer. The buyer sees this wherever a V2 total is shown.",
       "confidence": "stated by vendor, not independently verified"
@@ -25,7 +25,7 @@
     },
     "v2_footnote_discount": {
       "value": "EXCLUDED from the ranked comparison",
-      "source": "V2 quote, footnote 3, page 2",
+      "source": "V2 quote, footnote 3, page 3",
       "alternative": "include 4.5% on OEM-branded lines",
       "note": "Conditional on a deal-registration approval V2 does not hold yet. Shown to the buyer as a named upside scenario, never folded into the headline number."
     },
@@ -555,7 +555,7 @@
         ],
         "trace": [
           "raw: USD 6,180 per nos",
-          "FX: x88.4 -> INR 546,312  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 546,312  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 546,312 per nos, ex-GST"
         ],
         "extended_inr": 3277872
@@ -570,7 +570,7 @@
         ],
         "trace": [
           "raw: USD 198 per kit",
-          "FX: x88.4 -> INR 17,503  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 17,503  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 17,503 per kit, ex-GST"
         ],
         "extended_inr": 420072
@@ -585,7 +585,7 @@
         ],
         "trace": [
           "raw: USD 735 per nos",
-          "FX: x88.4 -> INR 64,974  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 64,974  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 64,974 per nos, ex-GST"
         ],
         "extended_inr": 1559376
@@ -600,7 +600,7 @@
         ],
         "trace": [
           "raw: USD 8,840 per nos",
-          "FX: x88.4 -> INR 781,456  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 781,456  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 781,456 per nos, ex-GST"
         ],
         "extended_inr": 1562912
@@ -615,7 +615,7 @@
         ],
         "trace": [
           "raw: USD 4,420 per nos",
-          "FX: x88.4 -> INR 390,728  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 390,728  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 390,728 per nos, ex-GST"
         ],
         "extended_inr": 781456
@@ -630,7 +630,7 @@
         ],
         "trace": [
           "raw: USD 232 per pack of 5",
-          "FX: x88.4 -> INR 20,509  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 20,509  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 20,509 per pack of 5, ex-GST"
         ],
         "extended_inr": 246108
@@ -645,7 +645,7 @@
         ],
         "trace": [
           "raw: USD 2,090 per nos",
-          "FX: x88.4 -> INR 184,756  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 184,756  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 184,756 per nos, ex-GST"
         ],
         "extended_inr": 2586584
@@ -660,7 +660,7 @@
         ],
         "trace": [
           "raw: USD 4,980 per nos",
-          "FX: x88.4 -> INR 440,232  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 440,232  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 440,232 per nos, ex-GST"
         ],
         "extended_inr": 1760928
@@ -675,7 +675,7 @@
         ],
         "trace": [
           "raw: USD 452 per box of 10",
-          "FX: x88.4 -> INR 39,957  [Vendor V2's own stated reference rate, quote page 1]",
+          "FX: x88.4 -> INR 39,957  [Vendor V2's own stated reference rate, quote page 2]",
           "landed: Rs 39,957 per box of 10, ex-GST"
         ],
         "extended_inr": 239742
