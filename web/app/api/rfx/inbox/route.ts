@@ -9,7 +9,7 @@
  *
  *   FAKED     the transport. Nothing was emailed and no mailbox was polled.
  *             A supplier "replies" because their document is on file and you
- *             invited them. This is the SMTP server the brief says to stub.
+ *             invited them. This is the SMTP server that is deliberately stubbed.
  *
  *   NOT FAKED the reading. Every arriving document goes through the same
  *             extraction path as a drag-and-drop upload: a real model call, a
@@ -39,6 +39,7 @@ import {
 } from "@/lib/store";
 import catalog from "@/lib/data/catalog.json";
 import { providerSentence } from "@/lib/provider-error";
+import { checkAccess, consumeQuota } from "@/lib/demo-guard";
 
 export const maxDuration = 300;
 
@@ -160,6 +161,12 @@ export async function GET() {
  * a single slow or failed read does not take the others with it.
  */
 export async function POST(request: Request) {
+  // Before anything is parsed: the access code. The per-IP rate and the daily
+  // cap are taken once it is known which documents will be read, and not at
+  // all for a supplier who sent nothing. See lib/demo-guard.ts.
+  const denied = checkAccess(request);
+  if (denied) return denied;
+
   try {
     const body = await request.json().catch(() => ({}));
     const code = String(body.supplierCode ?? "").trim();
@@ -235,6 +242,13 @@ export async function POST(request: Request) {
           "or record the non-response and award around them.",
       });
     }
+
+    // One model read per document that will arrive, certificates included.
+    const documents = files.reduce(
+      (n, f) => n + 1 + (carriesAttachments ? (f.attachments?.length ?? 0) : 0), 0,
+    );
+    const refused = await consumeQuota(request, documents);
+    if (refused) return refused;
 
     const rfx = await activeRfx();
     // The SAME cache the upload route uses. These two routes read the same

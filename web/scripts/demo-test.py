@@ -4,8 +4,8 @@ Walk the demo, exactly in the order it will be given, and check every claim.
 
     python3 scripts/demo-test.py
 
-Each test corresponds to a moment in the live demo and to a specific line in
-the brief. A test does not pass because the app returned 200; it passes because
+Each test corresponds to a moment in the live demo and to a specific product
+requirement. A test does not pass because the app returned 200; it passes because
 the number on screen is the number the verified calculator produces, and because
 the system does the RIGHT thing when it is not sure.
 
@@ -41,15 +41,15 @@ def post(path, body=None):
         return json.loads(r.read())
 
 
-def test(n, title, brief_ref):
+def test(n, title, req_ref):
     def deco(fn):
         try:
             detail = fn()
-            results.append((n, title, brief_ref, True, detail))
+            results.append((n, title, req_ref, True, detail))
         except AssertionError as e:
-            results.append((n, title, brief_ref, False, str(e)))
+            results.append((n, title, req_ref, False, str(e)))
         except Exception as e:                                    # noqa: BLE001
-            results.append((n, title, brief_ref, False, f"{type(e).__name__}: {e}"))
+            results.append((n, title, req_ref, False, f"{type(e).__name__}: {e}"))
         return fn
     return deco
 
@@ -89,8 +89,7 @@ print(f"  {r.get('cells')} cells, {r.get('unmapped')} unmapped item(s), all mark
 
 
 @test(2, "Five formats land in one comparable grid",
-      "'lands them all in a single side-by-side comparison: same lines, same "
-      "units, same currency'")
+      "every reply lands in one comparison with lines, units and currency aligned")
 def t2():
     d = get("/api/comparison")
     assert d["hasAnyExtraction"] is True, "should have data now"
@@ -113,7 +112,7 @@ def t2():
 
 
 @test(3, "The per-box trap: 'per box' vs someone else's 'per piece'",
-      "'The one whose per box is someone else's per 100 pieces'")
+      "a supplier's per-box price against another's per-100-pieces price")
 def t3():
     d = get("/api/comparison")
     m, lines = d["matrix"], {l["no"]: l for l in d["lines"]}
@@ -133,8 +132,7 @@ def t3():
 
 
 @test(4, "The three kinds of nothing are not the same thing",
-      "'What does your system do, and what does it show the buyer, when it "
-      "isn't sure?'")
+      "what the system shows the buyer when it is not sure")
 def t4():
     d = get("/api/comparison")
     m = d["matrix"]
@@ -159,7 +157,7 @@ def t4():
 
 
 @test(5, "The USD supplier is converted at a named rate and flagged",
-      "'The one who quoted in USD'")
+      "a supplier quoting in USD")
 def t5():
     d = get("/api/comparison")
     m = d["matrix"]
@@ -181,7 +179,7 @@ def t5():
 
 
 @test(6, "27 of 30, and the invented line 30A is not force-fitted",
-      "'The vendor who quoted 27 of 30 lines'")
+      "a supplier quoting only part of the line list")
 def t6():
     d = get("/api/comparison")
     sv = d["scenarios"]["singleVendor"]
@@ -216,7 +214,7 @@ def t6():
 
 
 @test(7, "The money moment, and the guard that stops it misleading",
-      "'all the way to a defensible award decision'")
+      "the workflow ends in an award the buyer can defend")
 def t7():
     d = get("/api/comparison")
     s = d["scenarios"]
@@ -247,7 +245,7 @@ def t7():
 
 
 @test(8, "Every number can show its source, and one without a source cannot exist",
-      "'Would a buyer with Rs 4 crore on the line act on what's on your screen?'")
+      "a buyer with crores at stake can trust what the screen shows")
 def t8():
     d = get("/api/comparison")
     prov = d["provenance"]
@@ -270,8 +268,7 @@ def t8():
 
 
 @test(9, "The reader is real, and an empty read fails loudly",
-      "'don't fake the extraction, don't fake the reasoning, don't hardcode "
-      "the answers'")
+      "extraction and reasoning are real; nothing answers from a stored answer")
 def t9():
     r = sh("npm run parse-check 2>&1")
     assert "PASS  10/10" in r.stdout, f"parser robustness failed:\n{r.stdout[-600:]}"
@@ -285,7 +282,7 @@ def t9():
 
 
 @test(10, "The calculator agrees with its reference implementation",
-      "'Real analysis on real extracted data'")
+      "analysis runs on extracted data")
 def t10():
     r = sh("npm run conformance 2>&1")
     assert "PASS" in r.stdout, f"conformance failed:\n{r.stdout[-800:]}"
@@ -304,7 +301,7 @@ print("=" * 78)
 for n, title, ref, ok, detail in results:
     mark = f"{GREEN}PASS{OFF}" if ok else f"{RED}FAIL{OFF}"
     print(f"\n{mark}  {BOLD}{n}. {title}{OFF}")
-    print(f"      {DIM}brief: {ref}{OFF}")
+    print(f"      {DIM}requirement: {ref}{OFF}")
     body = detail if ok else f"{RED}{detail}{OFF}"
     for line in [body[i:i + 82] for i in range(0, len(body), 82)]:
         print(f"      {line}")

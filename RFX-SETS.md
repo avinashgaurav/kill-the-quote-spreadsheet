@@ -1,9 +1,9 @@
-# Three RFx sets, for the interview
+# Three RFx sets
 
-Each set is the same four things the brief names: **scope, line items, questionnaire, terms.**
+Each set is the same four parts every RFx has: **scope, line items, questionnaire, terms.**
 
-Set 1 is what the product actually runs on. Sets 2 and 3 exist for one question you
-will be asked: *"does this only work for IT hardware?"* The answer is that the four
+Set 1 is what the product actually runs on. Sets 2 and 3 exist for one question worth
+answering up front: *"does this only work for IT hardware?"* The answer is that the four
 parts and the ugly edges are the same shape in every category, and only the unit
 traps change. Read Set 3 last: it is the one where a "line item" is not a thing at all.
 
@@ -49,7 +49,7 @@ part-shipment without prior approval. LD at 0.5% per week to a 5% cap.
 
 ---
 
-## Set 2: Corrugated packaging (the brief's own example)
+## Set 2: Corrugated packaging (the most common example in procurement)
 
 **Buyer:** a D2C brand, 4 fulfilment centres. **Value:** about Rs 3.1 crore a year.
 

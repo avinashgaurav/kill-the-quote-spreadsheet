@@ -449,7 +449,7 @@ async function main() {
     // behind `if (ok.length >= 2)`, so five failed reads skipped every
     // assertion and the harness signed off with "ACCURACY: pass". It did
     // exactly that when the API credit ran out mid-session: five 429s, no
-    // numbers, and a pass. Which is the same bug the product is graded on
+    // numbers, and a pass. Which is the same bug the product is judged on
     // (reporting success on a read that found nothing), shipped in the tool
     // that exists to catch it. A harness that cannot fail is not evidence.
     const ok = rows.filter((r) => r.ok);

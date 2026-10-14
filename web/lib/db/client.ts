@@ -313,8 +313,8 @@ CREATE INDEX IF NOT EXISTS extraction_cache_file_idx ON extraction_cache (file_h
 /*
  * Documents a supplier ATTACHED to an answer, and what each one says.
  *
- * The brief asks for "questionnaire answers and attached docs sitting
- * alongside the numbers". The reading half was built first: an answer that
+ * Questionnaire answers and attached documents belong next to the numbers.
+ * The reading half was built first: an answer that
  * cites VDS_ISO27001.pdf causes that PDF to be opened and read, because the
  * revision year and the expiry date are inside it and not on the form.
  *
@@ -424,6 +424,17 @@ const MIGRATIONS = [
    * beside `questions: catalog.questionnaire`.
    */
   `ALTER TABLE rfx ADD COLUMN IF NOT EXISTS questionnaire jsonb`,
+  /*
+   * Usage counters for the demo guard (lib/demo-guard.ts): one row per bucket
+   * per window. A bucket is a hashed IP or the global daily total. Kept in the
+   * database because a serverless function's memory resets on every cold start.
+   */
+  `CREATE TABLE IF NOT EXISTS demo_usage (
+    bucket text NOT NULL,
+    window_start timestamptz NOT NULL,
+    calls integer NOT NULL DEFAULT 0,
+    PRIMARY KEY (bucket, window_start)
+  )`,
 ];
 
 async function connect(): Promise<{ db: Db; query: Query }> {

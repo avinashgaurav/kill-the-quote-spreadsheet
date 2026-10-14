@@ -641,7 +641,7 @@ export function TrustBar({
 
       {/* The assumption ledger was the strongest judgement story in the build
           and had no surface at all: it existed in the plan and in the export,
-          never on screen. A judgement a grader cannot see does not count. */}
+          never on screen. A judgement a buyer cannot see does not count. */}
       <button
         onClick={onShowAssumptions}
         className="ml-auto text-muted-foreground underline decoration-dotted transition-colors hover:text-foreground"

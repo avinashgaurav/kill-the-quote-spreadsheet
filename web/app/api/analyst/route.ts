@@ -10,6 +10,9 @@ import {
 import { buildComparisonPayload, RFX_ID } from "@/lib/store";
 import { getQuery } from "@/lib/db/client";
 import { providerErrorResponse } from "@/lib/provider-error";
+import {
+  ANALYST_MAX_TURNS, checkAccess, consumeQuota, historyTooLarge,
+} from "@/lib/demo-guard";
 
 /**
  * The analyst turn.
@@ -24,6 +27,12 @@ import { providerErrorResponse } from "@/lib/provider-error";
 export const maxDuration = 300;
 
 export async function POST(request: Request) {
+  // Before anything is parsed: the access code. The per-IP rate and the daily
+  // cap are taken just before the loop, once the request is known to be one
+  // the model will actually see. See lib/demo-guard.ts.
+  const denied = checkAccess(request);
+  if (denied) return denied;
+
   try {
     const body = await request.json();
     const question = String(body.question ?? "").trim();
@@ -33,6 +42,8 @@ export async function POST(request: Request) {
     if (!question) {
       return Response.json({ ok: false, error: "No question given." }, { status: 400 });
     }
+    const oversized = historyTooLarge(history, question);
+    if (oversized) return oversized;
     const provider = activeProvider();
     const haveKey = provider === "gemini"
       ? Boolean(process.env.GEMINI_API_KEY)
@@ -60,6 +71,10 @@ export async function POST(request: Request) {
       });
     }
 
+    // Charged at the loop's bound, the most calls this question can make.
+    const refused = await consumeQuota(request, ANALYST_MAX_TURNS);
+    if (refused) return refused;
+
     const ctx: ToolContext = { payload, charts: [], citedCells: new Set() };
     const turns: Array<{ role: "user" | "assistant"; parts: Part[]; raw?: unknown }> = [
       ...history,
@@ -71,7 +86,7 @@ export async function POST(request: Request) {
     let currentParts: Part[] = [{ kind: "text", text: question }];
 
     // Bounded so a runaway loop cannot spend without limit.
-    for (let turn = 0; turn < 12; turn++) {
+    for (let turn = 0; turn < ANALYST_MAX_TURNS; turn++) {
       const response = await callLlm({
         system: ANALYST_SYSTEM,
         history: turns,
@@ -83,7 +98,7 @@ export async function POST(request: Request) {
         // final answer here is a short paragraph and a small table.
         // 6000 thinking + 2000 answer after the clamp in lib/llm.ts. It was
         // 4000 total, which the clamp correctly cut to 2000 thinking, and this
-        // is the graded capability: leading with coverage before money and
+        // is the core capability: leading with coverage before money and
         // citing its cells is the reasoning worth paying for.
         maxTokens: 8000,
         effort: "high",

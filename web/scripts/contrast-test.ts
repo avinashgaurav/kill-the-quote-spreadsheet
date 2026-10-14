@@ -13,7 +13,7 @@
  * That is not a coincidence, it is a bias: doubt gets drawn softly, because
  * softly is what doubt feels like. On a screen where a buyer is about to
  * commit four crore rupees it is exactly backwards, and it is precisely what
- * the brief asks about: "what does it SHOW THE BUYER when it isn't sure?"
+ * the central question: what does it SHOW THE BUYER when it is not sure?
  *
  * WHAT IT CHECKS. Two different WCAG floors, because they are different jobs:
  *

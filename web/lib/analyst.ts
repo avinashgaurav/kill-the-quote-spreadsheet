@@ -345,7 +345,7 @@ const amount = (n: number | null) => n;
 //                   actually valid?" was answered out of a hand-written note
 //                   handed to the model as tool output. The model call was
 //                   real and the answer was not derived, which is precisely
-//                   the one thing the brief forbids. The verdict has been
+//                   the one thing the core constraint forbids. The verdict has been
 //                   computed from the read answers since the questionnaire
 //                   loop was built; the grid and the award note use it; the
 //                   analyst was the one caller still reading the table.
@@ -929,10 +929,10 @@ export async function runTool(
 
 /** Suggested opening questions, shown in the UI. */
 /**
- * The first two are the brief's own worked example, verbatim in spirit:
- * the buyer retypes everything into Excel, and then "the VP asks one question:
- * what if we split it, cheapest per line, but only among vendors who cleared
- * the quality questionnaire? And there goes the fourth day."
+ * The first two are the problem's worked example: the buyer retypes everything
+ * into Excel, and then the VP asks for the award split cheapest per line, but
+ * only among suppliers who cleared the quality questionnaire, and a fourth day
+ * goes on answering it.
  *
  * That day is the one this product deletes, so it is the first thing on screen
  * rather than something a demo has to remember to type.

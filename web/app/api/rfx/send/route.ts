@@ -8,8 +8,8 @@ import {
 /**
  * Send the enquiry. The outbound half of the flow.
  *
- * The transport is stubbed, which the brief explicitly permits ("fake the SMTP
- * server if you like"). What is NOT stubbed is the part that matters: the four
+ * The transport is stubbed on purpose, because an SMTP server proves
+ * nothing about the product. What is NOT stubbed is the part that matters: the four
  * documents are really generated from the drafted enquiry, and the send is
  * REFUSED if the enquiry is still ambiguous.
  *
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
         : [`link to the 4-document pack (${packLink})`],
       sentAt: new Date().toISOString(),
       note:
-        `Transport is stubbed, as the brief permits. The four documents are really ` +
+        `Transport is stubbed by design. The four documents are really ` +
         `generated from this enquiry and are downloadable below; only the delivery hop ` +
         `is faked.` +
         (chosen.attachments

@@ -5,7 +5,7 @@
  * POST  send the request, and record what was asked and by when
  *
  * The transport is stubbed, exactly as the outbound enquiry is and for the same
- * reason the brief allows. What is not stubbed is the part that carries the
+ * reason: delivery is plumbing. What is not stubbed is the part that carries the
  * judgement: which items are outstanding, that the message contains only those,
  * that it carries a deadline, and that the asking is recorded so a buyer can
  * later say "asked, and they did not answer" rather than "missing".
@@ -271,7 +271,7 @@ export async function POST(request: Request) {
         itemCount: msg.items.length,
         body: msg.body,
         note:
-          "Transport is stubbed, as the brief permits. What is real is the record: " +
+          "Transport is stubbed by design. What is real is the record: " +
           "this enquiry now holds what was asked of them and when it was due, so the " +
           "award can say 'asked and not answered' rather than 'missing'.",
       },

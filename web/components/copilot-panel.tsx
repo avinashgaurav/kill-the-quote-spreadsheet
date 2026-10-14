@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { modelFetch } from "@/lib/model-fetch";
 
 interface ClarityIssue {
   severity: "blocking" | "should_fix" | "note";
@@ -82,9 +83,9 @@ interface SendIssue {
 /**
  * The channel the enquiry goes out on.
  *
- * The brief says "over a channel you choose", so it is a choice the buyer makes
+ * The buyer picks the channel, so it is a choice made
  * here rather than a constant in the code. The transport behind each one is
- * stubbed, which the brief permits, and the panel says so on the screen rather
+ * stubbed by design, and the panel says so on the screen rather
  * than in a comment. What is NOT stubbed is everything the choice affects: the
  * four documents, the envelope, and the fact that some channels cannot carry
  * an attachment, which changes what the supplier can even reply with.
@@ -150,7 +151,7 @@ export function CopilotPanel({
     setTurns((t) => [...t, { role: "user", text: message }]);
     setBusy(true);
     try {
-      const res = await fetch("/api/copilot", {
+      const res = await modelFetch("/api/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, history }),

@@ -1,7 +1,7 @@
 # Every decision, the reason, the cost
 
-The brief says a thousand decisions here have no correct answer, and asks whether
-I can say why I made them. This is that list.
+Most decisions here have no single correct answer, so the useful thing is to say why
+each one was made. This is that list.
 
 Each entry has the same five parts, deliberately:
 
@@ -9,25 +9,26 @@ Each entry has the same five parts, deliberately:
 - **Why**
 - **What it costs** (the honest downside, not a fake one)
 - **What I rejected** and why
-- **Which of the three criteria it earns**, and where the AI-loops rule bites
+- **Which of the three principles it serves**, and where the AI-loops rule bites
 
-The three criteria, quoted, because every entry is scored against them:
+Three design principles run through every entry.
 
-> **The ugly edges.** The angled photo. The vendor who quoted 27 of 30 lines. The one
-> who quoted in USD. The one whose "per box" is someone else's "per 100 pieces."
-> What does your system do, and what does it show the buyer, when it isn't sure?
->
-> **Trust.** Would a buyer with ₹4 crore on the line act on what's on your screen?
-> What did you build to earn that?
->
-> **Judgment and taste.** A thousand decisions here have no correct answer. We want
-> to see how you made them, and whether you can say why.
+**Survive the ugly edges.** Real quotes are messy: an angled photo of a rate card, a
+supplier who quoted only some of the lines, one who quoted in another currency, two
+whose units differ (a box against a hundred pieces). The system has to know when it is
+not sure, and the buyer has to see that uncertainty rather than a confident guess.
 
-And the rule:
+**Earn trust.** A buyer with crores at stake should be able to act on what the screen
+shows. Every number has to be traceable to where it came from.
 
-> **One rule: stub the plumbing, but the AI loops must be real.** Fake the SMTP
-> server if you like. Don't fake the extraction, don't fake the reasoning, don't
-> hardcode the answers to your demo questions.
+**Show judgment and taste.** Many decisions here have no single correct answer, so each
+one comes with a reason.
+
+And one hard rule I hold the whole project to:
+
+**The AI loops are real.** Delivery plumbing, such as an SMTP server, can be stubbed.
+Extraction and reasoning are never faked, and no demo question is answered from a
+stored answer.
 
 ---
 
@@ -63,7 +64,7 @@ a pure-LLM one and more trustworthy than it.
 do because it is one prompt instead of a calculator. It demos identically and is
 indefensible the moment someone asks "why is this number what it is".
 
-**Criteria.** Trust, primarily. It is the reason a ₹4 crore number can be defended
+**Principles.** Trust, primarily. It is the reason a ₹4 crore number can be defended
 line by line. It also *strengthens* the AI-loops rule rather than dodging it: the loop
 that remains is genuinely a reading loop, and it has nowhere to hide.
 
@@ -86,7 +87,7 @@ a silent one.
 **What I rejected.** Storing the empty result and showing a warning. Warnings get
 dismissed; an empty column that stays on screen is a lie that outlives the warning.
 
-**Criteria.** The ugly edges, directly: the vendor who quoted 27 of 30. And it is the
+**Principles.** The ugly edges, directly: the vendor who quoted 27 of 30. And it is the
 sharpest illustration of the AI-loops rule, because a faked extraction and a silently
 empty real one look **identical on screen**. Only the loud failure distinguishes them.
 
@@ -106,8 +107,7 @@ that price. That has happened, and it is the correct outcome.
 **What I rejected.** A nullable column with a UI badge for "no source". It would have
 kept more data and made the trust claim untrue.
 
-**Criteria.** Trust. This is the single concrete thing I would point at when asked
-"what did you build to earn it".
+**Principles.** Trust. This is the single concrete thing I would point to as earning it.
 
 ---
 
@@ -133,7 +133,7 @@ dense.
 **What I rejected.** Colour alone. It fails for colour-blind users and photocopies, so
 the mark carries the meaning and colour only reinforces it.
 
-**Criteria.** The ugly edges, and this is the most direct answer to "what does it show
+**Principles.** The ugly edges, and this is the most direct answer to "what does it show
 the buyer when it isn't sure". A design review this session found these five glyphs
 were the **lowest-contrast text on the entire page** (1.8:1 to 2.3:1). I had made them
 "quiet by design" and gone too far: the marks that communicate uncertainty were the
@@ -159,7 +159,7 @@ the screen less punchy.
 **What I rejected.** Showing the three totals side by side, which is what every
 comparison tool does and what I built first.
 
-**Criteria.** Judgment and taste. This is the entry I would lead with. Nobody asked for
+**Principles.** Judgment and taste. This is the entry I would lead with. Nobody asked for
 it, no test would have caught it, and it emerged only from staring at my own output and
 disbelieving it.
 
@@ -193,7 +193,7 @@ of real length: "ok" is rejected.
 **What I rejected.** A dismissible warning (the blocked cases are precisely the ones a
 hurried buyer clicks through), and a hard refusal (see above).
 
-**Criteria.** Judgment, and this is the entry where I most obviously changed my mind for
+**Principles.** Judgment, and this is the entry where I most obviously changed my mind for
 a stated reason.
 
 ---
@@ -234,7 +234,7 @@ fit inside a live evaluation. Six days, and the buyer can change it.
 sent, and gets ignored), and letting the request be sent with nothing outstanding (the
 tool now refuses, with a 422).
 
-**Criteria.** All three. It is an **ugly edge** at the supplier level rather than the
+**Principles.** All three. It is an **ugly edge** at the supplier level rather than the
 cell level. It is **trust**, because an award defended by "we asked twice" is a different
 document. And it is **judgment**, because it came from the observation that a gap and a
 declined gap are not the same thing.
@@ -286,7 +286,7 @@ a rule library and produces a verdict nobody can check or explain. And flagging 
 verdicts as harness data, which would have been honest and would have left the system
 catching nothing.
 
-**Criteria.** All three. The **ugly edge** is an answer contradicted by its own evidence.
+**Principles.** All three. The **ugly edge** is an answer contradicted by its own evidence.
 The **trust** is that every verdict carries the sentence that produced it, because a red
 badge that cannot say why is the same unaccountable thing as a typed table in a different
 colour. The **judgment** is the third state: passed, failed, and NOT READ. The third one
@@ -314,7 +314,7 @@ was the part that felt like a demo rather than a product.
 document that lands goes through the identical path as a drag-and-drop upload. A button
 that makes prepared answers appear is a scripted demo. A button that makes real documents
 arrive, which are then genuinely read, is a stubbed transport, and the difference is the
-whole of the brief's one rule. The panel says which it is doing, because a viewer cannot
+whole of the project's one constraint. The panel says which it is doing, because a viewer cannot
 tell by looking.
 
 **Why five of ten and not ten of ten.** You invite ten and five answer. A version where
@@ -326,7 +326,7 @@ answers, because inventing a reply for them would be inventing extraction output
 why it is labelled twice. And five suppliers on the roster can never be demonstrated
 beyond their own silence.
 
-**Criteria.** Judgment, mostly. The asymmetry is the decision, not the button.
+**Principles.** Judgment, mostly. The asymmetry is the decision, not the button.
 
 ---
 
@@ -338,7 +338,7 @@ ships with the build. A supplier nobody has heard of gets a column created at up
 
 **Why.** Until this session, the calculator closed over the seeded 30 IT-hardware lines
 and the five named suppliers. It worked beautifully on my data and would have failed
-in front of an interviewer who said "read this one instead". That is a demo, not a
+in front of anyone who said "read this one instead". That is a demo, not a
 product.
 
 **What it costs.** More moving parts, and a real bug found on the way: `responses.vendor_id`
@@ -350,7 +350,7 @@ more correct and would have broken the 442-assertion conformance suite's shape t
 before a demo. Instead the context is an **optional argument defaulting to the seeded
 catalog**, so every existing caller is provably unchanged.
 
-**Criteria.** Trust, and the AI-loops rule at its most literal. A system that only reads
+**Principles.** Trust, and the AI-loops rule at its most literal. A system that only reads
 its own fixtures is hardcoding by architecture even if no answer is hardcoded in text.
 
 ---
@@ -372,7 +372,7 @@ has to survive code validation.
 **Tested.** The end-to-end suite uploads a document containing exactly that instruction
 and asserts no price moves.
 
-**Criteria.** Trust.
+**Principles.** Trust.
 
 ## B2. Two independent reads for photographs
 
@@ -387,7 +387,7 @@ wrong row.
 
 **What it costs.** Real money, a few cents per document, and latency.
 
-**Criteria.** The ugly edges (the angled photo) and trust.
+**Principles.** The ugly edges (the angled photo) and trust.
 
 ## B3. Confidence is reported as three numbers, not one
 
@@ -399,7 +399,7 @@ the award. An average alone hides exactly the thing you need.
 
 **What it costs.** More numbers on screen.
 
-**Criteria.** The ugly edges. This is what "what does it show when it isn't sure" looks
+**Principles.** The ugly edges. This is what "what does it show when it isn't sure" looks
 like at the document level rather than the cell level.
 
 ## B4. The prompt describes the class of trap, not this corpus's traps
@@ -409,12 +409,12 @@ against a per-piece quote, a pointer at another price, money hidden in a footnot
 no longer names DIMM kits, boxes of ten, or "same as our March rates".
 
 **Why.** The earlier prompt was pre-briefed on my own dataset's specific tricks.
-Defensible as domain knowledge, and a sharp grader could fairly call it teaching to the
+Defensible as domain knowledge, and a reader could fairly call it teaching to the
 test.
 
 **What it costs.** Probably a small accuracy drop on my corpus. That is the point.
 
-**Criteria.** The AI-loops rule. A prompt that names the answers is a soft form of
+**Principles.** The AI-loops rule. A prompt that names the answers is a soft form of
 hardcoding them.
 
 ## B5. Cached on (model, prompt hash, file hash)
@@ -426,11 +426,11 @@ the file or one word of the prompt and it genuinely re-runs.
 were cached and which were read live, so the distinction is on screen rather than a
 claim.
 
-**What it costs.** A reviewer could suspect the cache IS the hardcoding. The defence is
+**What it costs.** A reader could suspect the cache IS the hardcoding. The defence is
 the key: the prompt hash is part of it, so improving the prompt correctly invalidates
 every cached result.
 
-**Criteria.** The AI-loops rule, and the honest answer to "how is this fast enough to
+**Principles.** The AI-loops rule, and the honest answer to "how is this fast enough to
 demo".
 
 ---
@@ -463,7 +463,7 @@ demo".
 
 | # | Decision | Why | Cost |
 |---|---|---|---|
-| D1 | Category: IT hardware | Densest unit traps per line of any category the brief named | Less relatable than packaging. Mitigated with two more RFx sets in `RFX-SETS.md` |
+| D1 | Category: IT hardware | Densest unit traps per line of any category considered | Less relatable than packaging. Mitigated with two more RFx sets in `RFX-SETS.md` |
 | D2 | Claude Opus 5, with a provider seam | Native PDF citations give real provenance, not a model-reported guess | Cost. The seam means provider is config, not architecture |
 | D3 | PDF read without citations is marked `provenanceWeaker` | On a provider with no citations API the locator is the model's own claim, which is weaker evidence | An extra state to explain |
 | D4 | Embedded Postgres locally, Neon in production | Fully runnable before anyone creates a cloud database. One env var switches | PGlite is single-process, so CLI writes are invisible to a running server |
@@ -477,7 +477,7 @@ demo".
 | D12 | Revision number derived from what the document claims | A counter would move on re-upload and flip which quote the buyer sees | Cannot order revisions that do not reference each other |
 | D13 | Active enquiry = most recently drafted | Two other rules were tried and rejected; see A7 | An abandoned draft takes over until discarded, so a discard exists |
 | D14 | Analyst answers cite the cells they used | An answer with no citations is a chat message, not analysis | Longer answers |
-| D15 | Analyst refuses when there is no data | Answering from a lookup table is exactly what the brief forbids | A refusal in the demo if the order of steps is wrong |
+| D15 | Analyst refuses when there is no data | Answering from a lookup table is exactly what the no-stored-answers rule forbids | A refusal in the demo if the order of steps is wrong |
 | D16 | Provider rate-limit returns 503 with a plain sentence | A raw 500 carrying a provider payload tells a buyer nothing and looks like the tool is broken | Found by the e2e suite against an exhausted key |
 | D17 | `.msg` and iWork files refused with instructions | Better to say "save it as .eml" than to half-read a binary format | Two formats unsupported |
 | D18 | Magic-byte sniffing on every upload | A PDF renamed `.xlsx` would otherwise produce plausible-looking nonsense | Rejects some legitimately mislabelled files |
@@ -494,7 +494,7 @@ demo".
 | D31 | Questionnaire verdicts derived on every read, never stored | A certificate that expires between now and award changes the verdict with nothing to migrate. A stored verdict is the typed table again | Recomputed on every page load |
 | D32 | `asOf` is injected into the assessor, not read from the clock | An audit months later must reproduce the decision somebody actually signed, not re-judge it against today | One more parameter to thread |
 | D33 | An unassessed supplier stays in the award scenarios | Excluding a real bid for want of a document nobody chased is its own kind of wrong. The panel says plainly that nobody has assessed them | A buyer could miss the marker |
-| D34 | An unrecognised filename is refused, then offered a picker | Refusing to guess is right; refusing and offering nothing is the wall an interviewer's own file hits | One more interaction |
+| D34 | An unrecognised filename is refused, then offered a picker | Refusing to guess is right; refusing and offering nothing is the wall a newcomer's own file hits | One more interaction |
 | D35 | Uploaded documents are stored in Postgres as base64, not on disk | A serverless filesystem is read-only, and the Neon HTTP driver and PGlite disagree about binary encoding | A third more bytes on a photograph |
 | D36 | The function region is pinned to the database region | Twenty queries per page across the Pacific was two seconds of loading skeleton | A config that must move if the database does |
 | D27 | Schema changes ship as idempotent ALTER migrations | `CREATE TABLE IF NOT EXISTS` never adds a column to an existing database, and the failure is silent | Migrations must be written by hand |
@@ -515,13 +515,13 @@ Kept because "can you say why" includes the decisions I had to reverse.
 | A zero price treated as a rate | Inflated the headline by ₹7.1 lakh | Audit predicted the exact delta |
 | Like-for-like comparing line **counts** | Two scenarios can award the same number of different lines | Audit pass on my own guard |
 | Numbered nav (1, 2, 3) | The flow is not linear and the numbers implied it was | User told me it felt forced. They were right |
-| Calculator closed over the seeded catalog | Worked on my data, would have failed on an interviewer's | Being asked directly whether anything was hardcoded |
+| Calculator closed over the seeded catalog | Worked on my data, would have failed on anyone else's | Asking myself directly whether anything was hardcoded |
 | "Active enquiry = newest" then "= one with replies" | The first broke on debris; the second broke the actual journey | Demo suite 10/10 → 1/10, then the e2e suite |
-| A hard refusal on the send, with no way forward | A dead end is a bug with good intentions. A buyer edits the draft until the check stops firing, leaving no record | Being asked what "refuses to send" actually meant |
+| A hard refusal on the send, with no way forward | A dead end is a bug with good intentions. A buyer edits the draft until the check stops firing, leaving no record | Trying to explain what "refuses to send" actually meant |
 | "5 blocked on you" including 3 blocked on the supplier | Second instance of the same double-count, in the fields I had just fixed | The e2e suite summing the parts and getting 154 of 150 |
 | A schema change that never reached an existing database | `CREATE TABLE IF NOT EXISTS` is a no-op on an existing table, so the new column never arrived, the insert threw, and a defensively-caught write became a feature that silently did nothing | Two e2e cases failing with nothing on screen |
 | `sendIssues` throwing on a null line | A gate on an outbound action must fail closed, not crash | The regression suite, on its first run |
-| **Qualification verdicts from a hand-typed table** | A row said "nothing read" beside "FAILED 6". The screen was asserting a conclusion it could not have reached, and the expired-certificate finding was a fact I had written down as already found | Being asked, directly, where that data came from |
+| **Qualification verdicts from a hand-typed table** | A row said "nothing read" beside "FAILED 6". The screen was asserting a conclusion it could not have reached, and the expired-certificate finding was a fact I had written down as already found | Tracing, directly, where that data came from |
 | A supplier who returned no questionnaire read as unassessed, and therefore eligible | Being asked ten mandatory questions and answering none is a failure. Never being asked is not. I had collapsed two different rows | The derived verdict disagreeing with the typed table |
 | The assessor not checking requirements a question names inline | Q5 lists three mandatory cities and two suppliers passed it while omitting two of the three | The same disagreement |
 | An adjusted price getting a clean tick | The caveat rode on the supplier's raw status rather than on the fact that an adjustment happened | Pointing the scope rule at a supplier outside the corpus |
@@ -547,5 +547,5 @@ Kept because "can you say why" includes the decisions I had to reverse.
 | Live deployment | Vercel plus Neon, not yet done. Production build passes. |
 | `.msg` and iWork formats | Refused with instructions rather than supported. |
 
-The first one is the only one that touches the brief's rule. Everything the harness
+The first one is the only one that touches the core constraint. Everything the harness
 needs exists; it needs a key.

@@ -267,7 +267,7 @@ def main():
     ob = body.get("outbound", {})
     case(
         "a clean enquiry goes out, on the channel that was chosen",
-        "the channel choice the brief asks for is decorative",
+        "the channel choice is decorative",
         st == 200 and body.get("ok") and "WhatsApp" in str(ob.get("channel")),
         f"channel={ob.get('channel')}, {len(body.get('pack', []))} documents generated",
     )
@@ -476,7 +476,7 @@ def main():
     req("/api/dev/fixture", "POST")
 
     # ---- nothing is bound to the demo path ---------------------------------
-    print(f"\n{D}--- an interviewer's own data, not mine ---{X}")
+    print(f"\n{D}--- a newcomer's own data, not mine ---{X}")
 
     req("/api/dev/fixture?reset=true", "POST")
     req("/api/dev/fixture", "POST")
@@ -505,7 +505,7 @@ def main():
     )
 
     # A quotation from a supplier this build has never heard of, in a filename
-    # that matches nothing. This is what an interviewer handing over their own
+    # that matches nothing. This is what a newcomer handing over their own
     # file actually looks like.
     xlsx_magic = b"PK\x03\x04" + b"\x00" * 26
     st, body = req(
@@ -517,7 +517,7 @@ def main():
     case(
         "an unrecognised supplier is refused AND offered a way forward",
         "refusing to guess is right; refusing to guess and then offering nothing "
-        "is a dead end, and an interviewer handing over their own quotation hits it",
+        "is a dead end, and a newcomer handing over their own quotation hits it",
         r0.get("needsVendor") is True and len(r0.get("knownVendors") or []) > 0,
         f"needsVendor={r0.get('needsVendor')}, and the response names the "
         f"{len(r0.get('knownVendors') or [])} suppliers it could be assigned to",
@@ -555,7 +555,7 @@ def main():
     case(
         "a supplier named on the fly gets their own column",
         "the product only works on the five suppliers that ship with it, so an "
-        "interviewer's own file has nowhere to go",
+        "newcomer's own file has nowhere to go",
         bool(created) and has_col,
         f"NEWCO_TEST created and rendering as a column: {has_col}",
     )
@@ -612,7 +612,7 @@ def main():
         "the analyst refuses honestly when it cannot reach a model",
         "the buyer gets a raw 500 and cannot tell whether the tool is broken or "
         "the answer is unavailable, or worse, gets a confident answer that came "
-        "from a lookup table, which is exactly what the brief forbids",
+        "from a lookup table, which is exactly what the core constraint forbids",
         (st == 200 and body.get("ok")) or unavailable,
         f"HTTP {st}: {msg[:110]}" if st != 200
         else f"answered: {str(body.get('answer'))[:70]}",
@@ -647,7 +647,7 @@ def main():
     case(
         "test-harness data is declared, not disguised",
         "someone demos on harness numbers believing they were read from real "
-        "documents, which is the one thing the brief calls faking it",
+        "documents, which is the one thing the core constraint calls faking it",
         len(comp5.get("fixtureVendors", [])) > 0,
         f"flagged suppliers: {comp5.get('fixtureVendors')}",
     )

@@ -112,7 +112,7 @@ export async function clearAllResponses() {
    * appears in the award note's "what we asked for and did not get" table. So
    * any exploratory click during a rehearsal was permanent: short of deleting
    * the database there was no way to remove it, and the award note would tell
-   * an interviewer that the buyer had chased Vector for thirteen items.
+   * anyone reading it that the buyer had chased Vector for thirteen items.
    *
    * Attachments are keyed to a response, and every response is going.
    */

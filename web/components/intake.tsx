@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Invite } from "./invite";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { modelFetch } from "@/lib/model-fetch";
 
 export interface FileResult {
   filename: string;
@@ -113,7 +114,7 @@ export function Intake({
         for (const f of files) n[f.name] = f;
         return n;
       });
-      const res = await fetch("/api/extract", { method: "POST", body: form });
+      const res = await modelFetch("/api/extract", { method: "POST", body: form });
       const json = await res.json();
       if (!json.ok) {
         setError(json.error ?? "Reading failed.");
@@ -292,7 +293,7 @@ function ResultList({
             The way forward for a file whose supplier we could not identify.
             Refusing to guess is the right call, because a price in the wrong
             column is a mistake nobody downstream can detect. Refusing to guess
-            and then offering nothing was the bug: an interviewer handing over
+            and then offering nothing was the bug: a newcomer handing over
             their own quotation hit a wall.
           */}
           {r.needsVendor && (

@@ -11,7 +11,7 @@
  *
  * ONE THING IS SIMULATED AND IT IS ONLY ONE THING. Nothing is emailed and no
  * mailbox is polled: a supplier replies because their document is on file and
- * you invited them. That is the SMTP server the brief says to stub. The READING
+ * you invited them. That is the SMTP server that is deliberately stubbed. The READING
  * is real, and the panel says so on screen rather than in a comment, because a
  * viewer cannot tell the difference by looking and is entitled to be told.
  *
@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { modelFetch } from "@/lib/model-fetch";
 
 interface Supplier {
   code: string;
@@ -100,7 +101,7 @@ export function Invite({ onDone }: { onDone: () => void }) {
     // others with it.
     for (const code of [...picked]) {
       try {
-        const r = await fetch("/api/rfx/inbox", {
+        const r = await modelFetch("/api/rfx/inbox", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ supplierCode: code, channel }),

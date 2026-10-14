@@ -17,8 +17,8 @@ import type { CellStatus } from "./normalise";
  * "Zenith Infotech Solutions Pvt Ltd" does not fit above a price and does not
  * need to: a buyer comparing five bids calls them Zenith. This was
  * `v.name.split(" ")[0]` inline, in two places in the grid, which is fine for
- * these five and wrong for the general case the product claims to handle. An
- * interviewer uploading a quotation from "The Bombay Cable Company" would get
+ * these five and wrong for the general case the product claims to handle. A
+ * newcomer uploading a quotation from "The Bombay Cable Company" would get
  * a column headed "The".
  *
  * So: drop the legal form, then take the distinctive part. The full legal name
@@ -65,8 +65,8 @@ export function displayState(status: CellStatus): DisplayState {
  *
  * An em dash for all of them was the original, and it collapsed five different
  * buyer actions into one shrug: chase the supplier, accept their answer, open
- * the original document, or ask for a real price. The graded question is
- * literally "what does it show the buyer when it isn't sure", so each kind of
+ * the original document, or ask for a real price. The question that matters
+ * most is "what does it show the buyer when it isn't sure", so each kind of
  * nothing gets its own mark, and the legend explains all of them.
  *
  * Glyphs are chosen to be distinguishable without colour, since roughly one man
