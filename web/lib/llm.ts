@@ -3,49 +3,31 @@
  *
  * The two AI loops (reading documents, answering questions) go through here so
  * the model is a configuration choice rather than something welded into the
- * app. Set LLM_PROVIDER=gemini to run on Gemini, otherwise it runs on Claude.
+ * app.
  *
- * WHICH ONE TO RUN, and why the seam is worth having.
+ * THE DEFAULT. With LLM_PROVIDER unset, every call goes to Anthropic: the main
+ * model is claude-opus-5 (override with ANTHROPIC_MODEL) and the independent
+ * crop re-read goes to Haiku (ANTHROPIC_CHEAP_MODEL). Set LLM_PROVIDER=gemini
+ * to run on Gemini 3.1 Pro instead, with Flash for the crop re-read. Nothing
+ * else changes; the switch is one environment variable, which is insurance
+ * against a provider being down or out of credit, not a preference.
  *
- * Gemini 3.1 Pro is what the measured accuracy figures come from: 107 of 107
- * lines returned across five formats, 100% price and unit exactness, nothing
- * invented, and confidence that tracked difficulty unprompted. It is also the
- * cheaper of the two. An earlier version of this comment said "run the real
- * demo on Claude Opus 5" and recommended Flash for Gemini, which was true when
- * the only Gemini key available was a free-tier one that returned limit: 0 on
- * every Pro model. Billing changed that and the comment did not, which is
- * exactly the sort of stale instruction this file should not carry.
+ * The providers are NOT equivalent, and the differences are stated, not hidden:
  *
- * The one thing Anthropic genuinely does better here is PDF provenance:
- * `supportsCitations()` below is true only for Anthropic, so a citation on a
- * three-page PDF comes from the provider rather than from the model reporting
- * its own locator. `extractDocument` flags the difference as
- * `provenanceWeaker` rather than hiding it. If PDF provenance is the thing
- * being examined, switch; otherwise Gemini is the measured choice.
- *
- * Either way the switch is one environment variable, which is the point of the
- * seam: it is insurance against a provider being down or out of credit at a
- * bad moment, not a preference.
- *
- * This exists for an honest reason and it is worth stating plainly, because the
- * providers are NOT equivalent for this job:
- *
- *   Claude Opus 5 is the default and what the demo should run on. Two of its
- *   features are load-bearing here. Native PDF citations return the vendor's
- *   own sentence plus a page number straight from the API, which is real
- *   provenance rather than a span matched by hand and hoped to be right. And
- *   `strict: true` tool schemas guarantee the extraction arguments validate
+ *   Anthropic gives native PDF citations (`supportsCitations()` below is true
+ *   only for Anthropic), so a citation on a multi-page PDF comes from the
+ *   provider rather than from the model reporting its own locator. `strict:
+ *   true` tool schemas also guarantee the extraction arguments validate
  *   exactly, so a malformed read fails loudly instead of arriving half-parsed.
  *
- *   Gemini Flash is here so the pipeline can be exercised end to end without
- *   Anthropic credits. It has no citations feature, so PDF provenance falls
- *   back to a model-reported locator, and it is a small fast model being asked
- *   to read a photograph of a rotated table with handwritten overrides, which
- *   is the hardest thing in this app. Expect its accuracy on that document to
- *   be worse. Use it to prove the plumbing works, not to prove the product does.
+ *   Gemini has no citations feature, so PDF provenance falls back to a
+ *   model-reported locator and `extractDocument` flags it as
+ *   `provenanceWeaker`. The accuracy figures quoted in WHAT-I-BUILT.md were
+ *   measured on Gemini 3.1 Pro; an Anthropic run has not been recorded yet.
  *
- * The accuracy harness scores whichever provider ran, against the same answer
- * key, so the difference is measurable rather than a matter of opinion.
+ * The accuracy harness (`npm run accuracy`) scores whichever provider ran,
+ * against the same answer key, so the difference is measurable rather than a
+ * matter of opinion.
  */
 
 import Anthropic from "@anthropic-ai/sdk";

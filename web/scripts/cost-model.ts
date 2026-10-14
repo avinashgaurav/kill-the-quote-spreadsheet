@@ -257,7 +257,7 @@ console.log(
   `${((1 - firstTurnHighRestMedium / asIs) * 100).toFixed(0)}% of the analyst's\n` +
   `  thinking cost. NOT DONE: the final turn of a question is where it has to\n` +
   `  lead with coverage before money and cite its cells, and which turn that is\n` +
-  `  cannot be known in advance. Cutting the reasoning budget on the graded\n` +
+  `  cannot be known in advance. Cutting the reasoning budget on the core\n` +
   `  capability, unverifiable without credit, is not a call to make alone.`,
 );
 console.log(`  ${D}* thinking is the CONFIGURED BUDGET, i.e. what the model may spend, billed as output${X}`);
@@ -327,6 +327,6 @@ const e2eCost = ((EXTRACT_SYSTEM + EXTRACT_TOOL + lineCatalogTok + 2000) * 2 / 1
   + (900 * 3 / 1e6) * OUT_PER_M + (budgets.high * 3 * 0.35 / 1e6) * THINK_PER_M;
 console.log(`  e2e-test            ${money(e2eCost).padStart(7)}  ${D}42 cases, ~5 reach a model${X}`);
 console.log(`  demo-test           ${money(0).padStart(7)}  ${D}10 walkthrough claims, no model calls${X}`);
-console.log(`  the other 9 suites  ${money(0).padStart(7)}  ${D}npm run verify, no key needed${X}`);
+console.log(`  the other 10 suites ${money(0).padStart(7)}  ${D}npm run verify, no key needed${X}`);
 console.log(`  api-check           ${money(0.00002).padStart(7)}  ${D}two tokens per tier${X}`);
 console.log("");

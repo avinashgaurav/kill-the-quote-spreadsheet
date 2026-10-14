@@ -680,8 +680,8 @@ async function main() {
 
   // ---- 22. A verdict about a document nobody could open ----------------
   //
-  // The brief asks for "questionnaire answers and attached docs sitting
-  // alongside the numbers". The reading half was built first, and then the
+  // Questionnaire answers and attached documents belong next to the
+  // numbers. The reading half was built first, and then the
   // attachment's BYTES were thrown away: a buyer could read the finding that
   // Vector's certificate names the withdrawn 2013 revision and expired in
   // November, and could not look at the certificate. On a screen whose whole
@@ -1358,7 +1358,7 @@ async function main() {
   // written into .next/types by `next dev` or `next build`, so it exists on
   // any machine that has run the app and does not exist in a clean checkout.
   //
-  // Result: an interviewer clones the repo, runs `npm run verify` because the
+  // Result: a newcomer clones the repo, runs `npm run verify` because the
   // README says to, and gets
   //   app/layout.tsx(23,50): error TS2304: Cannot find name 'LayoutProps'.
   //
@@ -1393,7 +1393,7 @@ async function main() {
           `cannot type check until somebody runs a build first`
         : "checked every .ts/.tsx under app/ for LayoutProps, PageProps and " +
           "RouteContext. Verified for real by cloning the repo to a temp dir, " +
-          "npm install, npm run verify: 9 suites green from cold",
+          "npm install, npm run verify: 10 suites green from cold",
     );
   }
 
