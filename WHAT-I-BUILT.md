@@ -33,7 +33,7 @@ that is what led me to stop trusting confidence scores at all.
 owns the enquiry, a VP who asks the hard question late, and a CFO who has to
 accept the answer. **Size:** 30 line items, 10 suppliers invited of whom 5
 reply, a 10-question questionnaire with 6 mandatory, and attached certificates.
-The whole dataset is fabricated, as the brief asked.
+The whole dataset is fictional: no real company, supplier or price is used.
 
 ---
 
@@ -115,7 +115,7 @@ of blaming the supplier.
 
 **4. Replies arrive in whatever shape suits the supplier.** Nobody is forced
 into a template. These are the five replies in the dataset, and they are the
-formats the brief describes:
+formats real suppliers send:
 
 | Supplier | What they sent | Lines priced |
 |---|---|---|
@@ -183,7 +183,7 @@ CSV. And a full JSON audit trail.
 
 ## The ugly edges
 
-The brief names four. Here is what happens on each one, and what the buyer sees.
+There are four that matter most. Here is what happens on each one, and what the buyer sees.
 
 **The angled photo.** Vector sent a photograph of a printed rate card. The eight
 biggest numbers on it are read a second time, independently, from a cropped
@@ -330,12 +330,12 @@ These are the questions I chose, and why each one earns its place.
 | The question | Why it matters |
 |---|---|
 | Is Vector's ISO 27001 certificate actually valid? | Their answer and their own evidence disagree. Proves the certificate was really opened |
-| Split it cheapest per line, but only among suppliers who cleared the quality questionnaire | The VP's question from the brief, word for word. The one that cost the fourth day |
+| Split it cheapest per line, but only among suppliers who cleared the quality questionnaire | The VP's question from the problem statement. The one that costs the fourth day |
 | What did that change against taking the cheapest from anyone? | Makes the system put a price on its own compliance |
 | Which numbers are you least sure about, biggest rupee impact first? | Asks it to rank its own uncertainty by money, not by count |
 | What would we save by dropping the ISO 27001 requirement? | An uncomfortable question, to see whether it answers anyway |
 | Chart the split award by supplier | Thirty lines, coloured by winner, in one picture |
-| Draft the award recommendation and say what it rests on | The defensible decision the brief ends on |
+| Draft the award recommendation and say what it rests on | The defensible decision the workflow ends on |
 | Which of these suppliers has the best reputation in the market? | It has to refuse. This is the most persuasive moment in the demo |
 
 The answer to the VP's question is the award table above, and this arrives
@@ -362,8 +362,8 @@ That paragraph is the product. Two more, shortened:
 
 ## The one rule: nothing is hardcoded
 
-The brief is strict about this. *Don't fake the extraction, don't fake the
-reasoning, don't hardcode the answers to your demo questions.*
+This is the one constraint I held the build to: extraction and reasoning are real
+model calls, and no demo question is answered from a stored answer.
 
 **Only the delivery is faked.** No email is sent and no mailbox is polled. The
 four enquiry documents are genuinely written, and every document that arrives is
@@ -411,10 +411,10 @@ quality, where the worst scored 52%. That number is in this document because it
 is the honest edge of the claim, and because finding it is what changed the
 design.
 
-Nine more checks run offline, with no API key and no network. The two
+Ten more suites run offline, with no API key and no network. The two
 independent calculators were compared cell by cell across 442 assertions. The
 readers run against every format and all 11 photographs. Sixteen cases cover how a questionnaire
-verdict is reached, including expired and superseded certificates. And 67 tests hold one case for every bug
+verdict is reached, including expired and superseded certificates. And 69 regression cases hold one for every bug
 that has ever shipped in this build, each with a sentence saying what it broke.
 
 ---

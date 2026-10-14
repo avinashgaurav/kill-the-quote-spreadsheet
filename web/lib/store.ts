@@ -1079,8 +1079,8 @@ export async function storeQuestionnaireAnswers(opts: {
    *
    * Their bytes are kept so the buyer can look at the certificate the verdict
    * turns on. A verdict about a document nobody can open is exactly the sort
-   * of assertion the rest of this product refuses to make, and the brief asks
-   * for "attached docs sitting alongside the numbers", not a summary of them.
+   * of assertion the rest of this product refuses to make, and the product promises
+   * the attached documents next to the numbers, not a summary of them.
    */
   attachments?: Array<{
     filename: string;

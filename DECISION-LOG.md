@@ -1,7 +1,7 @@
 # Every decision, the reason, the cost
 
-The brief says a thousand decisions here have no correct answer, and asks whether
-I can say why I made them. This is that list.
+Most decisions here have no single correct answer, so the useful thing is to say why
+each one was made. This is that list.
 
 Each entry has the same five parts, deliberately:
 
@@ -11,23 +11,24 @@ Each entry has the same five parts, deliberately:
 - **What I rejected** and why
 - **Which of the three criteria it earns**, and where the AI-loops rule bites
 
-The three criteria, quoted, because every entry is scored against them:
+The three criteria I scored every entry against:
 
-> **The ugly edges.** The angled photo. The vendor who quoted 27 of 30 lines. The one
-> who quoted in USD. The one whose "per box" is someone else's "per 100 pieces."
-> What does your system do, and what does it show the buyer, when it isn't sure?
+> **The ugly edges.** An angled photo of a rate card. A supplier who quoted only some
+> of the lines. One who quoted in another currency. Two whose units differ, a box
+> against a hundred pieces. What does the system do when it is not sure, and what
+> does the buyer see?
 >
-> **Trust.** Would a buyer with ₹4 crore on the line act on what's on your screen?
-> What did you build to earn that?
+> **Trust.** Would a buyer with crores at stake act on what the screen shows? What
+> earns that?
 >
-> **Judgment and taste.** A thousand decisions here have no correct answer. We want
-> to see how you made them, and whether you can say why.
+> **Judgment and taste.** Many decisions here have no single correct answer. Each one
+> should come with a reason.
 
-And the rule:
+And the one constraint:
 
-> **One rule: stub the plumbing, but the AI loops must be real.** Fake the SMTP
-> server if you like. Don't fake the extraction, don't fake the reasoning, don't
-> hardcode the answers to your demo questions.
+> **The AI loops are real.** Delivery plumbing, such as an SMTP server, may be stubbed.
+> Extraction and reasoning may not be faked, and no demo question is answered from a
+> stored answer.
 
 ---
 
@@ -314,7 +315,7 @@ was the part that felt like a demo rather than a product.
 document that lands goes through the identical path as a drag-and-drop upload. A button
 that makes prepared answers appear is a scripted demo. A button that makes real documents
 arrive, which are then genuinely read, is a stubbed transport, and the difference is the
-whole of the brief's one rule. The panel says which it is doing, because a viewer cannot
+whole of the project's one constraint. The panel says which it is doing, because a viewer cannot
 tell by looking.
 
 **Why five of ten and not ten of ten.** You invite ten and five answer. A version where
@@ -338,7 +339,7 @@ ships with the build. A supplier nobody has heard of gets a column created at up
 
 **Why.** Until this session, the calculator closed over the seeded 30 IT-hardware lines
 and the five named suppliers. It worked beautifully on my data and would have failed
-in front of an interviewer who said "read this one instead". That is a demo, not a
+in front of anyone who said "read this one instead". That is a demo, not a
 product.
 
 **What it costs.** More moving parts, and a real bug found on the way: `responses.vendor_id`
@@ -409,7 +410,7 @@ against a per-piece quote, a pointer at another price, money hidden in a footnot
 no longer names DIMM kits, boxes of ten, or "same as our March rates".
 
 **Why.** The earlier prompt was pre-briefed on my own dataset's specific tricks.
-Defensible as domain knowledge, and a sharp grader could fairly call it teaching to the
+Defensible as domain knowledge, and a sharp reviewer could fairly call it teaching to the
 test.
 
 **What it costs.** Probably a small accuracy drop on my corpus. That is the point.
@@ -463,7 +464,7 @@ demo".
 
 | # | Decision | Why | Cost |
 |---|---|---|---|
-| D1 | Category: IT hardware | Densest unit traps per line of any category the brief named | Less relatable than packaging. Mitigated with two more RFx sets in `RFX-SETS.md` |
+| D1 | Category: IT hardware | Densest unit traps per line of any category considered | Less relatable than packaging. Mitigated with two more RFx sets in `RFX-SETS.md` |
 | D2 | Claude Opus 5, with a provider seam | Native PDF citations give real provenance, not a model-reported guess | Cost. The seam means provider is config, not architecture |
 | D3 | PDF read without citations is marked `provenanceWeaker` | On a provider with no citations API the locator is the model's own claim, which is weaker evidence | An extra state to explain |
 | D4 | Embedded Postgres locally, Neon in production | Fully runnable before anyone creates a cloud database. One env var switches | PGlite is single-process, so CLI writes are invisible to a running server |
@@ -477,7 +478,7 @@ demo".
 | D12 | Revision number derived from what the document claims | A counter would move on re-upload and flip which quote the buyer sees | Cannot order revisions that do not reference each other |
 | D13 | Active enquiry = most recently drafted | Two other rules were tried and rejected; see A7 | An abandoned draft takes over until discarded, so a discard exists |
 | D14 | Analyst answers cite the cells they used | An answer with no citations is a chat message, not analysis | Longer answers |
-| D15 | Analyst refuses when there is no data | Answering from a lookup table is exactly what the brief forbids | A refusal in the demo if the order of steps is wrong |
+| D15 | Analyst refuses when there is no data | Answering from a lookup table is exactly what the core constraint forbids | A refusal in the demo if the order of steps is wrong |
 | D16 | Provider rate-limit returns 503 with a plain sentence | A raw 500 carrying a provider payload tells a buyer nothing and looks like the tool is broken | Found by the e2e suite against an exhausted key |
 | D17 | `.msg` and iWork files refused with instructions | Better to say "save it as .eml" than to half-read a binary format | Two formats unsupported |
 | D18 | Magic-byte sniffing on every upload | A PDF renamed `.xlsx` would otherwise produce plausible-looking nonsense | Rejects some legitimately mislabelled files |
@@ -494,7 +495,7 @@ demo".
 | D31 | Questionnaire verdicts derived on every read, never stored | A certificate that expires between now and award changes the verdict with nothing to migrate. A stored verdict is the typed table again | Recomputed on every page load |
 | D32 | `asOf` is injected into the assessor, not read from the clock | An audit months later must reproduce the decision somebody actually signed, not re-judge it against today | One more parameter to thread |
 | D33 | An unassessed supplier stays in the award scenarios | Excluding a real bid for want of a document nobody chased is its own kind of wrong. The panel says plainly that nobody has assessed them | A buyer could miss the marker |
-| D34 | An unrecognised filename is refused, then offered a picker | Refusing to guess is right; refusing and offering nothing is the wall an interviewer's own file hits | One more interaction |
+| D34 | An unrecognised filename is refused, then offered a picker | Refusing to guess is right; refusing and offering nothing is the wall a newcomer's own file hits | One more interaction |
 | D35 | Uploaded documents are stored in Postgres as base64, not on disk | A serverless filesystem is read-only, and the Neon HTTP driver and PGlite disagree about binary encoding | A third more bytes on a photograph |
 | D36 | The function region is pinned to the database region | Twenty queries per page across the Pacific was two seconds of loading skeleton | A config that must move if the database does |
 | D27 | Schema changes ship as idempotent ALTER migrations | `CREATE TABLE IF NOT EXISTS` never adds a column to an existing database, and the failure is silent | Migrations must be written by hand |
@@ -515,7 +516,7 @@ Kept because "can you say why" includes the decisions I had to reverse.
 | A zero price treated as a rate | Inflated the headline by ₹7.1 lakh | Audit predicted the exact delta |
 | Like-for-like comparing line **counts** | Two scenarios can award the same number of different lines | Audit pass on my own guard |
 | Numbered nav (1, 2, 3) | The flow is not linear and the numbers implied it was | User told me it felt forced. They were right |
-| Calculator closed over the seeded catalog | Worked on my data, would have failed on an interviewer's | Being asked directly whether anything was hardcoded |
+| Calculator closed over the seeded catalog | Worked on my data, would have failed on anyone else's | Being asked directly whether anything was hardcoded |
 | "Active enquiry = newest" then "= one with replies" | The first broke on debris; the second broke the actual journey | Demo suite 10/10 → 1/10, then the e2e suite |
 | A hard refusal on the send, with no way forward | A dead end is a bug with good intentions. A buyer edits the draft until the check stops firing, leaving no record | Being asked what "refuses to send" actually meant |
 | "5 blocked on you" including 3 blocked on the supplier | Second instance of the same double-count, in the fields I had just fixed | The e2e suite summing the parts and getting 154 of 150 |
@@ -547,5 +548,5 @@ Kept because "can you say why" includes the decisions I had to reverse.
 | Live deployment | Vercel plus Neon, not yet done. Production build passes. |
 | `.msg` and iWork formats | Refused with instructions rather than supported. |
 
-The first one is the only one that touches the brief's rule. Everything the harness
+The first one is the only one that touches the core constraint. Everything the harness
 needs exists; it needs a key.

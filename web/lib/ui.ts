@@ -17,8 +17,8 @@ import type { CellStatus } from "./normalise";
  * "Zenith Infotech Solutions Pvt Ltd" does not fit above a price and does not
  * need to: a buyer comparing five bids calls them Zenith. This was
  * `v.name.split(" ")[0]` inline, in two places in the grid, which is fine for
- * these five and wrong for the general case the product claims to handle. An
- * interviewer uploading a quotation from "The Bombay Cable Company" would get
+ * these five and wrong for the general case the product claims to handle. A
+ * newcomer uploading a quotation from "The Bombay Cable Company" would get
  * a column headed "The".
  *
  * So: drop the legal form, then take the distinctive part. The full legal name

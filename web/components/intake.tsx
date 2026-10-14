@@ -293,7 +293,7 @@ function ResultList({
             The way forward for a file whose supplier we could not identify.
             Refusing to guess is the right call, because a price in the wrong
             column is a mistake nobody downstream can detect. Refusing to guess
-            and then offering nothing was the bug: an interviewer handing over
+            and then offering nothing was the bug: a newcomer handing over
             their own quotation hit a wall.
           */}
           {r.needsVendor && (

@@ -248,7 +248,7 @@ PRIOR_PO = {
 #
 # The five without documents are here as names only. They carry no prices and
 # no questionnaire answers, because inventing a reply for them would be
-# inventing extraction output, and that is the one thing the brief forbids.
+# inventing extraction output, and that is the one thing the core constraint forbids.
 
 ROSTER = [
     # The five who reply. Codes match the VENDORS below.

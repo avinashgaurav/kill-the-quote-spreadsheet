@@ -3,8 +3,8 @@
 /**
  * Two surfaces the comparison was missing.
  *
- * SUPPLIER PANEL. The brief asks for "questionnaire answers and attached docs
- * sitting alongside the numbers", and until now they existed in the data and
+ * SUPPLIER PANEL. Questionnaire answers and attached documents belong next to
+ * the numbers, and until now they existed in the data and
  * never on screen. A price column without its qualification is the exact thing
  * that makes a buyer award to a supplier who cannot legally supply them, so the
  * column header is now the way in: click a supplier and you get their

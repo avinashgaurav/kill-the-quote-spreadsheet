@@ -454,7 +454,7 @@ export function Workbench({
 
           {/* The analyst stays visible beside the grid: an answer usually needs
               checking against a cell, so making the buyer navigate away to ask
-              would break the loop the brief describes. */}
+              would break the ask-and-check loop. */}
           <aside className="hidden w-[380px] shrink-0 flex-col border-l xl:flex">
             <div className="flex shrink-0 items-center justify-between border-b px-4 py-2.5">
               <p className="text-xs font-semibold">Ask</p>

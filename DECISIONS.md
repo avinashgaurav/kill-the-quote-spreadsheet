@@ -58,7 +58,7 @@ rather than to me.
 *What was wrong:* the tool that checked the questionnaire read a pass/fail flag
 and a hand-typed sentence out of a data file. So *"is Vector's ISO 27001
 certificate actually valid?"* was answered by handing the model my own
-conclusion, which is the one thing the brief forbids by name.
+conclusion, which is exactly the shortcut this project rules out.
 *How I fixed it:* the verdict is now worked out from the supplier's actual
 answer and the certificate attached to it, every time it is asked.
 
@@ -73,7 +73,7 @@ stops making it necessary. The tool now returns each supplier's total, worked
 out by the same code that worked out the headline, and the model quotes it.
 
 **The safety net on photographs caught nothing.** This is the one I would lead
-with, because it is the brief's own question: what does it show the buyer when
+with, because it is the central question: what does it show the buyer when
 it isn't sure?
 
 *What was wrong, in two layers.* I read one rate card as five photographs of
@@ -101,7 +101,7 @@ about what did.
 
 ## What I left out, and why
 
-- **Real email sending.** Stubbed, as the brief permits, because the plumbing
+- **Real email sending.** Stubbed by design, because the plumbing
   proves nothing and the reading proves everything. The channel choice is not
   faked: invite a supplier on WhatsApp and their certificate really does not
   arrive, because that is what the medium does.
@@ -118,9 +118,9 @@ about what did.
 - **Cutting the last ties to the shipped example.** You can draft your own
   enquiry and it works end to end, but it still borrows the example's buyer
   details and assumption list. Visible only to someone who drafts a second
-  enquiry, so it lost to work the interviewer will actually see.
-- **Scale.** Tested at 30 lines and 5 replies, not 300 and 30. The brief asked
-  for the size where it hurts, and that size is about judgement, not volume.
+  enquiry, so it lost to work every user will actually see.
+- **Scale.** Tested at 30 lines and 5 replies, not 300 and 30. The scope was
+  the size where it hurts, and that size is about judgement, not volume.
 - **Pricing each ambiguity warning.** The gate tells the buyer what a supplier
   could do with a vague line. What that vagueness would cost in rupees is the
   better warning, and I ran out of time before building it.

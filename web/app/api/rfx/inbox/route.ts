@@ -9,7 +9,7 @@
  *
  *   FAKED     the transport. Nothing was emailed and no mailbox was polled.
  *             A supplier "replies" because their document is on file and you
- *             invited them. This is the SMTP server the brief says to stub.
+ *             invited them. This is the SMTP server that is deliberately stubbed.
  *
  *   NOT FAKED the reading. Every arriving document goes through the same
  *             extraction path as a drag-and-drop upload: a real model call, a

@@ -47,7 +47,7 @@ for base, usable, max_pages in SPECS:
     if orphans:                         fail.append(f"{base}: heading orphaned at a page foot")
     if text.count(chr(8212)):           fail.append(f"{base}: em dash in the output")
     if not text.count(chr(8377)):       fail.append(f"{base}: rupee glyph lost in conversion")
-    if max_pages and pages > max_pages: fail.append(f"{base}: {pages} pages, the brief asks for {max_pages}")
+    if max_pages and pages > max_pages: fail.append(f"{base}: {pages} pages, the limit is {max_pages}")
     print()
 
 if fail:

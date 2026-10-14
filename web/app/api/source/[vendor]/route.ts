@@ -13,7 +13,7 @@ import { getQuery } from "@/lib/db/client";
  * A buyer could read our finding that Vector's ISO 27001 certificate names the
  * withdrawn 2013 revision and expired in November, and could not open the
  * certificate: the one filter meant only the photograph was servable, and the
- * brief asks for "attached docs sitting alongside the numbers", not a summary
+ * product promises the attached documents next to the numbers, not a summary
  * of them. A verdict about a document nobody can look at is precisely the sort
  * of assertion this product refuses to make everywhere else.
  *

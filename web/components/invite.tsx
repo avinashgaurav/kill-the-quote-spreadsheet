@@ -11,7 +11,7 @@
  *
  * ONE THING IS SIMULATED AND IT IS ONLY ONE THING. Nothing is emailed and no
  * mailbox is polled: a supplier replies because their document is on file and
- * you invited them. That is the SMTP server the brief says to stub. The READING
+ * you invited them. That is the SMTP server that is deliberately stubbed. The READING
  * is real, and the panel says so on screen rather than in a comment, because a
  * viewer cannot tell the difference by looking and is entitled to be told.
  *

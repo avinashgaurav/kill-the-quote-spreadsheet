@@ -313,8 +313,8 @@ CREATE INDEX IF NOT EXISTS extraction_cache_file_idx ON extraction_cache (file_h
 /*
  * Documents a supplier ATTACHED to an answer, and what each one says.
  *
- * The brief asks for "questionnaire answers and attached docs sitting
- * alongside the numbers". The reading half was built first: an answer that
+ * Questionnaire answers and attached documents belong next to the numbers.
+ * The reading half was built first: an answer that
  * cites VDS_ISO27001.pdf causes that PDF to be opened and read, because the
  * revision year and the expiry date are inside it and not on the form.
  *

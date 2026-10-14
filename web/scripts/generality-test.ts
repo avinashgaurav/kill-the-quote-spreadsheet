@@ -1,8 +1,8 @@
 /**
  * The "your data, not my data" test.
  *
- * The one failure that would ruin a live demo is not a wrong number. It is an
- * interviewer saying "here is my own enquiry and my own supplier" and the screen
+ * The one failure that would ruin a live demo is not a wrong number. It is a
+ * newcomer saying "here is my own enquiry and my own supplier" and the screen
  * coming back empty, because the whole comparison was quietly computed against
  * the thirty IT-hardware lines that happen to ship with the build.
  *

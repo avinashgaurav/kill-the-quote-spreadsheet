@@ -13,7 +13,7 @@ import { checkAccess, consumeQuota } from "@/lib/demo-guard";
 /**
  * Upload vendor documents and read them.
  *
- * This is the loop the brief requires to be real, so what happens here is
+ * This is the loop the core constraint requires to be real, so what happens here is
  * exactly what it looks like: the bytes go to the model, the model reports what
  * the document says, code validates it, and the rows are stored with their
  * provenance. There is no lookup table and no branch on filename that produces

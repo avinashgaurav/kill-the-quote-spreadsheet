@@ -3,7 +3,7 @@
 /**
  * The comparison grid: 30 lines x 5 suppliers, same units, same currency.
  *
- * This is the screen the brief is really asking about, so the density is
+ * This is the screen the whole product is really about, so the density is
  * deliberate. All 150 cells are reachable without paging, rows are 30px, and
  * the numbers use tabular figures so a column can be compared by eye. The
  * header and the line column are sticky, because a price is meaningless once

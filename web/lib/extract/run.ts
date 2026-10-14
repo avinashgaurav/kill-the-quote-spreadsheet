@@ -1,7 +1,7 @@
 /**
  * The extraction runner.
  *
- * This is the loop the brief says must be real, so a few things about it are
+ * This is the loop the core constraint says must be real, so a few things about it are
  * deliberate and worth stating:
  *
  * NO TOOLS BUT ONE. The extraction call is given exactly one tool, which only
@@ -15,7 +15,7 @@
  * CACHED, NOT FAKED. Results are cached on (model, prompt hash, file hash).
  * Re-running the same document does not re-spend, and a demo can be fast
  * without anything being hardcoded. Change the file or the prompt and it
- * genuinely re-runs. This distinction is the whole of the brief's one rule.
+ * genuinely re-runs. This distinction is the whole of the core constraint.
  *
  * CROP AND RE-READ. For photographs, each value's bounding box is cropped and
  * read again by a separate call with no surrounding context. Two independent
