@@ -279,7 +279,7 @@ export function questionnaireWorkbook(draft: DraftedRfx, rfxId: string): Buffer 
  *
  * BUILD-PLAN promised CSV alongside the workbook and it was never built. It is
  * worth having for a reason the xlsx cannot cover: a CSV is what somebody
- * pastes into whatever they already use, and it is the format a reviewer can
+ * pastes into whatever they already use, and it is the format anyone can
  * open with no assumptions at all.
  *
  * The xlsx is still the better artefact, because it carries the provenance in

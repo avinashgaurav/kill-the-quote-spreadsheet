@@ -34,7 +34,7 @@ The model extracts what a document says, in the supplier's own unit and currency
 
 | Metric | Definition | Baseline | Release threshold |
 |---|---|---|---|
-| **North star:** time to award-ready | Last supplier reply received to a comparison with no unresolved cells | Not yet measured | TBD (measured in EVALS.md) |
+| **North star:** time to award-ready | Last supplier reply received to a comparison with no unresolved cells | Not yet measured | TBD (measured in EVALS.md, planned) |
 | Price exactness | Extracted prices matching the answer key exactly | TBD (measured in EVALS.md) | TBD |
 | Invented-value rate | Extracted values with no source in the document | TBD (measured in EVALS.md) | 0% |
 | Contested-value rate | Prices where two independent reads disagree, routed to a person | TBD (measured in EVALS.md) | TBD |

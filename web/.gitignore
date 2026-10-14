@@ -32,7 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
-# ...but the template, which carries no values, is how a reviewer knows
+# ...but the template, which carries no values, is how a newcomer knows
 # which variables exist. A deeper .gitignore wins over the root one, so the
 # negation has to live here.
 !.env.example
@@ -54,7 +54,7 @@ next-env.d.ts
 # them got committed anyway: a `git add -A` ran while background agents were
 # writing _probe5.ts, _probe6.ts, _probe7.ts, _tmp_chase.ts and _tmp_dump.ts
 # into that directory. Nothing broke, and the repo carried five files that were
-# never meant to be read, in the folder a reviewer opens to see how it is
+# never meant to be read, in the folder a reader opens to see how it is
 # tested.
 #
 # My own instructions say never `git add -A`. Convention did not stop it, so a

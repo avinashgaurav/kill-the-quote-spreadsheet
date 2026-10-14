@@ -98,7 +98,7 @@ export async function POST(request: Request) {
         // final answer here is a short paragraph and a small table.
         // 6000 thinking + 2000 answer after the clamp in lib/llm.ts. It was
         // 4000 total, which the clamp correctly cut to 2000 thinking, and this
-        // is the graded capability: leading with coverage before money and
+        // is the core capability: leading with coverage before money and
         // citing its cells is the reasoning worth paying for.
         maxTokens: 8000,
         effort: "high",

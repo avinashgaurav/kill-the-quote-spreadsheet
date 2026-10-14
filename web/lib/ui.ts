@@ -65,8 +65,8 @@ export function displayState(status: CellStatus): DisplayState {
  *
  * An em dash for all of them was the original, and it collapsed five different
  * buyer actions into one shrug: chase the supplier, accept their answer, open
- * the original document, or ask for a real price. The graded question is
- * literally "what does it show the buyer when it isn't sure", so each kind of
+ * the original document, or ask for a real price. The question that matters
+ * most is "what does it show the buyer when it isn't sure", so each kind of
  * nothing gets its own mark, and the legend explains all of them.
  *
  * Glyphs are chosen to be distinguishable without colour, since roughly one man

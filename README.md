@@ -85,6 +85,14 @@ No database setup. With `DATABASE_URL` unset it runs embedded Postgres (PGlite) 
 **Without an API key** the calculator, grid, provenance, exports and every award scenario
 still work. The three AI loops refuse honestly rather than answering from a lookup table.
 
+**Loading demo data.** A fresh clone starts with an empty comparison. To fill it without a
+key, leave `npm run dev` running and, from `web/` in a second terminal, run
+`npm run fixture`. That posts to the dev-only `/api/dev/fixture` route, which writes the
+shipped quotes (`web/lib/data/raw-quotes.json`) as test-harness cells, each marked
+`test_fixture` under a banner that stays until they are gone; `npm run fixture:wipe` removes
+them. With a key, `npm run demo:load` instead reads every supplier's real documents through
+the model (`-- --dry` shows what it would do first).
+
 ## Demo protection
 
 Set `DEMO_ACCESS_CODE` on a public deployment and every route that calls a model (analyst,

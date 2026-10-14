@@ -11,8 +11,8 @@
  * priced 2, and test counts that had drifted in both directions.
  *
  * None of them changed a conclusion. All of them are the kind of thing a
- * reviewer finds in one command, in a submission whose entire argument is that
- * its numbers can be trusted. So the numbers now come from here, and this file
+ * careful reader finds in one command, in a project whose entire argument is
+ * that its numbers can be trusted. So the numbers now come from here, and this file
  * is the thing to re-run before touching a document.
  */
 

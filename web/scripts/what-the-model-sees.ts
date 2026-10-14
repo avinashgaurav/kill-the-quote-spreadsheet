@@ -12,7 +12,7 @@
  * `npm run accuracy`, which needs a key; this needs nothing and answers the
  * prior question: did the information survive the format at all?
  *
- * SECOND, and this is the one that matters live: a reviewer hands you a
+ * SECOND, and this is the one that matters live: someone hands you a
  * spreadsheet with four sheets, or a fourteen-page PDF, and asks whether you
  * read the whole thing. This prints the answer for their file rather than
  * asserting it about mine. Every sheet name, every page, the count of numbers

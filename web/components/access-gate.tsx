@@ -5,7 +5,7 @@
  *
  * Mounted once at the root and invisible until a model route answers 401 for
  * want of a code (see lib/model-fetch.ts). Browsing never triggers it, so a
- * reviewer only meets it at the moment something would cost money.
+ * visitor only meets it at the moment something would cost money.
  */
 
 import { useEffect, useState } from "react";

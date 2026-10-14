@@ -237,7 +237,7 @@ Call report_questionnaire exactly once, after reading the whole document.`;
  * on 30 November 2025. The contradiction the whole demo turns on lives in a
  * document that nothing ever opened. It only appeared to work because the
  * seeded fixture had the standard and the date typed into the `doc` string, so
- * a fixture read produced the finding and a REAL read did not. A reviewer
+ * a fixture read produced the finding and a REAL read did not. A user
  * saying "now upload Vector's questionnaire properly" would have watched six
  * mandatory failures become five and the money moment disappear.
  *

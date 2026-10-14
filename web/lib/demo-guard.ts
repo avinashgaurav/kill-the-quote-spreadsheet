@@ -2,7 +2,7 @@
  * Who may spend the owner's model budget, and how much of it.
  *
  * The comparison grid, provenance and exports are free to serve, so they stay
- * open: a reviewer should be able to browse the whole thing without asking
+ * open: a visitor should be able to browse the whole thing without asking
  * anyone. Every route that calls a model costs real money per request, and on
  * a public URL with no gate one script could empty the account overnight.
  *
