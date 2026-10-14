@@ -732,7 +732,7 @@
       "fx_note": "Converted at the reference rate on the date of invoicing, not the date of bid.",
       "footnote_discount_pct": 4.5,
       "footnote_discount_scope": "OEM-branded lines only, subject to deal registration approval",
-      "footnote_discount_note": "Buried in footnote 3 on page 2. Not reflected in any unit price. Conditional on an approval the vendor does not yet hold."
+      "footnote_discount_note": "Buried in footnote 3 on page 3. Not reflected in any unit price. Conditional on an approval the vendor does not yet hold."
     },
     "V3": {
       "gst": "'Taxes as applicable' - rate and inclusive/exclusive both unstated",
@@ -1161,7 +1161,7 @@
   "assumptions": {
     "fx_usd_inr": {
       "value": 88.4,
-      "source": "Vendor V2's own stated reference rate, quote page 1",
+      "source": "Vendor V2's own stated reference rate, quote page 2",
       "alternative": "RBI reference rate on bid-due date",
       "note": "V2's terms say conversion happens at the rate on the INVOICE date, not the bid date. Any INR total for V2 is therefore an estimate, not an offer. The buyer sees this wherever a V2 total is shown.",
       "confidence": "stated by vendor, not independently verified"
@@ -1179,7 +1179,7 @@
     },
     "v2_footnote_discount": {
       "value": "EXCLUDED from the ranked comparison",
-      "source": "V2 quote, footnote 3, page 2",
+      "source": "V2 quote, footnote 3, page 3",
       "alternative": "include 4.5% on OEM-branded lines",
       "note": "Conditional on a deal-registration approval V2 does not hold yet. Shown to the buyer as a named upside scenario, never folded into the headline number."
     },

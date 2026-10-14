@@ -189,7 +189,7 @@ const CALLS: Call[] = [
     outTok: 200, thinkBudget: budgets.medium, count: 1,
   },
   {
-    what: "Crop re-read, photo values", file: "lib/extract/run.ts:393",
+    what: "Crop re-read, photo values", file: "lib/extract/run.ts (verifyByCrop)",
     prefixTok: 120, payloadTok: imageTokens(300, 120),
     outTok: 20, thinkBudget: budgets.low, count: 8,
   },

@@ -36,7 +36,7 @@ from catalog import (LINES, VENDORS, QUOTES, TERMS, PRIOR_PO, RFX,
 ASSUMPTIONS = {
     "fx_usd_inr": dict(
         value=88.40,
-        source="Vendor V2's own stated reference rate, quote page 1",
+        source="Vendor V2's own stated reference rate, quote page 2",
         alternative="RBI reference rate on bid-due date",
         note="V2's terms say conversion happens at the rate on the INVOICE date, not the "
              "bid date. Any INR total for V2 is therefore an estimate, not an offer. "
@@ -59,7 +59,7 @@ ASSUMPTIONS = {
     ),
     "v2_footnote_discount": dict(
         value="EXCLUDED from the ranked comparison",
-        source="V2 quote, footnote 3, page 2",
+        source="V2 quote, footnote 3, page 3",
         alternative="include 4.5% on OEM-branded lines",
         note="Conditional on a deal-registration approval V2 does not hold yet. Shown to "
              "the buyer as a named upside scenario, never folded into the headline number.",

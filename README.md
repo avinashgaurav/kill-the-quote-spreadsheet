@@ -9,7 +9,25 @@ An independent product case study in AI-assisted procurement. The demo runs on a
 **fictional** dataset: thirty line items, a questionnaire, attached documents, and a roster
 of ten made-up suppliers of whom five reply. No real company, supplier or price is used.
 
-**Live:** https://kill-the-quote-spreadsheet.vercel.app
+**Live demo:** https://kill-the-quote-spreadsheet.vercel.app. Browsing is open: the
+comparison grid, cell provenance, supplier panels and all four exports. Anything that calls
+a model (drafting an enquiry, reading an upload or a reply, asking the analyst) needs an
+access code. Ask the author for one.
+
+## Why AI here, why code there
+
+A model is used only where the input is free-form language or images. Anything that must
+be exact and repeatable is ordinary code. The full list is in [AI-MAP.md](AI-MAP.md).
+
+| Step | Done by | Why |
+|---|---|---|
+| Draft the RFx from a conversation | Model (`lib/copilot.ts`) | Turning "200 laptops for three offices" into lines and questions is language work. It has no price field, so it cannot invent one |
+| Read each quotation, in any format | Model (`lib/extract/run.ts`) | Formats are unbounded (a photo, a price in a sentence), so rules cannot read them. It reports numbers as written and converts nothing |
+| Second read of the 8 largest prices on a photo | Model, cheaper tier, shown only the crop | Its value is independence. If the two reads disagree, code removes the price from every total |
+| Read questionnaire answers and attached certificates | Model (`lib/extract/questionnaire.ts`) | It reports what each document says and returns no verdict |
+| Units, currency, landed cost, totals, award scenarios | Code (`lib/normalise.ts`) | Must give the same answer every time; two independent implementations agree on all 150 cells |
+| Pass or fail on each question, and what each supplier still owes | Code (`lib/questionnaire.ts`, `lib/chase.ts`) | Comparing an expiry date to today is not a judgement call, and a model may echo the supplier's "yes" |
+| Answer the buyer's questions | Model chooses among 10 calculator tools (`lib/analyst.ts`) | Language in, language out. Every number comes from a tool; there is no tool that does free arithmetic |
 
 ![The comparison grid: thirty lines, five suppliers, coverage and contested cells flagged](docs/screenshots/comparison-grid.png)
 *The comparison grid: every price landed in rupees per the asked unit, with off-spec, contested and missing cells marked.*
@@ -53,7 +71,7 @@ asserted. Every row names the file behind it.
 | Answers come back as **text, tables, charts or exports** | Text and markdown tables. Bar charts, coloured by group, so "who wins each of thirty lines" is one chart. Four exports: award note, xlsx with provenance in cell comments, CSV, and a JSON audit bundle. |
 | Analysis runs **on extracted data** and ends in an award the buyer can defend | The award note leads with what the total rests on, why not the cheapest, the assumptions in force, the money deliberately not counted, and who was asked for what and whether they replied. |
 | Realistic scale: several suppliers, dozens of lines, a questionnaire, attachments | 30 lines, 10 suppliers of whom 5 reply, 10 questions of which 6 are mandatory, certificates and OEM letters. |
-| A fictional dataset a procurement professional would find credible | HSN codes per line, GSTIN and CIN, pack sizes that trap ("kit of 2", "box of 10", "box of 50"), MOQ, ex-works Singapore, a discount buried in footnote 3 on page 3, a prior-PO rate card, and a Rev 2 that supersedes a Rev 1. |
+| A fictional dataset a procurement professional would find credible | HSN codes per line, GSTIN and CIN, pack sizes that trap ("kit of 2", "box of 10", "box of 50"), MOQ, ex-works Singapore, a discount buried in footnote 3 on page 3, a prior-PO rate card, and a Rev 2 that supersedes a Rev 1. Known inconsistency, left as the supplier wrote it: Cygnus's terms say the 88.4 rate is "shown on page 1", but it sits on page 2. |
 | **The core constraint:** the AI loops are real, and no demo question is answered from a stored answer | Six model call sites, no lookup tables, and **two violations of this found and fixed** rather than avoided. See below. |
 
 **The two violations, because finding them is the point.** The analyst's

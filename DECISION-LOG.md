@@ -125,7 +125,7 @@ meaning and its own next action:
 | `!` | Needs your judgement | Decide |
 
 **Why.** The first build rendered all five as a dash. Five different actions collapsed
-into one shrug. A buyer cannot triage 44 empty cells that all look the same.
+into one shrug. A buyer cannot triage 51 empty cells that all look the same.
 
 **What it costs.** A legend to learn, and more visual noise in a grid that is already
 dense.
@@ -142,16 +142,18 @@ nodes.
 
 ---
 
-## A5. The ₹77.5 lakh saving that is not one
+## A5. The ₹45.3 lakh saving that is not one
 
 **The choice.** Whenever two award scenarios do not cover the same set of lines, the
 system says so and restates both on the common basis before anyone compares them.
 
-**Why.** Scenario (c), the strictest one, has a headline about ₹77.5 lakh **lower** than
+**Why.** Scenario (c), the strictest one, has a headline about ₹45.3 lakh **lower** than
 scenario (b). It looks like discipline saves money. It does not: it is lower because it
-awards 27 lines instead of 30. On the 27 lines all scenarios can fill, it is about
-₹4.1 lakh **dearer**.
+awards 28 lines instead of 30. On the 28 lines all scenarios can fill, it is about
+₹5.0 lakh **dearer**.
 Both numbers are individually correct, which is exactly why a careful human misses it.
+(Live-site figures. The offline reference data gives ₹77.5 lakh, 27 lines and ₹4.1 lakh;
+`npm run doc-numbers` prints those.)
 
 **What it costs.** A guard that fires and an explanation the buyer must read. It makes
 the screen less punchy.
@@ -207,7 +209,7 @@ and the award note prints who was asked, when, and whether they answered.
 
 **Why.** A supplier sending less than the enquiry asked for is not an edge case, it is
 the normal case. In this dataset one supplier sent a five-line email: 2 of 30 lines
-priced, no questionnaire, no terms. **That is ₹2.89 crore sitting behind a request
+priced, no questionnaire, no terms. **That is ₹2.92 crore sitting behind a request
 nobody had sent.**
 
 The deeper reason is the one that earns its place in the product. "Their questionnaire
@@ -475,7 +477,7 @@ demo".
 | D10 | Discount conditional on complete scope not applied to partial awards | A total-level discount that requires the whole order must not flatter a split award | An extra branch |
 | D11 | A zero price is `needs_review`, not a rate of zero | "Included at no additional charge" is a scope statement, not a price. Treating it as ₹0 inflated the headline by ₹7.1 lakh | A supplier genuinely quoting zero needs a human |
 | D12 | Revision number derived from what the document claims | A counter would move on re-upload and flip which quote the buyer sees | Cannot order revisions that do not reference each other |
-| D13 | Active enquiry = most recently drafted | Two other rules were tried and rejected; see A7 | An abandoned draft takes over until discarded, so a discard exists |
+| D13 | Active enquiry = most recently drafted | Two other rules were tried and rejected; see Part E | An abandoned draft takes over until discarded, so a discard exists |
 | D14 | Analyst answers cite the cells they used | An answer with no citations is a chat message, not analysis | Longer answers |
 | D15 | Analyst refuses when there is no data | Answering from a lookup table is exactly what the no-stored-answers rule forbids | A refusal in the demo if the order of steps is wrong |
 | D16 | Provider rate-limit returns 503 with a plain sentence | A raw 500 carrying a provider payload tells a buyer nothing and looks like the tool is broken | Found by the e2e suite against an exhausted key |
@@ -518,7 +520,6 @@ Kept because "can you say why" includes the decisions I had to reverse.
 | Calculator closed over the seeded catalog | Worked on my data, would have failed on anyone else's | Asking myself directly whether anything was hardcoded |
 | "Active enquiry = newest" then "= one with replies" | The first broke on debris; the second broke the actual journey | Demo suite 10/10 → 1/10, then the e2e suite |
 | A hard refusal on the send, with no way forward | A dead end is a bug with good intentions. A buyer edits the draft until the check stops firing, leaving no record | Trying to explain what "refuses to send" actually meant |
-| "5 blocked on you" including 3 blocked on the supplier | Second instance of the same double-count, in the fields I had just fixed | The e2e suite summing the parts and getting 154 of 150 |
 | A schema change that never reached an existing database | `CREATE TABLE IF NOT EXISTS` is a no-op on an existing table, so the new column never arrived, the insert threw, and a defensively-caught write became a feature that silently did nothing | Two e2e cases failing with nothing on screen |
 | `sendIssues` throwing on a null line | A gate on an outbound action must fail closed, not crash | The regression suite, on its first run |
 | **Qualification verdicts from a hand-typed table** | A row said "nothing read" beside "FAILED 6". The screen was asserting a conclusion it could not have reached, and the expired-certificate finding was a fact I had written down as already found | Tracing, directly, where that data came from |
@@ -540,12 +541,11 @@ Kept because "can you say why" includes the decisions I had to reverse.
 
 | Gap | Why it is still open |
 |---|---|
-| **Extraction accuracy is unmeasured against a live model** | The harness is built and runs. The Gemini free key is quota-exhausted and there is no Anthropic key. This is the one claim I cannot make. |
+| **Extraction accuracy is not committed** | A local run on Gemini 3.1 Pro (first recorded 2026-09-10) scored 107 of 107 lines on price and unit, but its results are not in the repo yet, and no run on Claude has been recorded. Until a run is committed, this is the one claim a reader cannot check. |
 | Multiple enquiries at once | Supplier codes are globally unique, not per enquiry. Fine for one buyer at a time, wrong for a real tenant model. |
 | Questionnaire assessment for new suppliers | A supplier created at upload is marked NOT ASSESSED and stays that way. There is no flow to assess them. |
 | A chase is never automatically marked answered | `answered_at` exists and nothing sets it. Closing the loop needs matching a later upload to an open chase, which is a real feature, not a flag. Today the buyer closes it with a reason. |
-| Live deployment | Vercel plus Neon, not yet done. Production build passes. |
 | `.msg` and iWork formats | Refused with instructions rather than supported. |
 
 The first one is the only one that touches the core constraint. Everything the harness
-needs exists; it needs a key.
+needs exists; what is missing is a committed run.
