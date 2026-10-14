@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AccessGate } from "@/components/access-gate";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,6 +55,8 @@ export default function RootLayout({
             a slow tooltip makes scanning the grid feel broken. */}
         <TooltipProvider delayDuration={120} skipDelayDuration={300}>
           {children}
+          {/* Asks for the demo access code when a model route needs it. */}
+          <AccessGate />
         </TooltipProvider>
       </body>
     </html>

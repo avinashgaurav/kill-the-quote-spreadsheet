@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { modelFetch } from "@/lib/model-fetch";
 
 interface Supplier {
   code: string;
@@ -100,7 +101,7 @@ export function Invite({ onDone }: { onDone: () => void }) {
     // others with it.
     for (const code of [...picked]) {
       try {
-        const r = await fetch("/api/rfx/inbox", {
+        const r = await modelFetch("/api/rfx/inbox", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ supplierCode: code, channel }),

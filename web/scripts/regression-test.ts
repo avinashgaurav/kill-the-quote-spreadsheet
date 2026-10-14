@@ -772,6 +772,12 @@ async function main() {
   //
   // Compared by content hash rather than by mtime, because a copy is either
   // the same bytes or it is a different document.
+  //
+  // With one deliberate exception: 99-internal. It is the answer key, and
+  // everything under public/ is downloadable by anyone, so the copy served
+  // the oracle to the world at /dataset/99-internal/ground-truth.json. It
+  // lives only in dataset/out now, where the scripts already read it, and
+  // this check fails if it ever reappears under public/.
   {
     const { createHash } = await import("node:crypto");
     const { readdirSync, statSync } = await import("node:fs");
@@ -790,26 +796,39 @@ async function main() {
       return out;
     };
 
+    const INTERNAL = "99-internal/";
     const served = hashTree(resolve(process.cwd(), "public/dataset"));
-    const built = hashTree(resolve(process.cwd(), "..", "dataset", "out"));
+    const built = new Map(
+      [...hashTree(resolve(process.cwd(), "..", "dataset", "out"))]
+        .filter(([k]) => !k.startsWith(INTERNAL)),
+    );
+    const leaked = [...served.keys()].filter((k) => k.startsWith(INTERNAL));
 
     const missing = [...built.keys()].filter((k) => !served.has(k));
-    const extra = [...served.keys()].filter((k) => !built.has(k));
+    const extra = [...served.keys()].filter((k) => !built.has(k) && !k.startsWith(INTERNAL));
     const changed = [...built.entries()]
       .filter(([k, h]) => served.has(k) && served.get(k) !== h)
       .map(([k]) => k);
 
     check(
       "24. The deployed site served a different dataset from the tests",
-      "public/dataset is byte-identical to dataset/out",
+      "public/dataset is byte-identical to dataset/out, less the answer key",
       built.size > 0 && !missing.length && !extra.length && !changed.length,
       built.size === 0
         ? "dataset/out is missing entirely, so nothing could be compared"
         : missing.length || extra.length || changed.length
           ? `${changed.length} changed, ${missing.length} missing, ${extra.length} stale. ` +
-            `Run: cp -R ../dataset/out/. public/dataset/  ` +
+            `Run: rsync -a --exclude 99-internal ../dataset/out/ public/dataset/  ` +
             `First few: ${[...changed, ...missing].slice(0, 3).join(", ")}`
           : `${built.size} files, every hash identical`,
+    );
+    check(
+      "24b. The answer key was publicly downloadable",
+      "nothing from dataset/out/99-internal is under public/",
+      leaked.length === 0,
+      leaked.length
+        ? `${leaked.length} internal file(s) under public/dataset, e.g. ${leaked[0]}. Delete them`
+        : "public/dataset has no 99-internal directory",
     );
   }
 

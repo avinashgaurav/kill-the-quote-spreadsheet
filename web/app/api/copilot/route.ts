@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { callLlm, activeModel, activeProvider, toolResultPart, type Part } from "@/lib/llm";
 import { providerErrorResponse } from "@/lib/provider-error";
+import { guardModelRoute } from "@/lib/demo-guard";
 import { COPILOT_SYSTEM, COPILOT_TOOLS, sendBlockers, type DraftedRfx } from "@/lib/copilot";
 
 /**
@@ -21,6 +22,11 @@ import { COPILOT_SYSTEM, COPILOT_TOOLS, sendBlockers, type DraftedRfx } from "@/
 export const maxDuration = 300;
 
 export async function POST(request: Request) {
+  // Before anything is parsed: an access code, a per-IP rate and a daily cap.
+  // See lib/demo-guard.ts.
+  const refused = await guardModelRoute(request);
+  if (refused) return refused;
+
   try {
     // A malformed body is a 400 with a sentence, not a 500 with a SyntaxError.
     const body = await request.json().catch(() => null);

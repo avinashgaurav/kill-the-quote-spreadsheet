@@ -424,6 +424,17 @@ const MIGRATIONS = [
    * beside `questions: catalog.questionnaire`.
    */
   `ALTER TABLE rfx ADD COLUMN IF NOT EXISTS questionnaire jsonb`,
+  /*
+   * Usage counters for the demo guard (lib/demo-guard.ts): one row per bucket
+   * per window. A bucket is a hashed IP or the global daily total. Kept in the
+   * database because a serverless function's memory resets on every cold start.
+   */
+  `CREATE TABLE IF NOT EXISTS demo_usage (
+    bucket text NOT NULL,
+    window_start timestamptz NOT NULL,
+    calls integer NOT NULL DEFAULT 0,
+    PRIMARY KEY (bucket, window_start)
+  )`,
 ];
 
 async function connect(): Promise<{ db: Db; query: Query }> {

@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { modelFetch } from "@/lib/model-fetch";
 import { inrShort } from "@/lib/ui";
 
 interface ChartSpec {
@@ -118,7 +119,7 @@ export function AnalystChat({
     setTurns((t) => [...t, { role: "user", text: question }]);
     setBusy(true);
     try {
-      const res = await fetch("/api/analyst", {
+      const res = await modelFetch("/api/analyst", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history: historyRef.current }),

@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { modelFetch } from "@/lib/model-fetch";
 
 interface ClarityIssue {
   severity: "blocking" | "should_fix" | "note";
@@ -150,7 +151,7 @@ export function CopilotPanel({
     setTurns((t) => [...t, { role: "user", text: message }]);
     setBusy(true);
     try {
-      const res = await fetch("/api/copilot", {
+      const res = await modelFetch("/api/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, history }),

@@ -39,6 +39,7 @@ import {
 } from "@/lib/store";
 import catalog from "@/lib/data/catalog.json";
 import { providerSentence } from "@/lib/provider-error";
+import { guardModelRoute } from "@/lib/demo-guard";
 
 export const maxDuration = 300;
 
@@ -160,6 +161,11 @@ export async function GET() {
  * a single slow or failed read does not take the others with it.
  */
 export async function POST(request: Request) {
+  // Before anything is parsed: an access code, a per-IP rate and a daily cap.
+  // See lib/demo-guard.ts.
+  const refused = await guardModelRoute(request);
+  if (refused) return refused;
+
   try {
     const body = await request.json().catch(() => ({}));
     const code = String(body.supplierCode ?? "").trim();

@@ -8,6 +8,7 @@ import {
 } from "@/lib/extract/questionnaire";
 import { dbCache } from "@/lib/extract/cache";
 import { providerSentence, providerErrorResponse } from "@/lib/provider-error";
+import { guardModelRoute } from "@/lib/demo-guard";
 
 /**
  * Upload vendor documents and read them.
@@ -29,12 +30,45 @@ import { providerSentence, providerErrorResponse } from "@/lib/provider-error";
 // default serverless window allows.
 export const maxDuration = 300;
 
+/**
+ * Bounds on one upload. A queue rather than a fixed list: reading an email can
+ * discover an attachment that itself needs reading, so the document bound also
+ * stops a pathological attachment chain from looping. Both are refused up front
+ * with 413 rather than truncated, so nobody pays to read half an upload.
+ */
+const MAX_DOCUMENTS = 40;
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
+
+const tooLarge = (error: string) => Response.json({ ok: false, error }, { status: 413 });
+
 export async function POST(request: Request) {
+  // Before anything is parsed: an access code, a per-IP rate and a daily cap.
+  // See lib/demo-guard.ts.
+  const refused = await guardModelRoute(request);
+  if (refused) return refused;
+
+  const sizeLimit =
+    `The upload is over ${MAX_UPLOAD_BYTES / 1024 / 1024} MB. Send fewer or smaller files at a time.`;
+  // The header is checked first so an oversized body is refused unread. It can
+  // be absent, so the files are measured again once parsed.
+  if (Number(request.headers.get("content-length") ?? 0) > MAX_UPLOAD_BYTES) {
+    return tooLarge(sizeLimit);
+  }
+
   try {
     await seedRfx();
 
     const form = await request.formData();
     const files = form.getAll("files").filter((f): f is File => f instanceof File);
+    if (files.reduce((n, f) => n + f.size, 0) > MAX_UPLOAD_BYTES) {
+      return tooLarge(sizeLimit);
+    }
+    if (files.length > MAX_DOCUMENTS) {
+      return tooLarge(
+        `${files.length} files is more than the ${MAX_DOCUMENTS} one upload can read. ` +
+        `Send them in smaller batches.`,
+      );
+    }
     const explicitVendor = form.get("vendor");
     const verifyPhotos = form.get("verifyPhotos") !== "false";
 
@@ -56,11 +90,8 @@ export async function POST(request: Request) {
     const rfx = await activeRfx();
     const knownVendors = new Set(rfx.ctx.vendors.map((v) => v.code));
 
-    // A queue rather than a fixed list: reading an email can discover an
-    // attachment that itself needs reading. Bounded so a pathological
-    // attachment chain cannot loop.
+    // Bounded by MAX_DOCUMENTS above, attachments found inside emails included.
     const queue = [...files];
-    const MAX_DOCUMENTS = 40;
 
     /**
      * Everything in this upload, so a questionnaire can be checked against the

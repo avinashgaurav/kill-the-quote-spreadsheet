@@ -69,6 +69,15 @@ No database setup. With `DATABASE_URL` unset it runs embedded Postgres (PGlite) 
 **Without an API key** the calculator, grid, provenance, exports and every award scenario
 still work. The three AI loops refuse honestly rather than answering from a lookup table.
 
+## Demo protection
+
+Set `DEMO_ACCESS_CODE` on a public deployment and every route that calls a model (analyst,
+co-pilot, extract, inbox) asks for it once, then trusts a signed seven-day cookie
+(`DEMO_COOKIE_SECRET`, optional). Browsing the grid and the exports needs no code. Model
+requests are also capped at `DEMO_RATE_LIMIT` per IP per 10 minutes (default 20) and
+`DEMO_DAILY_CALL_CAP` per UTC day (default 300), counted in Postgres. Uploads over 15 MB or
+40 files are refused. Everything lives in `web/lib/demo-guard.ts`; see `web/.env.example`.
+
 ## Two loops, one rule
 
 The model reads two kinds of document, and the split is the same in both:
