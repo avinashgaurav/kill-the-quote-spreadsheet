@@ -9,7 +9,25 @@ An independent product case study in AI-assisted procurement. The demo runs on a
 **fictional** dataset: thirty line items, a questionnaire, attached documents, and a roster
 of ten made-up suppliers of whom five reply. No real company, supplier or price is used.
 
-**Live:** https://kill-the-quote-spreadsheet.vercel.app
+**Live demo:** https://kill-the-quote-spreadsheet.vercel.app. Browsing is open: the
+comparison grid, cell provenance, supplier panels and all four exports. Anything that calls
+a model (drafting an enquiry, reading an upload or a reply, asking the analyst) needs an
+access code. Ask the author for one.
+
+## Why AI here, why code there
+
+A model is used only where the input is free-form language or images. Anything that must
+be exact and repeatable is ordinary code. The full list is in [AI-MAP.md](AI-MAP.md).
+
+| Step | Done by | Why |
+|---|---|---|
+| Draft the RFx from a conversation | Model (`lib/copilot.ts`) | Turning "200 laptops for three offices" into lines and questions is language work. It has no price field, so it cannot invent one |
+| Read each quotation, in any format | Model (`lib/extract/run.ts`) | Formats are unbounded (a photo, a price in a sentence), so rules cannot read them. It reports numbers as written and converts nothing |
+| Second read of the 8 largest prices on a photo | Model, cheaper tier, shown only the crop | Its value is independence. If the two reads disagree, code removes the price from every total |
+| Read questionnaire answers and attached certificates | Model (`lib/extract/questionnaire.ts`) | It reports what each document says and returns no verdict |
+| Units, currency, landed cost, totals, award scenarios | Code (`lib/normalise.ts`) | Must give the same answer every time; two independent implementations agree on all 150 cells |
+| Pass or fail on each question, and what each supplier still owes | Code (`lib/questionnaire.ts`, `lib/chase.ts`) | Comparing an expiry date to today is not a judgement call, and a model may echo the supplier's "yes" |
+| Answer the buyer's questions | Model chooses among 10 calculator tools (`lib/analyst.ts`) | Language in, language out. Every number comes from a tool; there is no tool that does free arithmetic |
 
 ![The comparison grid: thirty lines, five suppliers, coverage and contested cells flagged](docs/screenshots/comparison-grid.png)
 *The comparison grid: every price landed in rupees per the asked unit, with off-spec, contested and missing cells marked.*

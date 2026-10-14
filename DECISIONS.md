@@ -2,8 +2,8 @@
 
 **Kill the Quote Spreadsheet** · https://kill-the-quote-spreadsheet.vercel.app
 
-**I picked IT hardware** because it has the most unit traps of the four
-categories offered: kits, boxes of 10, boxes of 50, per-piece, per-DIMM. A unit
+**I picked IT hardware** because it has the most unit traps of the
+categories I considered: kits, boxes of 10, boxes of 50, per-piece, per-DIMM. A unit
 trap is the dangerous kind of error, because the wrong number still looks like a
 sensible price. Nobody catches it by reading the screen.
 

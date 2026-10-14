@@ -16,9 +16,9 @@ to do arithmetic, and never asked whether somebody passed.
 |---|---|---|---|
 | 1 | **Draft the enquiry**<br>`lib/copilot.ts` → `api/copilot` | Turn "I need 200 laptops for three offices" into scope, 30 line items, a questionnaire and terms. 3 tools, up to 8 turns. | Invent a price or an estimate. It has no view on what things cost. |
 | 2 | **Read a quotation**<br>`lib/extract/run.ts` | What does this document say, line by line, in the supplier's own unit and currency? One forced tool, no others. | Convert, multiply, discount, add, or rank. Report a number it cannot read. Return a value with no source. |
-| 3 | **Re-read a photograph's crop**<br>`lib/extract/run.ts:393` | Just this one value, cropped out, with no surrounding context. Cheap model, thinking off. | See the rest of the document. Two reads that agree is evidence; two that disagree drops the confidence. |
+| 3 | **Re-read a photograph's crop**<br>`lib/extract/run.ts` (`verifyByCrop`) | Just this one value, cropped out, with no surrounding context. Cheap model, thinking off. | See the rest of the document. Two reads that agree is evidence; two that disagree drops the confidence. |
 | 4 | **Read a questionnaire response**<br>`lib/extract/questionnaire.ts` | What did they answer, and what did they attach? Answer and evidence kept strictly apart, against **the questions this enquiry actually asked**. | Decide whether they pass. It returns no verdict at all. |
-| 5 | **Read an attached document**<br>`lib/extract/questionnaire.ts:338` | What do *you* say about yourself: which standard, with its revision year exactly as printed, which expiry date, issued to whom? | Judge whether it satisfies the question it was attached to. |
+| 5 | **Read an attached document**<br>`lib/extract/questionnaire.ts` (`extractEvidence`) | What do *you* say about yourself: which standard, with its revision year exactly as printed, which expiry date, issued to whom? | Judge whether it satisfies the question it was attached to. |
 | 6 | **Answer the buyer**<br>`lib/analyst.ts` → `api/analyst` | Choose which questions to put to the calculator, and explain what comes back. 10 tools, up to 12 turns. | Compute anything. There is deliberately no `evaluate` tool, no SQL, and no way to hand it two numbers and ask for their sum. |
 
 All six go through one seam, `lib/llm.ts`, so the provider is a one-line change
@@ -95,7 +95,7 @@ transport. The screen says which of those it is doing.
 cd web
 npm run api-check      # is the model reachable, and which tier
 npm run sees -- <file> # exactly what reaches the model for any document
-npm run verify         # 9 suites, no API key, 40 seconds
+npm run verify         # types, lint and 10 offline suites, no API key, about 20 seconds
 npm run accuracy       # is the reading actually right (needs a key)
 ```
 

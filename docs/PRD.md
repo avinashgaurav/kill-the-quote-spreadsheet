@@ -32,13 +32,21 @@ The model extracts what a document says, in the supplier's own unit and currency
 
 ## Success metrics
 
-| Metric | Definition | Baseline | Release threshold |
+**North star: time to award-ready.** Hours from the last supplier reply to a comparison with no unresolved cells and a drafted award note. **Target: under one working day per sourcing event (target, not yet measured).** The status quo of about four days is the unvalidated assumption above.
+
+| Supporting metric | Definition | Target | Where it stands |
 |---|---|---|---|
-| **North star:** time to award-ready | Last supplier reply received to a comparison with no unresolved cells | Not yet measured | TBD (measured in EVALS.md, planned) |
-| Price exactness | Extracted prices matching the answer key exactly | TBD (measured in EVALS.md) | TBD |
-| Invented-value rate | Extracted values with no source in the document | TBD (measured in EVALS.md) | 0% |
-| Contested-value rate | Prices where two independent reads disagree, routed to a person | TBD (measured in EVALS.md) | TBD |
-| Cost per normalised quote | Model spend to read one quotation fully | Estimated only (`npm run cost-model`); not measured | TBD |
+| Price exactness | Extracted prices matching the answer key exactly | 100% | A local Gemini 3.1 Pro run reported 107 of 107 lines; not yet committed (EVALS.md, planned) |
+| Invented-value rate | Extracted values with no source in the document | 0% | Same uncommitted run reported none |
+| Contested prices counted | Prices two independent reads disagree on that still reach a total | 0 | 0 by design: contested prices are excluded and routed to a person (regression case 47) |
+
+**Unit cost (estimates from `npm run cost-model`, not measured spend).** Priced at Gemini 3.1 Pro published rates ($2 per million input tokens, $12 per million output and thinking tokens), with thinking at about 35% of its budget. The app defaults to Claude Opus 5, which the script does not price.
+
+- Read one supplier quotation: about **$0.09** (five quotations, $0.44)
+- One analyst question: about **$0.19** (roughly three model turns)
+- One full demo (four drafting turns, every reply and the certificate read, eight questions): about **$2.58**, ceiling $4.90
+- One accuracy pass (`npm run accuracy -- --all`, ten reads): about **$0.87**
+- Re-reading an unchanged document: **$0**, served from the cache
 
 **Guardrails already enforced by tests (`npm run test:all`):** two independent calculators agree on all 150 cells (442 assertions); 69 regression cases for shipped bugs; 16 questionnaire-verdict cases.
 

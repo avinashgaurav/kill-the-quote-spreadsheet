@@ -120,7 +120,7 @@ formats real suppliers send:
 | Supplier | What they sent | Lines priced |
 |---|---|---|
 | Zenith | Their own Excel template, ignoring ours entirely | 30 of 30 |
-| Cygnus | A 3-page PDF, nine lines priced in USD, discount buried in a footnote on page 2 | 24 of 30 |
+| Cygnus | A 3-page PDF, nine lines priced in USD, discount buried in a footnote on page 3 | 24 of 30 |
 | Orbit | A Word document with the commercials written into sentences | 24 of 30 |
 | Vector | A photograph of a printed rate card, taken at an angle on a phone | 16 of 30 |
 | Helios | A five-line email pricing two lines, no questionnaire, no terms | 2 of 30 |
@@ -200,8 +200,8 @@ supplier who priced 2 of 30 cannot be compared on an overall total, then gives
 the per-line comparison instead.
 
 **The one who quoted in USD.** Cygnus priced nine lines in dollars. The system
-converts at 88.4, which is Cygnus's own stated rate from page 1 of their own
-quote, and shows the rupee figure, the rate, and where the rate came from. It
+converts at 88.4, which is Cygnus's own stated reference rate from page 2 of
+their own quote, and shows the rupee figure, the rate, and where the rate came from. It
 also flags that the quote is ex-works Singapore, so it excludes freight and duty
 and is not comparable with a delivered price.
 

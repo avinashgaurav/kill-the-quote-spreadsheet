@@ -11,41 +11,43 @@ traps change. Read Set 3 last: it is the one where a "line item" is not a thing 
 
 ## Set 1: IT hardware refresh (BUILT, this is the live demo)
 
-**Buyer:** Kaveri Retail, 210 stores. **Value:** about Rs 4.27 crore at budget.
+**Buyer:** Kaveri Retail, three sites (Bengaluru HQ, Pune, Gurugram). **Enquiry:** RFX-2026-0142.
+**Value:** about Rs 4.27 crore at budget.
 
 ### Scope
-Supply, delivery and 3-year onsite warranty of end-user compute, networking and
-peripherals for a store-network refresh. Delivery to a central warehouse in Bengaluru
-in three tranches. Prices asked ex-GST, in INR, DDP Bengaluru, 90-day validity.
+Supply, delivery, installation and commissioning of 30 line items across four groups:
+enduser compute, datacentre, network and power, and retail peripherals. Prices asked
+ex-GST, in INR, FOR destination at all three sites, 90-day validity.
 
 ### Line items (30, grouped)
 | Group | Lines | Example | Asked in |
 |---|---|---|---|
-| End-user compute | 1 to 6 | Business laptop, i5, 16GB, 512GB | nos |
-| Displays | 7 to 10 | 24" IPS monitor | nos |
-| Networking | 11 to 16 | 48-port PoE+ switch, 10G SFP+ transceiver | nos, **box of 10** |
-| Server and storage | 17 to 21 | 32GB DDR5 RDIMM | **kit of 2** |
-| Peripherals and cable | 22 to 30 | Cat6A patch cord | **box of 50** |
+| Enduser compute | 1 to 11 | Business laptop, 14in, Core i5, 16GB, 512GB | nos |
+| Datacentre | 12 to 17 | 32GB server memory as a matched kit of 2x 16GB (line 13) | nos, **kit of 2**, **pack of 5** |
+| Network and power | 18 to 25 | 10G SFP+ transceiver (line 20), Cat6A patch cord (line 22) | nos, **box of 10**, **box of 50** |
+| Retail and peripherals | 26 to 30 | 2D barcode scanner, rugged handheld | nos |
 
-The three bold rows are the whole point. A supplier quoting "per piece" against a line
+The bold units are the whole point. A supplier quoting "per piece" against a line
 asked "per box of 10" is off by 10x and the number still looks reasonable.
 
 ### Questionnaire (10 questions, 6 mandatory)
-1. **M** OEM authorisation letter for every brand quoted (document required)
-2. **M** ISO 27001 certificate, current, against the 2022 standard (document required)
-3. **M** Average annual turnover, last 3 years, over Rs 25 crore
-4. **M** Onsite service presence in all 14 states where we operate
-5. **M** Confirm 3-year onsite warranty on all compute lines
-6. **M** No sub-contracting of warranty service without written consent
-7. Lead time in weeks for the largest single tranche
-8. Escalation matrix, three levels, with names
-9. Buy-back or trade-in of the equipment being replaced
-10. Any line where you are quoting an equivalent rather than the exact make
+1. **M** OEM authorisation for every brand quoted (letters attached)
+2. **M** ISO/IEC 27001:2022 certificate showing validity (attached)
+3. ISO 9001:2015 certificate
+4. **M** Tie-up with a CPCB-authorised e-waste recycler (authorisation attached)
+5. **M** Onsite support locations: Bengaluru, Pune and Gurugram mandatory, plus at least twelve tier-2 cities
+6. **M** Next-business-day onsite response for enduser hardware, 4 hours for datacentre, at every location in Q5
+7. **M** Audited turnover of at least Rs 50 crore in each of the last two years (statements attached)
+8. Three enterprise references of 500 seats or more, from the last 24 months
+9. Dedicated account manager and a three-level escalation matrix
+10. Buyback and certified data destruction for about 300 retired laptops
 
 ### Terms asked
-GST extra at actuals. DDP Bengaluru warehouse, freight and insurance in the price.
-Payment 45 days from delivery and acceptance. Validity 90 days. INR only. No
-part-shipment without prior approval. LD at 0.5% per week to a 5% cap.
+GST extra, quoted separately. FOR destination, freight, insurance and unloading in the
+price. Payment net 30 from delivery and acceptance, no advance. Validity 90 days. INR
+only, and any other currency must state its rate, source and date. Prices firm for the
+delivery period. LD at 0.5% per week to a 5% cap. Conditional discounts recorded but not
+ranked.
 
 ---
 
