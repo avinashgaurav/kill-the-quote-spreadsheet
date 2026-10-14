@@ -8,7 +8,7 @@ import {
 } from "@/lib/extract/questionnaire";
 import { dbCache } from "@/lib/extract/cache";
 import { providerSentence, providerErrorResponse } from "@/lib/provider-error";
-import { guardModelRoute } from "@/lib/demo-guard";
+import { checkAccess, consumeQuota } from "@/lib/demo-guard";
 
 /**
  * Upload vendor documents and read them.
@@ -42,10 +42,11 @@ const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 const tooLarge = (error: string) => Response.json({ ok: false, error }, { status: 413 });
 
 export async function POST(request: Request) {
-  // Before anything is parsed: an access code, a per-IP rate and a daily cap.
-  // See lib/demo-guard.ts.
-  const refused = await guardModelRoute(request);
-  if (refused) return refused;
+  // Before anything is parsed: the access code. The per-IP rate and the daily
+  // cap come after the size checks below, so an upload refused as too large
+  // does not spend anybody's allowance. See lib/demo-guard.ts.
+  const denied = checkAccess(request);
+  if (denied) return denied;
 
   const sizeLimit =
     `The upload is over ${MAX_UPLOAD_BYTES / 1024 / 1024} MB. Send fewer or smaller files at a time.`;
@@ -56,8 +57,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    await seedRfx();
-
     const form = await request.formData();
     const files = form.getAll("files").filter((f): f is File => f instanceof File);
     if (files.reduce((n, f) => n + f.size, 0) > MAX_UPLOAD_BYTES) {
@@ -79,6 +78,13 @@ export async function POST(request: Request) {
       );
     }
 
+    // One model read per file, at least. Photo verification and attachments
+    // found inside an email can add more, so this is a floor on the cost, but
+    // it scales with the upload instead of counting forty files as one call.
+    const refused = await consumeQuota(request, files.length);
+    if (refused) return refused;
+
+    await seedRfx();
     const cache = await dbCache();
     const results: unknown[] = [];
 

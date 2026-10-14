@@ -1,5 +1,6 @@
 import {
-  ACCESS_COOKIE, ACCESS_TTL_SECONDS, codeMatches, issueAccessToken, rateLimit,
+  ACCESS_COOKIE, ACCESS_TTL_SECONDS, codeMatches, issueAccessToken, misconfiguration,
+  rateLimit,
 } from "@/lib/demo-guard";
 
 /**
@@ -16,6 +17,13 @@ const UNLOCK_ATTEMPTS_PER_WINDOW = 10;
 export async function POST(request: Request) {
   if (!process.env.DEMO_ACCESS_CODE?.trim()) {
     return Response.json({ ok: true, required: false });
+  }
+
+  // A production code with no real signing secret: refuse to issue a cookie
+  // rather than sign one with a key derived from the code itself.
+  const broken = misconfiguration();
+  if (broken) {
+    return Response.json({ ok: false, code: "misconfigured", error: broken }, { status: 503 });
   }
 
   try {

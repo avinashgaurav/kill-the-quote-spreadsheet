@@ -72,11 +72,17 @@ still work. The three AI loops refuse honestly rather than answering from a look
 ## Demo protection
 
 Set `DEMO_ACCESS_CODE` on a public deployment and every route that calls a model (analyst,
-co-pilot, extract, inbox) asks for it once, then trusts a signed seven-day cookie
-(`DEMO_COOKIE_SECRET`, optional). Browsing the grid and the exports needs no code. Model
-requests are also capped at `DEMO_RATE_LIMIT` per IP per 10 minutes (default 20) and
-`DEMO_DAILY_CALL_CAP` per UTC day (default 300), counted in Postgres. Uploads over 15 MB or
-40 files are refused. Everything lives in `web/lib/demo-guard.ts`; see `web/.env.example`.
+co-pilot, extract, inbox) asks for it once, then trusts a signed seven-day cookie. In production
+the code also needs `DEMO_COOKIE_SECRET` (32+ characters); without it the unlock and every model
+route answer 503 rather than sign with a weak key. Browsing the grid and the exports needs no
+code. Usage is counted in model calls, in Postgres: each request is charged the most calls it can
+make (an analyst question 12, a co-pilot message 8, an upload one per file, an inbox delivery one
+per document), against `DEMO_RATE_LIMIT` per IP per 10 minutes (default 60) and
+`DEMO_DAILY_CALL_CAP` per UTC day across everyone (default 300). Requests that fail cheap checks
+(uploads over 15 MB or 40 files, a conversation over 40 messages or 60,000 characters, a message
+over 8,000 characters) are refused with 413 before any allowance is spent. Off Vercel the
+forwarded-IP headers can be spoofed, so the daily cap is the real backstop. Everything lives in
+`web/lib/demo-guard.ts`; see `web/.env.example`.
 
 ## Two loops, one rule
 

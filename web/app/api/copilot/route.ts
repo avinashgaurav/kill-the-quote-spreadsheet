@@ -2,7 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import { callLlm, activeModel, activeProvider, toolResultPart, type Part } from "@/lib/llm";
 import { providerErrorResponse } from "@/lib/provider-error";
-import { guardModelRoute } from "@/lib/demo-guard";
+import {
+  COPILOT_MAX_TURNS, checkAccess, consumeQuota, historyTooLarge,
+} from "@/lib/demo-guard";
 import { COPILOT_SYSTEM, COPILOT_TOOLS, sendBlockers, type DraftedRfx } from "@/lib/copilot";
 
 /**
@@ -22,10 +24,11 @@ import { COPILOT_SYSTEM, COPILOT_TOOLS, sendBlockers, type DraftedRfx } from "@/
 export const maxDuration = 300;
 
 export async function POST(request: Request) {
-  // Before anything is parsed: an access code, a per-IP rate and a daily cap.
-  // See lib/demo-guard.ts.
-  const refused = await guardModelRoute(request);
-  if (refused) return refused;
+  // Before anything is parsed: the access code. The per-IP rate and the daily
+  // cap are taken just before the loop, once the request is known to be one
+  // the model will actually see. See lib/demo-guard.ts.
+  const denied = checkAccess(request);
+  if (denied) return denied;
 
   try {
     // A malformed body is a 400 with a sentence, not a 500 with a SyntaxError.
@@ -44,6 +47,8 @@ export async function POST(request: Request) {
     if (!message) {
       return Response.json({ ok: false, error: "No message." }, { status: 400 });
     }
+    const oversized = historyTooLarge(history, message);
+    if (oversized) return oversized;
 
     const provider = activeProvider();
     const haveKey = provider === "gemini"
@@ -58,6 +63,10 @@ export async function POST(request: Request) {
       }, { status: 503 });
     }
 
+    // Charged at the loop's bound, the most calls this message can make.
+    const refused = await consumeQuota(request, COPILOT_MAX_TURNS);
+    if (refused) return refused;
+
     const turns = [...history];
     let currentParts: Part[] = [{ kind: "text", text: message }];
     const toolCalls: Array<{ name: string; ms: number }> = [];
@@ -68,7 +77,7 @@ export async function POST(request: Request) {
     let underspecified: Record<string, unknown> | null = null;
     let usage = { input: 0, output: 0 };
 
-    for (let turn = 0; turn < 8; turn++) {
+    for (let turn = 0; turn < COPILOT_MAX_TURNS; turn++) {
       const response = await callLlm({
         system: COPILOT_SYSTEM,
         history: turns,

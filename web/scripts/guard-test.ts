@@ -34,8 +34,17 @@ function req(ip: string, cookie?: string): Request {
 
 async function main() {
   const {
-    guardModelRoute, issueAccessToken, codeMatches, ACCESS_COOKIE,
+    guardModelRoute, issueAccessToken, codeMatches, ACCESS_COOKIE, checkAccess, consumeQuota,
+    clientIp, tokenValid, ANALYST_MAX_TURNS, MAX_HISTORY_CHARS,
   } = await import("../lib/demo-guard");
+  const { getQuery } = await import("../lib/db/client");
+  const usageTotal = async () => {
+    const query = await getQuery();
+    const { rows } = await query<{ total: number | null }>(
+      `SELECT COALESCE(SUM(calls), 0) AS total FROM demo_usage`,
+    );
+    return Number(rows[0]?.total ?? 0);
+  };
 
   console.log("\n" + "=".repeat(78));
   console.log(`${B}DEMO GUARD${X}  access code, per-IP rate, daily cap`);
@@ -162,6 +171,124 @@ async function main() {
     "a production build with no code still has a ceiling",
     a === null && b?.status === 429,
     `no cookie needed, but the second call of a cap-1 day is ${b?.status}`,
+  );
+
+  // ---- a production code without a real signing secret fails closed ----
+  env.DEMO_ACCESS_CODE = "open-sesame";
+  delete env.DEMO_COOKIE_SECRET;
+  const { POST: unlock } = await import("../app/api/access/route");
+  const unlockReq = () => new Request("https://demo.test/api/access", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-for": "192.0.2.60" },
+    body: JSON.stringify({ code: "open-sesame" }),
+  });
+  const noSecretUnlock = await unlock(unlockReq());
+  const noSecretBody = await noSecretUnlock.json();
+  const noSecretRoute = checkAccess(req("192.0.2.61", cookie), now);
+  env.DEMO_COOKIE_SECRET = "too-short";
+  const shortSecret = checkAccess(req("192.0.2.61", cookie), now);
+  env.DEMO_COOKIE_SECRET = "x".repeat(32);
+  const goodUnlock = await unlock(unlockReq());
+  const goodCookie = `${ACCESS_COOKIE}=${encodeURIComponent(issueAccessToken(now).value)}`;
+  const goodRoute = checkAccess(req("192.0.2.61", goodCookie), now);
+  check(
+    "production with a code but no 32-character secret: 503 on unlock and on model routes",
+    noSecretUnlock.status === 503 &&
+      /DEMO_COOKIE_SECRET required/.test(String(noSecretBody?.error)) &&
+      noSecretRoute?.status === 503 && shortSecret?.status === 503 &&
+      goodUnlock.status === 200 && goodRoute === null,
+    `unset: unlock ${noSecretUnlock.status}, route ${noSecretRoute?.status}; short: ` +
+      `${shortSecret?.status}; 32 chars: unlock ${goodUnlock.status}, route ${goodRoute?.status ?? 200}`,
+  );
+
+  // ---- a signed cookie claiming a longer life than the server grants ----
+  const farFuture = issueAccessToken(now + 30 * 86_400_000).value;
+  check(
+    "a validly signed cookie whose expiry is beyond now + TTL is refused",
+    !tokenValid(farFuture, now) && tokenValid(issueAccessToken(now).value, now),
+    "the signature is ours, but nothing this server issues lives that long",
+  );
+
+  // ---- weights: a request is charged for the model calls it can make ----
+  env.NODE_ENV = "development";
+  env.DEMO_COOKIE_SECRET = "test-secret";
+  env.DEMO_RATE_LIMIT = "10";
+  env.DEMO_DAILY_CALL_CAP = "1000";
+  const weightDay = now + 5 * 86_400_000;
+  const w1 = await consumeQuota(req("192.0.2.70"), 6, weightDay);
+  const w2 = await consumeQuota(req("192.0.2.70"), 5, weightDay);
+  const w3 = await consumeQuota(req("192.0.2.71"), 4, weightDay);
+  env.DEMO_RATE_LIMIT = "1000";
+  env.DEMO_DAILY_CALL_CAP = String(ANALYST_MAX_TURNS + 1);
+  const capDay = now + 6 * 86_400_000;
+  const d1 = await consumeQuota(req("192.0.2.72"), ANALYST_MAX_TURNS, capDay);
+  const d2 = await consumeQuota(req("192.0.2.73"), 2, capDay);
+  check(
+    "per-IP limit and daily cap count weighted model calls, not requests",
+    w1 === null && w2?.status === 429 && w3 === null && d1 === null && d2?.status === 429,
+    `limit 10: weight 6 ${w1?.status ?? 200}, then weight 5 ${w2?.status}, other IP ${w3?.status ?? 200}; ` +
+      `cap ${ANALYST_MAX_TURNS + 1}: analyst weight ${ANALYST_MAX_TURNS} ${d1?.status ?? 200}, then weight 2 ${d2?.status}`,
+  );
+
+  // ---- client address ----
+  const both = new Request("https://demo.test/api/analyst", {
+    method: "POST",
+    headers: {
+      "x-vercel-forwarded-for": "203.0.113.90, 10.0.0.2",
+      "x-forwarded-for": "198.51.100.99, 10.0.0.1",
+      "x-real-ip": "198.51.100.98",
+    },
+  });
+  const spoofA = new Request("https://demo.test/api/analyst", {
+    method: "POST",
+    headers: { "x-vercel-forwarded-for": "203.0.113.91", "x-forwarded-for": "1.1.1.1" },
+  });
+  const spoofB = new Request("https://demo.test/api/analyst", {
+    method: "POST",
+    headers: { "x-vercel-forwarded-for": "203.0.113.91", "x-forwarded-for": "2.2.2.2" },
+  });
+  env.DEMO_RATE_LIMIT = "1";
+  const ipDay = now + 7 * 86_400_000;
+  const s1 = await consumeQuota(spoofA, 1, ipDay);
+  const s2 = await consumeQuota(spoofB, 1, ipDay);
+  check(
+    "x-vercel-forwarded-for wins over x-forwarded-for and x-real-ip",
+    clientIp(both) === "203.0.113.90" && s1 === null && s2?.status === 429 &&
+      clientIp(new Request("https://demo.test/")) === "unknown",
+    `resolved ${clientIp(both)}; a changed x-forwarded-for under the same Vercel ` +
+      `address shares its bucket (${s1?.status ?? 200}, ${s2?.status}); no headers is "unknown"`,
+  );
+
+  // ---- an oversized history is refused before it costs anything ----
+  env.DEMO_RATE_LIMIT = "1000";
+  env.DEMO_DAILY_CALL_CAP = "1000";
+  const { POST: analyst } = await import("../app/api/analyst/route");
+  const before = await usageTotal();
+  const analystCookie = `${ACCESS_COOKIE}=${encodeURIComponent(issueAccessToken().value)}`;
+  const askWith = (history: unknown[], question = "Who is cheapest?") => analyst(new Request(
+    "https://demo.test/api/analyst", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json", cookie: analystCookie, "x-forwarded-for": "192.0.2.80",
+      },
+      body: JSON.stringify({ question, history }),
+    },
+  ));
+  const tooLong = await askWith(
+    [{ role: "user", parts: [{ kind: "text", text: "x".repeat(MAX_HISTORY_CHARS) }] }],
+  );
+  const tooMany = await askWith(
+    Array.from({ length: 41 }, () => ({ role: "user", parts: [] })),
+  );
+  const tooBigQuestion = await askWith([], "y".repeat(9000));
+  const tooLongBody = await tooLong.json();
+  const after = await usageTotal();
+  check(
+    "an oversized history or message is a 413 and consumes no quota",
+    tooLong.status === 413 && tooMany.status === 413 && tooBigQuestion.status === 413 &&
+      /characters/.test(String(tooLongBody?.error)) && after === before,
+    `chars ${tooLong.status}, messages ${tooMany.status}, question ${tooBigQuestion.status}; ` +
+      `usage counters ${before} before, ${after} after`,
   );
 
   console.log(`\n${pass} passed, ${fail} failed`);
