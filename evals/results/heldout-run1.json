@@ -1,0 +1,336 @@
+{
+  "startedAt": "2026-10-15T10:55:23.680Z",
+  "provider": "claude-cli",
+  "configuredModel": "claude-opus-5",
+  "args": [
+    "--heldout",
+    "--fresh",
+    "--json",
+    "../evals/results/heldout-run1.json"
+  ],
+  "heldout": [
+    {
+      "label": "H1 Kestrel   xlsx",
+      "file": "H1_Kestrel_PriceSchedule_KC-2026-311.xlsx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 48307,
+      "expectedPriced": 18,
+      "found": 18,
+      "priceExact": 18,
+      "unitRight": 17,
+      "currencyRight": 18,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9633333333333334,
+      "meanConfidenceOnRight": 0.9633333333333334,
+      "meanConfidenceOnWrong": 0,
+      "misses": [
+        "L13: unit \"Kit (2x16GB)\" against \"kit\""
+      ],
+      "usage": {
+        "input": 13114,
+        "output": 5447,
+        "thinking": 669,
+        "cacheRead": 0,
+        "costUsd": 0.267305
+      },
+      "kind": "doc"
+    },
+    {
+      "label": "H2 Tarang    pdf",
+      "file": "H2_Tarang_Offer_TDC-OF-0926-77.pdf",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 42081,
+      "expectedPriced": 13,
+      "found": 13,
+      "priceExact": 13,
+      "unitRight": 13,
+      "currencyRight": 13,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.949230769230769,
+      "meanConfidenceOnRight": 0.949230769230769,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 15588,
+        "output": 4567,
+        "thinking": 436,
+        "cacheRead": 0,
+        "costUsd": 0.270045
+      },
+      "kind": "doc"
+    },
+    {
+      "label": "H3 Nilgiri   docx",
+      "file": "H3_Nilgiri_Quotation_Letter.docx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 71833,
+      "expectedPriced": 11,
+      "found": 11,
+      "priceExact": 11,
+      "unitRight": 11,
+      "currencyRight": 11,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9354545454545455,
+      "meanConfidenceOnRight": 0.9354545454545455,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8902,
+        "output": 7482,
+        "thinking": 389,
+        "cacheRead": 17585,
+        "costUsd": 0.2848425
+      },
+      "kind": "doc"
+    },
+    {
+      "label": "H4 Tejas photo moderate",
+      "file": "H4_tejas_quote_photo_moderate.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 60146,
+      "expectedPriced": 15,
+      "found": 15,
+      "priceExact": 15,
+      "unitRight": 15,
+      "currencyRight": 15,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8986666666666667,
+      "meanConfidenceOnRight": 0.8986666666666667,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8384,
+        "output": 5747,
+        "thinking": 1156,
+        "cacheRead": 6372,
+        "costUsd": 0.230691
+      },
+      "kind": "photo"
+    },
+    {
+      "label": "H4 Tejas photo low light",
+      "file": "H4_tejas_quote_photo_lowlight.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 105442,
+      "expectedPriced": 15,
+      "found": 15,
+      "priceExact": 10,
+      "unitRight": 15,
+      "currencyRight": 15,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.6106666666666667,
+      "meanConfidenceOnRight": 0.613,
+      "meanConfidenceOnWrong": 0.6060000000000001,
+      "misses": [
+        "L2: read 186400, truth 106400 [confidence 0.58]",
+        "L6: read 28750, truth 20750 [confidence 0.63]",
+        "L7: read 13850, truth 13050 [confidence 0.62]",
+        "L8: read 1300, truth 1360 [confidence 0.60]",
+        "L28: read 58900, truth 50900 [confidence 0.60]"
+      ],
+      "usage": {
+        "input": 8385,
+        "output": 9786,
+        "thinking": 4932,
+        "cacheRead": 6372,
+        "costUsd": 0.33167599999999997
+      },
+      "kind": "photo"
+    },
+    {
+      "label": "H5 Saptarishi eml",
+      "file": "H5_saptarishi_reply.eml",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 26227,
+      "expectedPriced": 5,
+      "found": 5,
+      "priceExact": 5,
+      "unitRight": 5,
+      "currencyRight": 5,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.718,
+      "meanConfidenceOnRight": 0.718,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 4803,
+        "output": 2551,
+        "thinking": 289,
+        "cacheRead": 6372,
+        "costUsd": 0.11498099999999999
+      },
+      "kind": "doc"
+    }
+  ],
+  "heldoutOverall": {
+    "expected": 77,
+    "found": 77,
+    "exact": 72,
+    "units": 76,
+    "invented": 0,
+    "confOnWrong": 0.6060000000000001,
+    "wrongPrices": 5
+  },
+  "finishedAt": "2026-10-15T11:01:17.733Z",
+  "failedChecks": 0,
+  "verdict": "pass",
+  "rateLimitEvents": [
+    {
+      "at": "2026-10-15T10:56:11.980Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.15,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.59,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T10:56:54.073Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.15,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.59,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T10:58:05.909Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.16,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.6,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T10:58:05.909Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.17,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.6,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T10:59:06.058Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.17,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.6,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T11:00:51.501Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.18,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.6,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T11:01:17.730Z",
+      "status": "allowed",
+      "resetsAt": 1792074600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.2,
+          "resetsAt": 1792074600
+        },
+        "seven_day": {
+          "utilization": 0.6,
+          "resetsAt": 1792270800
+        }
+      }
+    }
+  ]
+}

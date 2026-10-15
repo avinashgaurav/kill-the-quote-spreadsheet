@@ -160,3 +160,67 @@ Raw output in `evals/results/`:
 - run 1: `accuracy-2026-10-15-claude-cli-claude-opus-5.json`
 - run 2: `accuracy-2026-10-15-claude-cli-claude-opus-5-docs-run2.json`
 - run 3: `accuracy-2026-10-15-claude-cli-claude-opus-5-after-fix.json`
+
+## Held-out run
+
+The 107/107 above is an in-sample score: the reader prompt and both fixes came from that same corpus. This run measures the reader on documents it has never seen.
+
+**Method.** Five new fictional vendor replies against the same RFx (the buyer's enquiry is an input, not an answer), built by `dataset/generators/build_heldout.py` into `dataset/heldout/`. The suppliers, prices, layouts and line selection are all new:
+
+- Kestrel xlsx: two sheets, the supplier's own item codes, a GST column, a regret, a substitution and a per-piece line.
+- Tarang pdf: two pages with rate and amount columns side by side, one USD line, a per-cartridge line and a regret.
+- Nilgiri docx: a letter with Indian digit grouping in prose, a per-pair line and a complimentary (zero) line.
+- Tejas: one quotation sheet photographed twice (moderate, and very hard: low light, motion blur, slight curl), with two pen overrides and one price under glare.
+- Saptarishi eml: plain text, with a per-box-of-25 line, a relative price and a regret.
+
+That makes 77 priced lines over 6 inputs, plus 1 value the key marks unreadable on each photograph. The answer key (`dataset/heldout/answer-key.json`) was committed in `53a6e8d`, before any model read the set. The prompts and `web/lib` were not changed. `accuracy.ts --heldout` scores the set with the same scoring and the same fail checks. Three full runs, `--fresh` each time.
+
+The method note above applies unchanged: these runs used the Claude Code CLI path (`LLM_PROVIDER=claude-cli`, `claude-opus-5`, `CLAUDE_CLI_TIMEOUT_MS=400000`), not the production API.
+
+| Metric | In-sample (run 3 above) | Held-out, mean (min to max, 3 runs) |
+|---|---|---|
+| Priced lines exact on price | 107/107 documents (100%) | 71.3/77 (92.6%), 70 to 72 |
+| Lines returned | 107/107 | 76.7/77, 76 to 77 |
+| Unit right (of returned) | 100% | 75.7, 75 to 76 (one harness artefact each run, see below) |
+| Invented prices | 0 | 0, 0 to 0 |
+| Unreadable value admitted | 5/5 photographs | 2/2 photographs, every run |
+| Mean confidence on wrong prices | 0.47 (photo set) | 0.65, 0.61 to 0.69 |
+| Highest confidence on any wrong price | 0.55 | 0.70 |
+| Harness verdict | pass | pass, 3 of 3 |
+
+Per input, every run: Kestrel 18/18, Tarang 13/13, Nilgiri 11/11, Tejas moderate photo 15/15 and Saptarishi 5/5, all exact. Every miss was on the very hard Tejas photograph, which read 10, 8 and 10 of 15. Without that photograph the held-out set is 62/62 in all three runs.
+
+Two caveats. First, the two corpora are not the same size or mix, so the 92.6% against 100% is not a like-for-like drop. The in-sample 107 counts documents only (its photo set is scored separately), while the held-out 77 includes the very hard photograph. Second, the wrong prices sat at higher confidence than in-sample (0.65 against 0.47 on average, up to 0.70). Every one is still below the 0.8 line at which the UI flags a value as low-confidence, and the harness's 0.75 calibration check passed in every run, but the margin is smaller.
+
+### Every held-out miss
+
+| # | Input | Line | Runs | What happened | Failure category |
+|---|---|---|---|---|---|
+| 1 | Tejas low light | L6 | 1, 2, 3 | Read 28,750 against 20,750, confidence 0.63 to 0.70 | Degraded image: digit misread, low confidence |
+| 2 | Tejas low light | L7 | 1, 2, 3 | Read 13,850 against 13,050, confidence 0.62 to 0.70 | Same |
+| 3 | Tejas low light | L8 | 1, 2, 3 | Read 1,300 against 1,360, confidence 0.60 to 0.69 | Same |
+| 4 | Tejas low light | L28 | 1, 2, 3 | Read 58,900 against 50,900, confidence 0.60 to 0.68 | Same |
+| 5 | Tejas low light | L2 | 1, 2 | Read 1,86,400 against 1,06,400, confidence 0.58 and 0.68 | Same (the 0 in Indian grouping read as 8) |
+| 6 | Tejas low light | L18 | 3 | Read 1,06,500 against 1,86,500, confidence 0.60 | Same, the other way round |
+| 7 | Tejas low light | L11 | 2 | Read 2,500 against 2,580, confidence 0.68 | Same |
+| 8 | Tejas low light | L20 | 2 | Not returned | Degraded image: value left as a gap |
+| 9 | Kestrel xlsx | L13 | 1, 2, 3 | Unit returned as "Kit (2x16GB)" against a key of "kit" | Harness artefact, not a reader error |
+
+The Kestrel unit miss is the scorer, not the reader. The sheet's unit cell really says "Kit (2x16GB)". The unit matcher treats the "2" as an invented pack size because the key records the unit as "kit". The scoring code was frozen for this task, so the miss is left in the numbers.
+
+The same matcher strips "nos", "pc" and "each", so the unit check means nothing on lines keyed that way. It only bites on pack, box, kit, cartridge and pair units. This was true of the in-sample corpus as well.
+
+The pen overrides (Tejas L9 and L29) were read as the handwritten price in every run on both photographs. The relative price and the three regrets (Saptarishi L21, L23; Kestrel L14; Tarang L16) never came back as a number. The complimentary line (Nilgiri L30) came back as 0, and the per-cartridge, per-pair and per-box-of-25 lines came back in the supplier's unit (the per-piece line passes the unit check whatever comes back, see above).
+
+### Cost and limits
+
+Wall clock was 354 s, 365 s and 444 s per run (26 to 170 s per read, the very hard photograph the slowest). The CLI's own cost estimate was $1.50, $0.94 and $1.19. There were no usage-limit or rate-limit errors, and every rate-limit event said `allowed`.
+
+Raw output: `evals/results/heldout-run1.json`, `heldout-run2.json`, `heldout-run3.json`.
+
+```bash
+cd web
+python3 ../dataset/generators/build_heldout.py   # optional: rebuilds the set
+LLM_PROVIDER=claude-cli CLAUDE_CLI_TIMEOUT_MS=400000 npx tsx scripts/accuracy.ts \
+  --heldout --fresh --json ../evals/results/heldout-run1.json
+```
