@@ -32,10 +32,13 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-export type Provider = "anthropic" | "gemini";
+export type Provider = "anthropic" | "gemini" | "claude-cli";
 
 export function activeProvider(): Provider {
-  return process.env.LLM_PROVIDER === "gemini" ? "gemini" : "anthropic";
+  if (process.env.LLM_PROVIDER === "gemini") return "gemini";
+  // Evaluation-only route through the local Claude Code CLI. See callClaudeCli.
+  if (process.env.LLM_PROVIDER === "claude-cli") return "claude-cli";
+  return "anthropic";
 }
 
 export const MODEL_IDS = {
@@ -67,6 +70,13 @@ export const MODEL_IDS = {
     // rates to read four digits is waste, and the whole point of the second
     // read is that it is INDEPENDENT, not that it is clever.
     cheap: process.env.GEMINI_CHEAP_MODEL || "gemini-flash-latest",
+  },
+  // Same model ids as the Anthropic default, so an eval through the CLI
+  // measures the model production is configured for.
+  "claude-cli": {
+    main: process.env.CLAUDE_CLI_MODEL || process.env.ANTHROPIC_MODEL || "claude-opus-5",
+    cheap: process.env.CLAUDE_CLI_CHEAP_MODEL || process.env.ANTHROPIC_CHEAP_MODEL
+      || "claude-haiku-4-5-20251001",
   },
 };
 
@@ -129,6 +139,8 @@ export interface LlmResult {
     /** The thinking share of `output`, so a runaway prompt is visible. */
     thinking?: number;
     cacheRead?: number;
+    /** Reported by the claude-cli route only (list-price estimate). */
+    costUsd?: number;
   };
   /** API-provided citations. Anthropic PDFs only; empty elsewhere. */
   citations: unknown[];
@@ -230,7 +242,9 @@ export interface LlmRequest {
 }
 
 export async function callLlm(req: LlmRequest): Promise<LlmResult> {
-  return activeProvider() === "gemini" ? callGemini(req) : callAnthropic(req);
+  const provider = activeProvider();
+  if (provider === "claude-cli") return callClaudeCli(req);
+  return provider === "gemini" ? callGemini(req) : callAnthropic(req);
 }
 
 // ---------------------------------------------------------------------------
@@ -609,6 +623,158 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
     stopReason: cand?.finishReason ?? null,
     model,
     rawAssistant: parts,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Evaluation-only: the local Claude Code CLI
+// ---------------------------------------------------------------------------
+
+/**
+ * LLM_PROVIDER=claude-cli. Routes a call through the locally installed and
+ * logged-in `claude` binary instead of the API, so the accuracy harness can be
+ * run on a subscription without an API key. NOT a production path.
+ *
+ * Kept as close to a plain Messages call as the CLI allows:
+ *   - the app's own system prompt via --system-prompt (replaces Claude Code's)
+ *   - no tools (--tools ""), no MCP (--strict-mcp-config), no hooks, CLAUDE.md,
+ *     skills or plugins (--safe-mode), no settings files (--setting-sources ""),
+ *     no session written to disk (--no-session-persistence)
+ *   - content blocks (text, base64 image, base64 PDF document) sent verbatim
+ *     as a stream-json user message
+ *   - a forced tool becomes --json-schema with that tool's input_schema, and
+ *     the structured output is returned as a call to that tool
+ *
+ * Known differences from the API path, stated rather than hidden: the CLI adds
+ * a short preamble and an environment block to the system prompt; structured
+ * output is enforced by the CLI's own StructuredOutput tool rather than by
+ * tool_choice with strict: true; max_tokens and temperature cannot be set; the
+ * prompt-cache breakpoint is the CLI's, not ours; PDF citations are not
+ * surfaced (so supportsCitations() stays false and PDFs are flagged
+ * provenanceWeaker, exactly as on Gemini). Multi-turn tool loops (the analyst,
+ * the copilot) are not supported and throw.
+ */
+
+/** Rate-limit and usage-limit events the CLI reported, for the harness to record. */
+export const claudeCliEvents: Array<Record<string, unknown>> = [];
+
+async function callClaudeCli(req: LlmRequest): Promise<LlmResult> {
+  if (req.history?.length || (req.tools?.length && !req.forceTool)) {
+    throw new Error(
+      "LLM_PROVIDER=claude-cli supports single-shot calls only (forced tool or " +
+      "plain text). Multi-turn tool loops need the anthropic or gemini provider.",
+    );
+  }
+  const { spawn } = await import("node:child_process");
+  const { tmpdir } = await import("node:os");
+
+  const model = MODEL_IDS["claude-cli"][req.kind ?? "main"];
+  const tool = req.forceTool ? req.tools?.find((t) => t.name === req.forceTool) : undefined;
+  if (req.forceTool && !tool) throw new Error(`forceTool ${req.forceTool} is not in tools`);
+
+  // Same block shapes the Anthropic path sends, minus cache_control: the CLI
+  // places its own cache breakpoints.
+  const content = toAnthropicBlocks(req.parts).map((b) => {
+    const { cache_control: _drop, ...rest } = b as unknown as Record<string, unknown>;
+    void _drop;
+    return rest;
+  });
+  const input = JSON.stringify({
+    type: "user",
+    message: { role: "user", content },
+  }) + "\n";
+
+  const args = [
+    "-p",
+    "--input-format", "stream-json",
+    "--output-format", "stream-json",
+    "--verbose",
+    "--system-prompt", req.system,
+    "--tools", "",
+    "--model", model,
+    "--effort", req.effort ?? "high",
+    "--no-session-persistence",
+    "--setting-sources", "",
+    "--strict-mcp-config",
+    "--safe-mode",
+    "--disable-slash-commands",
+    ...(tool ? ["--json-schema", JSON.stringify(tool.input_schema)] : []),
+  ];
+
+  const bin = process.env.CLAUDE_CLI_BIN || "claude";
+  const started = Date.now();
+  const stdout: string = await new Promise((resolveOut, reject) => {
+    // A neutral working directory, so no project context is discovered.
+    const child = spawn(bin, args, { cwd: tmpdir(), stdio: ["pipe", "pipe", "pipe"] });
+    let out = "", err = "";
+    child.stdout.on("data", (d) => { out += d; });
+    child.stderr.on("data", (d) => { err += d; });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code !== 0 && !out.includes('"type":"result"')) {
+        reject(new Error(`claude CLI exited ${code}: ${err.slice(0, 500)}`));
+      } else resolveOut(out);
+    });
+    child.stdin.end(input);
+  });
+
+  type CliResult = {
+    is_error?: boolean; subtype?: string; result?: string; api_error_status?: unknown;
+    structured_output?: Record<string, unknown>; stop_reason?: string | null;
+    duration_ms?: number; total_cost_usd?: number; num_turns?: number;
+    usage?: {
+      input_tokens?: number; output_tokens?: number;
+      cache_creation_input_tokens?: number; cache_read_input_tokens?: number;
+      output_tokens_details?: { thinking_tokens?: number };
+    };
+    modelUsage?: Record<string, unknown>;
+  };
+  let result: CliResult | null = null;
+  const texts: string[] = [];
+  for (const line of stdout.split("\n")) {
+    if (!line.trim()) continue;
+    let ev: Record<string, unknown>;
+    try { ev = JSON.parse(line); } catch { continue; }
+    if (ev.type === "result") result = ev as CliResult;
+    if (ev.type === "rate_limit_event") {
+      claudeCliEvents.push({ at: new Date().toISOString(), ...(ev.rate_limit_info as object) });
+      const info = ev.rate_limit_info as { status?: string };
+      if (info?.status && info.status !== "allowed") {
+        console.error(`[claude-cli] rate limit event: ${JSON.stringify(info)}`);
+      }
+    }
+    if (ev.type === "assistant") {
+      const msg = ev.message as { content?: Array<{ type: string; text?: string }> };
+      for (const c of msg?.content ?? []) if (c.type === "text" && c.text) texts.push(c.text);
+    }
+  }
+  if (!result) throw new Error(`claude CLI returned no result event: ${stdout.slice(-500)}`);
+  if (result.is_error) {
+    throw new Error(
+      `claude CLI error (${result.subtype}, api status ${String(result.api_error_status)}): ` +
+      `${String(result.result ?? "").slice(0, 500)}`,
+    );
+  }
+
+  const answered = Object.keys(result.modelUsage ?? {});
+  const u = result.usage ?? {};
+  return {
+    text: tool ? texts.join("\n").trim() : String(result.result ?? "").trim(),
+    toolCalls: tool && result.structured_output
+      ? [{ id: "claude_cli_0", name: tool.name, input: result.structured_output }]
+      : [],
+    usage: {
+      input: (u.input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0),
+      output: u.output_tokens ?? 0,
+      thinking: u.output_tokens_details?.thinking_tokens ?? 0,
+      cacheRead: u.cache_read_input_tokens ?? 0,
+      costUsd: result.total_cost_usd,
+    },
+    citations: [],
+    stopReason: result.stop_reason ?? result.subtype ?? null,
+    // The model that actually answered, as the CLI reports it.
+    model: answered.length ? answered.join("+") : model,
+    rawAssistant: { cliMs: Date.now() - started, numTurns: result.num_turns },
   };
 }
 

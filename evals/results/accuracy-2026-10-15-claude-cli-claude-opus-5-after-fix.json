@@ -1,0 +1,521 @@
+{
+  "startedAt": "2026-10-15T07:15:17.758Z",
+  "provider": "claude-cli",
+  "configuredModel": "claude-opus-5",
+  "args": [
+    "--all",
+    "--fresh",
+    "--json",
+    "../evals/results/accuracy-2026-10-15-claude-cli-claude-opus-5-after-fix.json"
+  ],
+  "documents": [
+    {
+      "label": "Zenith  xlsx (Rev 1)",
+      "file": "01-vendor-zenith/Zenith_Quotation_ZIS-NBR-2026-1184.xlsx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 76087,
+      "expectedPriced": 30,
+      "found": 30,
+      "priceExact": 30,
+      "unitRight": 30,
+      "currencyRight": 30,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9563333333333336,
+      "meanConfidenceOnRight": 0.9563333333333336,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 15905,
+        "output": 8836,
+        "thinking": 557,
+        "cacheRead": 0,
+        "costUsd": 0.37994000000000006
+      }
+    },
+    {
+      "label": "Cygnus  pdf",
+      "file": "02-vendor-cygnus/Cygnus_Quotation_CTI-Q-2026-0918.pdf",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 100400,
+      "expectedPriced": 27,
+      "found": 27,
+      "priceExact": 27,
+      "unitRight": 27,
+      "currencyRight": 27,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9522222222222221,
+      "meanConfidenceOnRight": 0.9522222222222221,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 19893,
+        "output": 11585,
+        "thinking": 787,
+        "cacheRead": 0,
+        "costUsd": 0.488545
+      }
+    },
+    {
+      "label": "Orbit   docx",
+      "file": "03-vendor-orbit/Orbit_Offer_OSS-QT-2026-27-0442.docx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 151395,
+      "expectedPriced": 27,
+      "found": 27,
+      "priceExact": 27,
+      "unitRight": 27,
+      "currencyRight": 27,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.824444444444444,
+      "meanConfidenceOnRight": 0.824444444444444,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 15380,
+        "output": 17783,
+        "thinking": 914,
+        "cacheRead": 18669,
+        "costUsd": 0.6076895
+      }
+    },
+    {
+      "label": "Vector  photo",
+      "file": "04-vendor-vector/IMG_20260917_1142_vector_rate_card.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 86195,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8514285714285715,
+      "meanConfidenceOnRight": 0.8514285714285715,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8386,
+        "output": 9012,
+        "thinking": 2717,
+        "cacheRead": 6372,
+        "costUsd": 0.312336
+      }
+    },
+    {
+      "label": "Helios  eml",
+      "file": "05-vendor-helios/helios_reply_2026-09-17.eml",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 37926,
+      "expectedPriced": 2,
+      "found": 2,
+      "priceExact": 2,
+      "unitRight": 2,
+      "currencyRight": 2,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.4,
+      "meanConfidenceOnRight": 0.4,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 4622,
+        "output": 3215,
+        "thinking": 510,
+        "cacheRead": 6372,
+        "costUsd": 0.129771
+      }
+    }
+  ],
+  "documentsOverall": {
+    "expected": 107,
+    "found": 107,
+    "exact": 107,
+    "units": 107,
+    "invented": 0
+  },
+  "photos": [
+    {
+      "label": "v1 easy      flat/bright",
+      "file": "04-vendor-vector/variants/v1_flat_bright.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 76017,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.9166666666666666,
+      "meanConfidenceOnRight": 0.9166666666666666,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8376,
+        "output": 7977,
+        "thinking": 1493,
+        "cacheRead": 6372,
+        "costUsd": 0.286361
+      }
+    },
+    {
+      "label": "v2 moderate  handheld",
+      "file": "04-vendor-vector/variants/v2_moderate.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 91440,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8900000000000002,
+      "meanConfidenceOnRight": 0.8900000000000002,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8374,
+        "output": 9125,
+        "thinking": 3183,
+        "cacheRead": 6372,
+        "costUsd": 0.315041
+      }
+    },
+    {
+      "label": "v3 hard      curl+thumb",
+      "file": "04-vendor-vector/variants/v3_curled_thumb.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 165500,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8057142857142859,
+      "meanConfidenceOnRight": 0.8057142857142859,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8377,
+        "output": 15059,
+        "thinking": 7838,
+        "cacheRead": 6372,
+        "costUsd": 0.463421
+      }
+    },
+    {
+      "label": "v4 v.hard    lowlight",
+      "file": "04-vendor-vector/variants/v4_lowlight_motion.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 238526,
+      "expectedPriced": 21,
+      "found": 20,
+      "priceExact": 7,
+      "unitRight": 20,
+      "currencyRight": 20,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.4595000000000001,
+      "meanConfidenceOnRight": 0.44857142857142857,
+      "meanConfidenceOnWrong": 0.46538461538461545,
+      "misses": [
+        "L1: read 55900, truth 57900 [confidence 0.50]",
+        "L2: read 95500, truth 99500 [confidence 0.55]",
+        "L3: read 94000, truth 84000 [confidence 0.50]",
+        "L7: read 24400, truth 12400 [confidence 0.40]",
+        "L8: read 1290, truth 1180 [confidence 0.50]",
+        "L9: read 1590, truth 1540 [confidence 0.50]",
+        "L10: read 2970, truth 2870 [confidence 0.45]",
+        "L12: not returned (truth 524000 nos)",
+        "L18: read 194000, truth 184000 [confidence 0.38]",
+        "L20: read 4250, truth 4150 [confidence 0.50]",
+        "L22: read 298, truth 268 [confidence 0.50]",
+        "L25: read 62600, truth 61800 [confidence 0.45]",
+        "L27: read 5400, truth 8400 [confidence 0.40]",
+        "L29: read 42600, truth 41900 [confidence 0.42]"
+      ],
+      "usage": {
+        "input": 8378,
+        "output": 21496,
+        "thinking": 13745,
+        "cacheRead": 6372,
+        "costUsd": 0.6243559999999999
+      }
+    },
+    {
+      "label": "v5 v.hard    steep angle",
+      "file": "04-vendor-vector/variants/v5_steep_angle.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 132342,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8471428571428571,
+      "meanConfidenceOnRight": 0.8471428571428571,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8376,
+        "output": 13049,
+        "thinking": 6257,
+        "cacheRead": 6372,
+        "costUsd": 0.413161
+      }
+    }
+  ],
+  "finishedAt": "2026-10-15T07:34:33.611Z",
+  "failedChecks": 0,
+  "verdict": "pass",
+  "rateLimitEvents": [
+    {
+      "at": "2026-10-15T07:16:33.840Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.68,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.52,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:18:14.246Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.7,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:20:45.644Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.71,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:20:45.645Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.73,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:22:11.841Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.73,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:22:49.767Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.75,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:24:05.789Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.75,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:25:37.232Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.77,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.53,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:28:22.734Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.78,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.54,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:32:21.262Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.82,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.54,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T07:34:33.607Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.84,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.55,
+          "resetsAt": 1792270800
+        }
+      }
+    }
+  ]
+}

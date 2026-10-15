@@ -1,0 +1,256 @@
+{
+  "startedAt": "2026-10-15T06:48:19.517Z",
+  "provider": "claude-cli",
+  "configuredModel": "claude-opus-5",
+  "args": [
+    "--fresh",
+    "--json",
+    "../evals/results/accuracy-2026-10-15-claude-cli-claude-opus-5-docs-run2.json"
+  ],
+  "documents": [
+    {
+      "label": "Zenith  xlsx (Rev 1)",
+      "file": "01-vendor-zenith/Zenith_Quotation_ZIS-NBR-2026-1184.xlsx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 81684,
+      "expectedPriced": 30,
+      "found": 30,
+      "priceExact": 30,
+      "unitRight": 30,
+      "currencyRight": 30,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9649999999999997,
+      "meanConfidenceOnRight": 0.9649999999999997,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 2,
+        "output": 9514,
+        "thinking": 447,
+        "cacheRead": 15594,
+        "costUsd": 0.24565700000000001
+      }
+    },
+    {
+      "label": "Cygnus  pdf",
+      "file": "02-vendor-cygnus/Cygnus_Quotation_CTI-Q-2026-0918.pdf",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 92684,
+      "expectedPriced": 27,
+      "found": 27,
+      "priceExact": 27,
+      "unitRight": 27,
+      "currencyRight": 27,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9466666666666663,
+      "meanConfidenceOnRight": 0.9466666666666663,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 2,
+        "output": 10709,
+        "thinking": 534,
+        "cacheRead": 19582,
+        "costUsd": 0.277526
+      }
+    },
+    {
+      "label": "Orbit   docx",
+      "file": "03-vendor-orbit/Orbit_Offer_OSS-QT-2026-27-0442.docx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 92546,
+      "expectedPriced": 27,
+      "found": 26,
+      "priceExact": 26,
+      "unitRight": 26,
+      "currencyRight": 26,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9349999999999994,
+      "meanConfidenceOnRight": 0.9349999999999994,
+      "meanConfidenceOnWrong": 0,
+      "misses": [
+        "L30: not returned (truth 0 nos)"
+      ],
+      "usage": {
+        "input": 2,
+        "output": 9629,
+        "thinking": 1387,
+        "cacheRead": 11988,
+        "costUsd": 0.24672900000000003
+      }
+    },
+    {
+      "label": "Vector  photo",
+      "file": "04-vendor-vector/IMG_20260917_1142_vector_rate_card.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 97389,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8866666666666667,
+      "meanConfidenceOnRight": 0.8866666666666667,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 2,
+        "output": 9792,
+        "thinking": 3408,
+        "cacheRead": 14447,
+        "costUsd": 0.2520335
+      }
+    },
+    {
+      "label": "Helios  eml",
+      "file": "05-vendor-helios/helios_reply_2026-09-17.eml",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 37945,
+      "expectedPriced": 2,
+      "found": 2,
+      "priceExact": 2,
+      "unitRight": 2,
+      "currencyRight": 2,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.88,
+      "meanConfidenceOnRight": 0.88,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 2,
+        "output": 3442,
+        "thinking": 574,
+        "cacheRead": 10683,
+        "costUsd": 0.0914015
+      }
+    }
+  ],
+  "documentsOverall": {
+    "expected": 107,
+    "found": 106,
+    "exact": 106,
+    "units": 106,
+    "invented": 0
+  },
+  "finishedAt": "2026-10-15T06:55:01.779Z",
+  "failedChecks": 0,
+  "verdict": "pass",
+  "rateLimitEvents": [
+    {
+      "at": "2026-10-15T06:49:41.195Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.44,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.49,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:51:13.886Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.45,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.49,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:52:46.436Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.46,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.49,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:54:23.827Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.5,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.5,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:55:01.776Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.51,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.5,
+          "resetsAt": 1792270800
+        }
+      }
+    }
+  ]
+}

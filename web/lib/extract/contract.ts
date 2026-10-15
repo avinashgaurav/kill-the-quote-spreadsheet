@@ -85,6 +85,23 @@ export const provenanceSchema = z.object({
 
 export type Provenance = z.infer<typeof provenanceSchema>;
 
+/**
+ * Row provenance: the same shape, but an EMPTY citedText no longer fails the
+ * whole document.
+ *
+ * One row of a photographed rate card once came back with `citedText: ""`, and
+ * `min(1)` threw on the parse, so a read with twenty correct prices was
+ * discarded as a failed read. One unsourced value is a reason to distrust that
+ * value, not the other twenty. The row is kept here and flagged by
+ * `validateExtraction`; the calculator then keeps it out of every total (see
+ * `unsourced` in lib/normalise.ts), exactly as it treats a contested read.
+ *
+ * The locator is still required: without it a human cannot find the value.
+ */
+const rowProvenanceSchema = provenanceSchema.extend({
+  citedText: z.string().nullish().transform((v) => v ?? ""),
+});
+
 export const extractedRowSchema = z.object({
   /**
    * The RFx line this belongs to, or null if it matches nothing. Validated
@@ -144,7 +161,7 @@ export const extractedRowSchema = z.object({
    */
   confidence: z.number().min(0).max(1).nullish().transform((v) => v ?? 0.5),
 
-  provenance: provenanceSchema,
+  provenance: rowProvenanceSchema,
 });
 
 export type ExtractedRow = z.infer<typeof extractedRowSchema>;
@@ -237,11 +254,18 @@ const provenanceJson = {
         "Word: 'para 7'. Email: 'body line 4'. Photo: 'bbox x0,y0,x1,y1' as four " +
         "numbers between 0 and 1 giving the fraction across and down the image.",
     },
+    // No `minLength: 1` here, deliberately. Anthropic's strict tool schemas do
+    // not support string-length constraints, and this schema is sent raw (not
+    // through an SDK helper that would strip them), so adding one risks a 400
+    // on the production path rather than enforcing anything. Non-empty is
+    // asked for in the description and enforced in code instead.
     citedText: {
       type: "string",
       description:
         "The vendor's own words for this value, verbatim and unedited. Never a paraphrase. " +
-        "For a spreadsheet cell, the cell's literal contents.",
+        "For a spreadsheet cell, the cell's literal contents. NEVER empty: if you can see " +
+        "where the value is but cannot transcribe the words around it, copy whatever " +
+        "characters you can read, including the number itself.",
     },
     method: {
       type: "string",
@@ -335,7 +359,9 @@ export const EXTRACTION_TOOL = {
                 "The number as the vendor wrote it, in THEIR unit and THEIR currency. Do not " +
                 "convert, do not multiply by pack size, do not apply any discount. " +
                 "Normalisation happens in code afterwards. If a handwritten value overrides " +
-                "a printed one, this is the handwritten value.",
+                "a printed one, this is the handwritten value. A line the vendor says is " +
+                "included, free, complimentary or at no extra charge is priced 0 (status " +
+                "quoted), never null.",
             },
             uom: {
               type: ["string", "null"],
@@ -530,7 +556,23 @@ export function validateExtraction(
     "quoted", "substituted", "downgraded", "uom_mismatch", "bundled", "moq_adjusted",
   ];
 
-  extraction.rows.forEach((row, i) => {
+  extraction.rows.forEach((input, i) => {
+    let row = input;
+
+    // A value with no cited text. Kept, not fatal, and routed to a person: the
+    // locator still says where to look, but nothing on this row proves what
+    // the document says. The calculator excludes it from every total.
+    if (!row.provenance.citedText.trim()) {
+      issues.push({
+        severity: "downgrade",
+        rowIndex: i,
+        reason:
+          "returned with no cited text, so nothing on this row shows the vendor's own " +
+          "words. Kept for review at its locator and excluded from totals.",
+      });
+      row = { ...row, confidence: Math.min(row.confidence, 0.4) };
+    }
+
     // A line number that is not in the RFx is a hallucination. Send it to the
     // unmapped tray rather than trusting it.
     if (row.rfxLineNo !== null && !validLineNos.has(row.rfxLineNo)) {

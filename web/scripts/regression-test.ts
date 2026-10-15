@@ -35,6 +35,7 @@ import { assessQuestionnaire, type QuestionSpec } from "../lib/questionnaire";
 import catalog from "../lib/data/catalog.json";
 import rawQuotes from "../lib/data/raw-quotes.json";
 import type { RawQuote } from "../lib/normalise";
+import { extractionSchema, validateExtraction, EXTRACTION_TOOL } from "../lib/extract/contract";
 
 const G = "\x1b[32m", R = "\x1b[31m", D = "\x1b[2m", B = "\x1b[1m", X = "\x1b[0m";
 let failures = 0;
@@ -1484,6 +1485,85 @@ async function main() {
       `"per DIMM" against a kit is still x2 (9600 -> ${kit?.unitInr}), both ` +
       `flagged. Aliases are keyed by the ASKED unit, so the structure protects ` +
       `this rather than the strictness of the match`,
+    );
+  }
+
+  // ---- 48. One empty citation discarded a whole photographed read ------
+  //
+  // A claude-cli eval run of the Vector rate card returned twenty-one prices
+  // and one row with `citedText: ""`. Zod's min(1) threw on the parse and the
+  // entire read was reported as failed: one unsourced value cost twenty good
+  // ones. The row must survive the parse, be flagged, and stay out of totals.
+  {
+    const row = (n: number, cited: string) => ({
+      rfxLineNo: n, vendorDescription: `line ${n}`, status: "quoted", price: 1000 + n,
+      uom: "nos", currency: "INR", qty: null, printedPrice: null, handwritten: false,
+      offeredMakeModel: null, note: null, scopeUpliftRef: null, scopeUpliftNote: null,
+      reference: null, confidence: 0.9,
+      provenance: { locator: "bbox 0.1,0.1,0.2,0.2", citedText: cited, method: "vision_bbox", page: null },
+    });
+    let parsedOk = false;
+    let flagged = false, kept = 0, conf = 1;
+    try {
+      const ex = extractionSchema.parse({ rows: [row(1, "1001"), row(2, ""), row(3, "1003")] });
+      parsedOk = true;
+      const v = validateExtraction(ex, new Set([1, 2, 3]));
+      kept = v.rows.length;
+      flagged = v.issues.some((x) => x.rowIndex === 1 && /no cited text/.test(x.reason));
+      conf = v.rows.find((r) => r.rfxLineNo === 2)?.confidence ?? 1;
+    } catch { /* parsedOk stays false */ }
+    const cell = buildMatrix({
+      V4: { "2": { status: "quoted", price: 1002, uom: "nos", ccy: "INR", unsourced: true } },
+    } as never).V4?.[2];
+    check(
+      "48. One empty citation failed a whole document read",
+      "an unsourced row is kept and flagged, the rest of the read survives, and the " +
+      "calculator keeps the unsourced value out of every total",
+      parsedOk && kept === 3 && flagged && conf <= 0.4
+        && cell?.status === "needs_review" && cell?.unitInr === null,
+      `parsed ${parsedOk}, rows kept ${kept}/3, flagged ${flagged}, confidence ${conf}, ` +
+      `calculator status ${cell?.status} with landed value ${cell?.unitInr}`,
+    );
+  }
+
+  // ---- 49. A line priced "at no additional charge" read as no price -----
+  //
+  // Orbit's L30 ("extended cover ... included in our laptop prices at no
+  // additional charge") came back as status bundled with a null price, which
+  // validation turns into ILLEGIBLE: a buyer is told to open the original for
+  // a sentence that was read perfectly. The reader is now told to report it as
+  // 0, and a 0 still never wins a line (case 8).
+  {
+    const priceDesc = String(
+      (EXTRACTION_TOOL.input_schema.properties.rows.items.properties.price as { description: string })
+        .description,
+    );
+    const runSrc = readFileSync(resolve(process.cwd(), "lib/extract/run.ts"), "utf8");
+    const ex = extractionSchema.parse({
+      rows: [{
+        rfxLineNo: 30, vendorDescription: "extended cover", status: "quoted", price: 0,
+        uom: null, currency: "INR", qty: null, printedPrice: null, handwritten: false,
+        offeredMakeModel: null, note: null, scopeUpliftRef: null, scopeUpliftNote: null,
+        reference: null, confidence: 0.9,
+        provenance: {
+          locator: "para 39", method: "docx_prose", page: null,
+          citedText: "extended cover to five years is included in our laptop prices at no additional charge",
+        },
+      }],
+    });
+    const v = validateExtraction(ex, new Set([30]));
+    const r30 = v.rows[0];
+    const zero = buildMatrix({
+      V3: { "30": { status: "quoted", price: 0, uom: "nos", ccy: "INR" } },
+    }).V3?.[30];
+    check(
+      "49. An included line was reported with no price and shown as illegible",
+      "the reader is told an included line is a 0, and a 0 is kept as a reviewed " +
+      "scope statement, never as illegible and never in a total",
+      /no extra charge/.test(priceDesc) && /included, free, complimentary/.test(runSrc)
+        && r30?.status === "quoted" && zero?.status === "needs_review" && zero?.unitInr === null,
+      `tool description and system prompt carry the rule; validated status ${r30?.status}; ` +
+      `calculator status ${zero?.status}, landed value ${zero?.unitInr}`,
     );
   }
 

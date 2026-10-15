@@ -57,4 +57,4 @@ CONDITIONAL MONEY LEFT ON THE TABLE (shown, never scored)
   V4 handwritten 5.0% if PO by 25 Sep (before approval can close)
      up to Rs 1,533,510, and V4 is disqualified anyway
 
-Oracle written: /Users/raramuri/Desktop/Personal/AC/dataset/out/99-internal/ground-truth.json
+Oracle written: dataset/out/99-internal/ground-truth.json

@@ -43,6 +43,18 @@ be exact and repeatable is ordinary code. The full list is in [AI-MAP.md](AI-MAP
 
 Screenshots use the fictional dataset loaded through the local test harness, so the "test data" banner is expected. Its totals differ from the live site's: the harness holds every price as typed (cheapest from anyone ₹3.88 cr), while the live site reads the documents and excludes contested photo prices (₹3.91 cr).
 
+## Evals
+
+Measured on a fully fictional corpus: 5 supplier replies in 5 formats (107 priced lines) and 5 photos of one rate card, from easy to very hard. Method and every miss: [EVALS.md](EVALS.md).
+
+| Measure | Result |
+|---|---|
+| Priced lines read exactly, price and unit | 107 / 107 |
+| Prices invented for lines the supplier never priced | 0 |
+| Hardest photo (low light) | 7 / 21 exact, but every wrong price came back at confidence 0.55 or below, so it is routed to a person |
+
+Run through the Claude Code CLI with the app's own prompts and schema, not the production API path; an API rerun is planned.
+
 ## Read these first
 
 | | |

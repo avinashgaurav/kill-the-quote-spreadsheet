@@ -60,7 +60,9 @@ for (const f of [".env.local", ".env"]) {
 
 import { extractDocument } from "../lib/extract/run";
 import { diskCache } from "./disk-cache";
-import { activeModel, activeProvider } from "../lib/llm";
+import { activeModel, activeProvider, claudeCliEvents } from "../lib/llm";
+import { writeFileSync, mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import type { ExtractedRow } from "../lib/extract/contract";
 import rawQuotes from "../lib/data/raw-quotes.json";
 
@@ -160,14 +162,25 @@ interface Score {
   meanConfidenceOnWrong: number;
   meanConfidenceOnRight: number;
   misses: string[];
+  /** Token usage as the provider reported it, when it did. */
+  usage?: { input: number; output: number; thinking?: number; cacheRead?: number; costUsd?: number };
 }
 
 function score(label: string, file: string, vendor: string, rows: ExtractedRow[],
                meta: { model: string; cached: boolean; ms: number },
-               onlyLines?: Set<number>): Score {
+               onlyLines?: Set<number>, rawRows: ExtractedRow[] = []): Score {
   const truth = QUOTES[vendor] ?? {};
   const byLine = new Map<number, ExtractedRow>();
   for (const r of rows) if (r.rfxLineNo !== null) byLine.set(r.rfxLineNo, r);
+  // The reader's rows BEFORE validation. Needed for one case only: a line the
+  // key prices at 0 ("included at no additional charge"). validateExtraction
+  // deliberately nulls a zero and routes it to review, because a zero is a
+  // scope statement and must never win a line. So the validated row can never
+  // carry the 0 the reader correctly reported, and scoring it there would
+  // count a right read as a miss. A zero in any unit is zero, so its unit is
+  // not scored.
+  const rawByLine = new Map<number, ExtractedRow>();
+  for (const r of rawRows) if (r.rfxLineNo !== null) rawByLine.set(r.rfxLineNo, r);
 
   const inScope = (n: number) => !onlyLines || onlyLines.has(n);
 
@@ -180,6 +193,12 @@ function score(label: string, file: string, vendor: string, rows: ExtractedRow[]
 
   for (const [k, t] of expected) {
     const got = byLine.get(Number(k));
+    const rawZero = t.price === 0 ? rawByLine.get(Number(k)) : undefined;
+    if (rawZero && rawZero.price === 0) {
+      found += 1; priceExact += 1; unitRight += 1; ccyRight += 1;
+      confRight.push(rawZero.confidence);
+      continue;
+    }
     if (!got || got.price === null) {
       misses.push(`L${k}: not returned (truth ${t.price} ${t.uom ?? ""})`);
       continue;
@@ -272,15 +291,17 @@ async function run(label: string, file: string, vendor: string,
   } as Record<string, string>)[ext] ?? "application/octet-stream";
 
   try {
-    const { rows, meta } = await extractDocument({
+    const { rows, meta, extraction } = await extractDocument({
       buf, filename: name, mimeType: mime,
       cache: fresh ? undefined : CACHE,
       // The crop re-read is a separate mechanism with its own evidence value.
       // Leaving it on here would score the pair, not the reader.
       verifyPhotos: false,
     });
-    return score(label, file, vendor, rows,
-                 { model: meta.model, cached: meta.cached, ms: meta.ms }, onlyLines);
+    const s = score(label, file, vendor, rows,
+                    { model: meta.model, cached: meta.cached, ms: meta.ms }, onlyLines,
+                    extraction.rows);
+    return { ...s, usage: meta.usage };
   } catch (e) {
     return { ...empty, error: String(e).slice(0, 300) };
   }
@@ -361,6 +382,15 @@ async function main() {
   );
 
   let failed = 0;
+  const report: Record<string, unknown> = {
+    startedAt: new Date().toISOString(),
+    provider: activeProvider(),
+    configuredModel: activeModel("main"),
+    args,
+  };
+  // Optional machine-readable output: --json <path>. Off by default.
+  const jsonAt = args.indexOf("--json");
+  const jsonPath = jsonAt >= 0 ? args[jsonAt + 1] : undefined;
 
   if (wantDocs) {
     console.log("\n=== The five replies, one per format ===");
@@ -373,6 +403,7 @@ async function main() {
     }
     table(rows);
     detail(rows);
+    report.documents = rows;
 
     const tot = (f: (r: Score) => number) => rows.filter((r) => r.ok).reduce((a, r) => a + f(r), 0);
     const expected = tot((r) => r.expectedPriced);
@@ -385,6 +416,7 @@ async function main() {
       `${pct(exact, found)} exact on price, ${pct(units, found)} on unit, ` +
       `${invented} invented.`,
     );
+    report.documentsOverall = { expected, found, exact, units, invented };
 
     // What actually fails a run. A missed line is a gap on the screen and the
     // buyer can see it. An invented price is not visible as an error at all.
@@ -433,6 +465,7 @@ async function main() {
     }
     table(rows);
     detail(rows);
+    report.photos = rows;
 
     // Calibration, checked on EVERY row rather than the ends.
     //
@@ -524,6 +557,15 @@ async function main() {
   }
 
   console.log(failed ? `\nACCURACY: ${failed} failure(s)` : "\nACCURACY: pass");
+  if (jsonPath) {
+    report.finishedAt = new Date().toISOString();
+    report.failedChecks = failed;
+    report.verdict = failed ? "fail" : "pass";
+    if (claudeCliEvents.length) report.rateLimitEvents = claudeCliEvents;
+    mkdirSync(dirname(resolve(jsonPath)), { recursive: true });
+    writeFileSync(resolve(jsonPath), JSON.stringify(report, null, 2));
+    console.log(`wrote ${resolve(jsonPath)}`);
+  }
   process.exit(failed ? 1 : 0);
 }
 

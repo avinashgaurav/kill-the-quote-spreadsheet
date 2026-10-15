@@ -97,6 +97,13 @@ export interface RawQuote {
    */
   contested?: { first: number | null; second: number | null };
   /**
+   * The reader returned this value with no cited text: it knows where the
+   * value is (the locator) but gave none of the vendor's words for it. Treated
+   * like a contested read, because a number nobody can show the source of is
+   * a number nobody should be awarding against.
+   */
+  unsourced?: boolean;
+  /**
    * This price excludes something the enquiry asked for, and the supplier
    * quoted that something separately under THIS label in their own response.
    *
@@ -306,6 +313,19 @@ export function normaliseCell(
     trace.push({
       rule: "contested read",
       basis: "the second read saw only a crop of this number, on a different model",
+      result: "excluded from every total and raised for a person",
+    });
+    return out("needs_review");
+  }
+
+  if (raw.unsourced) {
+    flags.push(
+      "the reader returned this value without the vendor's own words for it, so " +
+      "its source cannot be shown and it is not counted",
+    );
+    trace.push({
+      rule: "unsourced read",
+      basis: "the extraction row carried a locator but empty cited text",
       result: "excluded from every total and raised for a person",
     });
     return out("needs_review");
