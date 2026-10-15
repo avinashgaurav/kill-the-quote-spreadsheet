@@ -1,0 +1,422 @@
+{
+  "note": "Held-out answer key. Written from the same table the documents are rendered from, and committed before any model call.",
+  "quotes": {
+    "H1": {
+      "1": {
+        "status": "quoted",
+        "price": 63400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "2": {
+        "status": "quoted",
+        "price": 108900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "4": {
+        "status": "quoted",
+        "price": 40650,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 9620,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "quoted",
+        "price": 21050,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1415,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1795,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "10": {
+        "status": "quoted",
+        "price": 3150,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "12": {
+        "status": "substituted",
+        "price": 562000,
+        "uom": "nos",
+        "ccy": "INR",
+        "offered": "Dell PowerEdge R760, 2x Xeon Silver 4410Y, 128GB"
+      },
+      "13": {
+        "status": "quoted",
+        "price": 18350,
+        "uom": "kit",
+        "ccy": "INR"
+      },
+      "14": {
+        "status": "not_quoted",
+        "note": "Regret, not available from our OEM."
+      },
+      "18": {
+        "status": "quoted",
+        "price": 189500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "20": {
+        "status": "quoted",
+        "price": 40800,
+        "uom": "box of 10",
+        "ccy": "INR"
+      },
+      "21": {
+        "status": "quoted",
+        "price": 28150,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "22": {
+        "status": "uom_mismatch",
+        "price": 262,
+        "uom": "per pc",
+        "ccy": "INR",
+        "note": "Priced per patch cord against a box of 50 asked."
+      },
+      "23": {
+        "status": "quoted",
+        "price": 77300,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "25": {
+        "status": "quoted",
+        "price": 66900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "27": {
+        "status": "quoted",
+        "price": 9280,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "28": {
+        "status": "quoted",
+        "price": 51750,
+        "uom": "nos",
+        "ccy": "INR"
+      }
+    },
+    "H2": {
+      "12": {
+        "status": "quoted",
+        "price": 574500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "13": {
+        "status": "quoted",
+        "price": 18990,
+        "uom": "kit",
+        "ccy": "INR"
+      },
+      "14": {
+        "status": "quoted",
+        "price": 66800,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "15": {
+        "status": "quoted",
+        "price": 829000,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "16": {
+        "status": "not_quoted",
+        "note": "Not offered."
+      },
+      "17": {
+        "status": "uom_mismatch",
+        "price": 4480,
+        "uom": "per cartridge",
+        "ccy": "INR",
+        "note": "Priced per cartridge against a pack of 5 asked."
+      },
+      "18": {
+        "status": "quoted",
+        "price": 193200,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "19": {
+        "status": "quoted",
+        "price": 5240,
+        "uom": "nos",
+        "ccy": "USD",
+        "note": "USD, ex-works Singapore."
+      },
+      "20": {
+        "status": "quoted",
+        "price": 42600,
+        "uom": "box of 10",
+        "ccy": "INR"
+      },
+      "21": {
+        "status": "quoted",
+        "price": 27650,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "22": {
+        "status": "quoted",
+        "price": 14050,
+        "uom": "box of 50",
+        "ccy": "INR"
+      },
+      "23": {
+        "status": "quoted",
+        "price": 79900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "24": {
+        "status": "quoted",
+        "price": 306500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "25": {
+        "status": "quoted",
+        "price": 67250,
+        "uom": "nos",
+        "ccy": "INR"
+      }
+    },
+    "H3": {
+      "1": {
+        "status": "quoted",
+        "price": 61750,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "3": {
+        "status": "quoted",
+        "price": 88400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 9380,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "7": {
+        "status": "quoted",
+        "price": 13250,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1720,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "10": {
+        "status": "uom_mismatch",
+        "price": 6180,
+        "uom": "per pair",
+        "ccy": "INR",
+        "note": "Headsets priced per pair against single units asked."
+      },
+      "11": {
+        "status": "quoted",
+        "price": 2640,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "26": {
+        "status": "quoted",
+        "price": 146500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "27": {
+        "status": "quoted",
+        "price": 9050,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "29": {
+        "status": "quoted",
+        "price": 46300,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "30": {
+        "status": "quoted",
+        "price": 0,
+        "uom": "nos",
+        "ccy": "INR",
+        "note": "Years 4 and 5 cover complimentary on laptops. Zero-price line."
+      }
+    },
+    "H4": {
+      "1": {
+        "status": "quoted",
+        "price": 62300,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "2": {
+        "status": "quoted",
+        "price": 106400,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "3": {
+        "status": "quoted",
+        "price": 87900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "5": {
+        "status": "quoted",
+        "price": 9540,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "quoted",
+        "price": 20750,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "7": {
+        "status": "quoted",
+        "price": 13050,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1360,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "9": {
+        "status": "quoted",
+        "price": 1640,
+        "uom": "nos",
+        "ccy": "INR",
+        "handwritten": true,
+        "printed_price": 1690,
+        "note": "Printed 1,690 struck through, 1,640 written in pen."
+      },
+      "11": {
+        "status": "quoted",
+        "price": 2580,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "13": {
+        "status": "quoted",
+        "price": 18700,
+        "uom": "kit",
+        "ccy": "INR"
+      },
+      "18": {
+        "status": "quoted",
+        "price": 186500,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "20": {
+        "status": "quoted",
+        "price": 41900,
+        "uom": "box of 10",
+        "ccy": "INR"
+      },
+      "21": {
+        "status": "illegible",
+        "printed_price": 27800,
+        "note": "Glare across the cell. A price is present and cannot be read."
+      },
+      "27": {
+        "status": "quoted",
+        "price": 9120,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "28": {
+        "status": "quoted",
+        "price": 50900,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "29": {
+        "status": "quoted",
+        "price": 45600,
+        "uom": "nos",
+        "ccy": "INR",
+        "handwritten": true,
+        "printed_price": 46900,
+        "note": "Printed 46,900 struck through, 45,600 written in pen."
+      }
+    },
+    "H5": {
+      "4": {
+        "status": "quoted",
+        "price": 39950,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "6": {
+        "status": "quoted",
+        "price": 20600,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "8": {
+        "status": "quoted",
+        "price": 1290,
+        "uom": "nos",
+        "ccy": "INR"
+      },
+      "21": {
+        "status": "relative",
+        "basis": "prior_invoice",
+        "note": "'access points at the same rate as our last invoice'"
+      },
+      "22": {
+        "status": "uom_mismatch",
+        "price": 7250,
+        "uom": "per box of 25",
+        "ccy": "INR",
+        "note": "Priced per box of 25 against a box of 50 asked."
+      },
+      "23": {
+        "status": "not_quoted",
+        "note": "'racks we cannot supply this time'"
+      },
+      "25": {
+        "status": "quoted",
+        "price": 65400,
+        "uom": "nos",
+        "ccy": "INR"
+      }
+    }
+  }
+}
