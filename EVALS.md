@@ -173,7 +173,7 @@ The 107/107 above is an in-sample score: the reader prompt and both fixes came f
 - Tejas: one quotation sheet photographed twice (moderate, and very hard: low light, motion blur, slight curl), with two pen overrides and one price under glare.
 - Saptarishi eml: plain text, with a per-box-of-25 line, a relative price and a regret.
 
-That makes 77 priced lines over 6 inputs, plus 1 value the key marks unreadable on each photograph. The answer key (`dataset/heldout/answer-key.json`) was committed in `53a6e8d`, before any model read the set. The prompts and `web/lib` were not changed. `accuracy.ts --heldout` scores the set with the same scoring and the same fail checks. Three full runs, `--fresh` each time.
+That makes 77 priced lines over 6 inputs, plus 1 value the key marks unreadable on each photograph. The answer key (`dataset/heldout/answer-key.json`) was committed in the commit titled "Add a held-out corpus and answer key, before any model call", before any model read the set. The prompts and `web/lib` were not changed. `accuracy.ts --heldout` scores the set with the same per-line scoring and fail checks, except that the photo calibration check only runs on a photo read below 90% exact (the moderate photo, 15/15, was not calibration-checked). After the runs, one regression-test anchor in `web/scripts/regression-test.ts` was updated to match the edited harness line; no scoring or app code changed. Three full runs, `--fresh` each time.
 
 The method note above applies unchanged: these runs used the Claude Code CLI path (`LLM_PROVIDER=claude-cli`, `claude-opus-5`, `CLAUDE_CLI_TIMEOUT_MS=400000`), not the production API.
 
