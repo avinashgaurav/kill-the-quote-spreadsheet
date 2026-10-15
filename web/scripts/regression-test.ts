@@ -574,7 +574,7 @@ async function main() {
   // while the photograph in the middle of the set read at 52% accuracy with
   // 0.90 confidence on every wrong digit. Ends are not a distribution.
   const harness = readFileSync(resolve(process.cwd(), "scripts/accuracy.ts"), "utf8");
-  const photoBlock = harness.slice(harness.indexOf("if (wantPhotos)"));
+  const photoBlock = harness.slice(harness.indexOf("if (wantPhotos"));
   check(
     "19a. The accuracy harness passed when nothing was read",
     "an unread photograph fails the run instead of skipping the assertions",
