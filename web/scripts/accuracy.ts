@@ -66,13 +66,20 @@ import { dirname } from "node:path";
 import type { ExtractedRow } from "../lib/extract/contract";
 import rawQuotes from "../lib/data/raw-quotes.json";
 
-const OUT = resolve(process.cwd(), "../dataset/out");
+// --heldout scores the held-out corpus (dataset/heldout, built by
+// generators/build_heldout.py) against its own answer key, instead of the five
+// documents the reader prompt was written against. Same scoring, same checks.
+const HELDOUT = process.argv.includes("--heldout");
+const HELDOUT_DIR = resolve(process.cwd(), "../dataset/heldout");
+const OUT = HELDOUT ? HELDOUT_DIR : resolve(process.cwd(), "../dataset/out");
 
 type Truth = {
   status: string; price?: number; uom?: string; ccy?: string;
   qty_override?: number; printed_price?: number; handwritten?: boolean;
 };
-const QUOTES = rawQuotes.quotes as unknown as Record<string, Record<string, Truth>>;
+const QUOTES = (HELDOUT
+  ? JSON.parse(readFileSync(resolve(HELDOUT_DIR, "answer-key.json"), "utf8")).quotes
+  : rawQuotes.quotes) as unknown as Record<string, Record<string, Truth>>;
 
 /**
  * Statuses in the answer key that mean "there is a number on the page".
@@ -392,7 +399,11 @@ async function main() {
   const jsonAt = args.indexOf("--json");
   const jsonPath = jsonAt >= 0 ? args[jsonAt + 1] : undefined;
 
-  if (wantDocs) {
+  if (HELDOUT) {
+    failed += await heldout(report);
+  }
+
+  if (wantDocs && !HELDOUT) {
     console.log("\n=== The five replies, one per format ===");
     const rows: Score[] = [];
     for (const [label, file, vendor] of DOCS) {
@@ -444,7 +455,7 @@ async function main() {
     }
   }
 
-  if (wantPhotos) {
+  if (wantPhotos && !HELDOUT) {
     console.log("\n=== The same rate card, five photographs, easy to very hard ===");
     console.log(
       "  The test is NOT that accuracy stays high. It is that confidence falls with it,\n" +
@@ -567,6 +578,63 @@ async function main() {
     console.log(`wrote ${resolve(jsonPath)}`);
   }
   process.exit(failed ? 1 : 0);
+}
+
+/**
+ * The held-out set: every input in the manifest, scored like the five replies,
+ * with the photographs also held to the calibration check. Returns the number
+ * of failed checks.
+ */
+async function heldout(report: Record<string, unknown>): Promise<number> {
+  const manifest = JSON.parse(readFileSync(resolve(HELDOUT_DIR, "manifest.json"), "utf8")) as
+    Array<{ label: string; file: string; key: string; kind: "doc" | "photo" }>;
+  console.log(`\n=== Held-out set: ${manifest.length} inputs ===`);
+  const rows: Score[] = [];
+  for (const m of manifest) {
+    process.stdout.write(`  reading ${m.label} ... `);
+    const r = await run(m.label, m.file, m.key);
+    console.log(r.ok ? `${r.cached ? "cached" : `${(r.ms / 1000).toFixed(1)}s`}` : "FAILED");
+    rows.push(r);
+  }
+  table(rows);
+  detail(rows);
+  report.heldout = rows.map((r, i) => ({ ...r, kind: manifest[i].kind }));
+
+  let failed = 0;
+  const ok = rows.filter((r) => r.ok);
+  const tot = (f: (r: Score) => number) => ok.reduce((a, r) => a + f(r), 0);
+  const expected = rows.reduce((a, r, i) => a + Object.values(QUOTES[manifest[i].key])
+    .filter((t) => PRICED.has(t.status)).length, 0);
+  const found = tot((r) => r.found), exact = tot((r) => r.priceExact);
+  const units = tot((r) => r.unitRight), invented = tot((r) => r.invented);
+  // Pooled over every wrong price in the run, so one number per run.
+  const wrongConf = ok.flatMap((r) => Array(r.found - r.priceExact).fill(r.meanConfidenceOnWrong));
+  const confOnWrong = wrongConf.length
+    ? wrongConf.reduce((a, b) => a + b, 0) / wrongConf.length : null;
+  console.log(
+    `\n  overall: ${exact}/${expected} priced lines exact (${pct(exact, expected)}), ` +
+    `${found} returned, ${units} unit right, ${invented} invented, ` +
+    `mean confidence on wrong prices ${confOnWrong === null ? "n/a" : confOnWrong.toFixed(2)}.`,
+  );
+  report.heldoutOverall = { expected, found, exact, units, invented, confOnWrong,
+                            wrongPrices: wrongConf.length };
+
+  if (invented > 0) { console.log(`  FAIL: ${invented} invented price(s).`); failed += 1; }
+  if (expected && found / expected < 0.85) { console.log("  FAIL: recall below 85%."); failed += 1; }
+  if (found && exact / found < 0.9) {
+    console.log("  FAIL: fewer than 90% of returned prices match the key."); failed += 1;
+  }
+  rows.forEach((r, i) => {
+    if (!r.ok) { console.log(`  FAIL: ${r.label} did not read. ${r.error ?? ""}`); failed += 1; return; }
+    if (r.illegibleExpected > r.illegibleAdmitted) {
+      console.log(`  FAIL: ${r.label} guessed at a value the key marks unreadable.`); failed += 1;
+    }
+    const acc = r.expectedPriced ? r.priceExact / r.expectedPriced : 0;
+    if (manifest[i].kind === "photo" && acc < 0.9 && r.meanConfidenceOnWrong > 0.75) {
+      console.log(`  FAIL: ${r.label} returned wrong prices at high confidence.`); failed += 1;
+    }
+  });
+  return failed;
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

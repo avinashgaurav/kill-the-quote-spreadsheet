@@ -1,0 +1,38 @@
+[
+  {
+    "label": "H1 Kestrel   xlsx",
+    "file": "H1_Kestrel_PriceSchedule_KC-2026-311.xlsx",
+    "key": "H1",
+    "kind": "doc"
+  },
+  {
+    "label": "H2 Tarang    pdf",
+    "file": "H2_Tarang_Offer_TDC-OF-0926-77.pdf",
+    "key": "H2",
+    "kind": "doc"
+  },
+  {
+    "label": "H3 Nilgiri   docx",
+    "file": "H3_Nilgiri_Quotation_Letter.docx",
+    "key": "H3",
+    "kind": "doc"
+  },
+  {
+    "label": "H4 Tejas photo moderate",
+    "file": "H4_tejas_quote_photo_moderate.jpg",
+    "key": "H4",
+    "kind": "photo"
+  },
+  {
+    "label": "H4 Tejas photo low light",
+    "file": "H4_tejas_quote_photo_lowlight.jpg",
+    "key": "H4",
+    "kind": "photo"
+  },
+  {
+    "label": "H5 Saptarishi eml",
+    "file": "H5_saptarishi_reply.eml",
+    "key": "H5",
+    "kind": "doc"
+  }
+]
