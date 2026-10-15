@@ -43,6 +43,18 @@ be exact and repeatable is ordinary code. The full list is in [AI-MAP.md](AI-MAP
 
 Screenshots use the fictional dataset loaded through the local test harness, so the "test data" banner is expected. Its totals differ from the live site's: the harness holds every price as typed (cheapest from anyone ₹3.88 cr), while the live site reads the documents and excludes contested photo prices (₹3.91 cr).
 
+## Evals
+
+Measured on a fully fictional corpus: 5 supplier replies in 5 formats (107 priced lines) and 5 photos of one rate card, from easy to very hard. Method and every miss: [EVALS.md](EVALS.md).
+
+| Measure | Result |
+|---|---|
+| Priced lines read exactly, price and unit | 107 / 107, after two fixes derived from this same corpus |
+| Prices invented for lines the supplier never priced | 0 |
+| Hardest photo (low light) | 7 / 21 exact. Every wrong price came back at confidence 0.55 or below and is flagged low-confidence in the UI. Confidence does not gate the calculator's totals: in the app, the photo cross-check (`verifyPhotos`) re-reads the largest figures from a crop on a second model and keeps any it disagrees on out of every total. This eval ran with that cross-check off. |
+
+The fixes had a side effect: mean confidence on Helios fell from 0.87 to 0.40 (prices still exact; both rows now show as needing review) and on Orbit from 0.94 to 0.82. Run through the Claude Code CLI with the app's own prompts and schema, not the production API path; an API rerun is planned.
+
 ## Read these first
 
 | | |

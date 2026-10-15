@@ -892,6 +892,12 @@ export async function loadComparison(
        * calculator here, because the calculator is the only place that can
        * keep the number out of a total.
        */
+      // A row stored with empty cited text (kept by validateExtraction rather
+      // than failing the whole document) must not reach a total.
+      unsourced: (() => {
+        const p = row.provenance as { citedText?: unknown } | null;
+        return p && !String(p.citedText ?? "").trim() ? true : undefined;
+      })(),
       contested: (() => {
         const v = row.verification as Array<{
           agreed?: boolean; firstRead?: number | null; secondRead?: number | null;

@@ -1,0 +1,518 @@
+{
+  "startedAt": "2026-10-15T06:25:48.235Z",
+  "provider": "claude-cli",
+  "configuredModel": "claude-opus-5",
+  "args": [
+    "--all",
+    "--fresh",
+    "--json",
+    "../evals/results/accuracy-2026-10-15-claude-cli-claude-opus-5.json"
+  ],
+  "documents": [
+    {
+      "label": "Zenith  xlsx (Rev 1)",
+      "file": "01-vendor-zenith/Zenith_Quotation_ZIS-NBR-2026-1184.xlsx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 84673,
+      "expectedPriced": 30,
+      "found": 30,
+      "priceExact": 30,
+      "unitRight": 30,
+      "currencyRight": 30,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9649999999999999,
+      "meanConfidenceOnRight": 0.9649999999999999,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 15596,
+        "output": 9669,
+        "thinking": 640,
+        "cacheRead": 0,
+        "costUsd": 0.397675
+      }
+    },
+    {
+      "label": "Cygnus  pdf",
+      "file": "02-vendor-cygnus/Cygnus_Quotation_CTI-Q-2026-0918.pdf",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 96578,
+      "expectedPriced": 27,
+      "found": 27,
+      "priceExact": 27,
+      "unitRight": 27,
+      "currencyRight": 27,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9507407407407406,
+      "meanConfidenceOnRight": 0.9507407407407406,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 19584,
+        "output": 11478,
+        "thinking": 510,
+        "cacheRead": 0,
+        "costUsd": 0.48278
+      }
+    },
+    {
+      "label": "Orbit   docx",
+      "file": "03-vendor-orbit/Orbit_Offer_OSS-QT-2026-27-0442.docx",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 96075,
+      "expectedPriced": 27,
+      "found": 26,
+      "priceExact": 26,
+      "unitRight": 26,
+      "currencyRight": 26,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.9376923076923073,
+      "meanConfidenceOnRight": 0.9376923076923073,
+      "meanConfidenceOnWrong": 0,
+      "misses": [
+        "L30: not returned (truth 0 nos)"
+      ],
+      "usage": {
+        "input": 5927,
+        "output": 10434,
+        "thinking": 1169,
+        "cacheRead": 6063,
+        "costUsd": 0.3231415000000001
+      }
+    },
+    {
+      "label": "Vector  photo",
+      "file": "04-vendor-vector/IMG_20260917_1142_vector_rate_card.jpg",
+      "ok": false,
+      "model": "",
+      "cached": false,
+      "ms": 0,
+      "expectedPriced": 0,
+      "found": 0,
+      "priceExact": 0,
+      "unitRight": 0,
+      "currencyRight": 0,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0,
+      "meanConfidenceOnRight": 0,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "error": "[\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"inclusive\": true,\n    \"path\": [\n      \"rows\",\n      5,\n      \"provenance\",\n      \"citedText\"\n    ],\n    \"message\": \"Too small: expected string to have >=1 characters\"\n  }\n]"
+    },
+    {
+      "label": "Helios  eml",
+      "file": "05-vendor-helios/helios_reply_2026-09-17.eml",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 36612,
+      "expectedPriced": 2,
+      "found": 2,
+      "priceExact": 2,
+      "unitRight": 2,
+      "currencyRight": 2,
+      "invented": 0,
+      "illegibleExpected": 0,
+      "illegibleAdmitted": 0,
+      "meanConfidence": 0.87,
+      "meanConfidenceOnRight": 0.87,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 4622,
+        "output": 3443,
+        "thinking": 574,
+        "cacheRead": 6063,
+        "costUsd": 0.1353165
+      }
+    }
+  ],
+  "documentsOverall": {
+    "expected": 86,
+    "found": 85,
+    "exact": 85,
+    "units": 85,
+    "invented": 0
+  },
+  "photos": [
+    {
+      "label": "v1 easy      flat/bright",
+      "file": "04-vendor-vector/variants/v1_flat_bright.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 75898,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.9152380952380955,
+      "meanConfidenceOnRight": 0.9152380952380955,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8376,
+        "output": 7844,
+        "thinking": 1689,
+        "cacheRead": 6063,
+        "costUsd": 0.2828815
+      }
+    },
+    {
+      "label": "v2 moderate  handheld",
+      "file": "04-vendor-vector/variants/v2_moderate.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 133899,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8723809523809524,
+      "meanConfidenceOnRight": 0.8723809523809524,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8374,
+        "output": 12621,
+        "thinking": 5582,
+        "cacheRead": 6063,
+        "costUsd": 0.4022865
+      }
+    },
+    {
+      "label": "v3 hard      curl+thumb",
+      "file": "04-vendor-vector/variants/v3_curled_thumb.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 159173,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.902857142857143,
+      "meanConfidenceOnRight": 0.902857142857143,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8377,
+        "output": 15142,
+        "thinking": 8489,
+        "cacheRead": 6063,
+        "costUsd": 0.4653415
+      }
+    },
+    {
+      "label": "v4 v.hard    lowlight",
+      "file": "04-vendor-vector/variants/v4_lowlight_motion.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 334242,
+      "expectedPriced": 21,
+      "found": 18,
+      "priceExact": 6,
+      "unitRight": 18,
+      "currencyRight": 18,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.5194444444444444,
+      "meanConfidenceOnRight": 0.5499999999999999,
+      "meanConfidenceOnWrong": 0.5041666666666667,
+      "misses": [
+        "L2: read 95500, truth 99500 [confidence 0.60]",
+        "L4: read 97200, truth 37200 [confidence 0.35]",
+        "L5: not returned (truth 8950 nos)",
+        "L7: not returned (truth 12400 nos)",
+        "L8: read 1250, truth 1180 [confidence 0.60]",
+        "L9: read 1500, truth 1540 [confidence 0.55]",
+        "L10: read 2970, truth 2870 [confidence 0.55]",
+        "L13: read 5600, truth 9600 [confidence 0.40]",
+        "L18: read 194000, truth 184000 [confidence 0.45]",
+        "L20: read 4250, truth 4150 [confidence 0.55]",
+        "L21: not returned (truth 26400 nos)",
+        "L22: read 295, truth 268 [confidence 0.55]",
+        "L25: read 62800, truth 61800 [confidence 0.55]",
+        "L27: read 5400, truth 8400 [confidence 0.40]",
+        "L29: read 41400, truth 41900 [confidence 0.50]"
+      ],
+      "usage": {
+        "input": 32231,
+        "output": 31352,
+        "thinking": 15951,
+        "cacheRead": 20502,
+        "costUsd": 1.116341
+      }
+    },
+    {
+      "label": "v5 v.hard    steep angle",
+      "file": "04-vendor-vector/variants/v5_steep_angle.jpg",
+      "ok": true,
+      "model": "claude-opus-5",
+      "cached": false,
+      "ms": 203629,
+      "expectedPriced": 21,
+      "found": 21,
+      "priceExact": 21,
+      "unitRight": 21,
+      "currencyRight": 21,
+      "invented": 0,
+      "illegibleExpected": 1,
+      "illegibleAdmitted": 1,
+      "meanConfidence": 0.8419047619047619,
+      "meanConfidenceOnRight": 0.8419047619047619,
+      "meanConfidenceOnWrong": 0,
+      "misses": [],
+      "usage": {
+        "input": 8376,
+        "output": 18813,
+        "thinking": 11782,
+        "cacheRead": 6063,
+        "costUsd": 0.5571065000000001
+      }
+    }
+  ],
+  "finishedAt": "2026-10-15T06:47:52.178Z",
+  "failedChecks": 1,
+  "verdict": "fail",
+  "rateLimitEvents": [
+    {
+      "at": "2026-10-15T06:27:12.902Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.09,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.43,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:28:49.487Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.12,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.44,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:30:25.565Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.17,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.45,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:32:08.699Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.21,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.45,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:32:45.318Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.24,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.46,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:34:01.219Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.25,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.46,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:36:15.119Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.27,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.46,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:38:54.295Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.3,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.47,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:44:28.542Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.33,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.47,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:44:28.542Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.39,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.48,
+          "resetsAt": 1792270800
+        }
+      }
+    },
+    {
+      "at": "2026-10-15T06:47:52.175Z",
+      "status": "allowed",
+      "resetsAt": 1792056600,
+      "rateLimitType": "five_hour",
+      "overageStatus": "rejected",
+      "overageDisabledReason": "out_of_credits",
+      "isUsingOverage": false,
+      "unifiedWindows": {
+        "five_hour": {
+          "utilization": 0.4,
+          "resetsAt": 1792056600
+        },
+        "seven_day": {
+          "utilization": 0.48,
+          "resetsAt": 1792270800
+        }
+      }
+    }
+  ]
+}
