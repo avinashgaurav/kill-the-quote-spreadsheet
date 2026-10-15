@@ -657,8 +657,21 @@ async function callGemini(req: LlmRequest): Promise<LlmResult> {
 
 /** Rate-limit and usage-limit events the CLI reported, for the harness to record. */
 export const claudeCliEvents: Array<Record<string, unknown>> = [];
+/** Oldest events are dropped past this, so a long-lived process cannot grow it without bound. */
+const CLAUDE_CLI_EVENTS_MAX = 500;
+/**
+ * A CLI call still running after this is killed and reported as a failed read.
+ * The slowest recorded read took 334 s, so a long photo run may need it raised.
+ */
+const CLAUDE_CLI_TIMEOUT_MS = Number(process.env.CLAUDE_CLI_TIMEOUT_MS) || 300_000;
 
 async function callClaudeCli(req: LlmRequest): Promise<LlmResult> {
+  if (process.env.NODE_ENV === "production" && process.env.ALLOW_CLAUDE_CLI_EVAL !== "1") {
+    throw new Error(
+      "LLM_PROVIDER=claude-cli is an evaluation-only route and is refused when " +
+      "NODE_ENV=production. Set ALLOW_CLAUDE_CLI_EVAL=1 to run an eval anyway.",
+    );
+  }
   if (req.history?.length || (req.tools?.length && !req.forceTool)) {
     throw new Error(
       "LLM_PROVIDER=claude-cli supports single-shot calls only (forced tool or " +
@@ -707,10 +720,17 @@ async function callClaudeCli(req: LlmRequest): Promise<LlmResult> {
     // A neutral working directory, so no project context is discovered.
     const child = spawn(bin, args, { cwd: tmpdir(), stdio: ["pipe", "pipe", "pipe"] });
     let out = "", err = "";
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      reject(new Error(
+        `claude CLI did not finish within ${CLAUDE_CLI_TIMEOUT_MS / 1000} s and was killed`,
+      ));
+    }, CLAUDE_CLI_TIMEOUT_MS);
     child.stdout.on("data", (d) => { out += d; });
     child.stderr.on("data", (d) => { err += d; });
-    child.on("error", reject);
+    child.on("error", (e) => { clearTimeout(timer); reject(e); });
     child.on("close", (code) => {
+      clearTimeout(timer);
       if (code !== 0 && !out.includes('"type":"result"')) {
         reject(new Error(`claude CLI exited ${code}: ${err.slice(0, 500)}`));
       } else resolveOut(out);
@@ -738,6 +758,9 @@ async function callClaudeCli(req: LlmRequest): Promise<LlmResult> {
     if (ev.type === "result") result = ev as CliResult;
     if (ev.type === "rate_limit_event") {
       claudeCliEvents.push({ at: new Date().toISOString(), ...(ev.rate_limit_info as object) });
+      if (claudeCliEvents.length > CLAUDE_CLI_EVENTS_MAX) {
+        claudeCliEvents.splice(0, claudeCliEvents.length - CLAUDE_CLI_EVENTS_MAX);
+      }
       const info = ev.rate_limit_info as { status?: string };
       if (info?.status && info.status !== "allowed") {
         console.error(`[claude-cli] rate limit event: ${JSON.stringify(info)}`);
