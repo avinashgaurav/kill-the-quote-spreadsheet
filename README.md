@@ -17,7 +17,7 @@ Suppliers reply to an RFx as spreadsheets, PDFs, emails and phone photos, and so
 >
 > **Held-out check** (5 new fictional supplier replies in all 5 formats, 6 inputs with one sheet photographed twice, 77 priced lines, key committed before any model call, code frozen, 3 runs): **0 invented** in every run; spreadsheet, PDF, Word, email and a moderate photo read **exactly in all 3 runs**; the very hard low-light photo read 10, 8 and 10 of 15 exactly, every wrong price at confidence 0.70 or below and flagged in the UI. Overall **71.3 / 77 (93%)** exact.
 >
-> Caveat: fictional data; run through the Claude Code CLI, not the production API path; the 107 / 107 above is on the corpus the two reader fixes came from; the held-out key was written by the author. Method and every miss: [EVALS.md](EVALS.md).
+> Caveat: fictional data; run through the Claude Code CLI, not the production API path; the live demo runs on Gemini, not on the Claude model these evals measured; the 107 / 107 above is on the corpus the two reader fixes came from; the held-out key was written by the author. Method and every miss: [EVALS.md](EVALS.md).
 
 ## Why AI here, why code there
 
