@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Cancel superseded PR runs only; never cancel a run on main.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run types
+      - name: Lint
+        run: npm run lint
+
+      # Every suite in test:all runs offline: no API key, no network model call.
+      # Keep this list in sync with the test:all script in web/package.json.
+      - name: Calculator conformance
+        run: npm run conformance
+      - name: Reader test
+        run: npm run reader-test
+      - name: Parse check
+        run: npm run parse-check
+      - name: Revision test
+        run: npm run revision-test
+      - name: Generality test
+        run: npm run generality-test
+      - name: Questionnaire test
+        run: npm run questionnaire-test
+      - name: Contrast test
+        run: npm run contrast-test
+      - name: Cache test
+        run: npm run cache-test
+      - name: Regression test
+        run: npm run regression-test
+      - name: Guard test
+        run: npm run guard-test
