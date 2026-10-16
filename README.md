@@ -54,3 +54,7 @@ npm run dev                    # then `npm run fixture` in a second terminal to 
 - [docs/DESIGN-NOTES.md](docs/DESIGN-NOTES.md): screenshots, and every requirement checked against the code.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): the two loops, the one rule, and the repo layout.
 - [docs/SETUP.md](docs/SETUP.md): full setup, demo protection, and every test suite.
+
+## License
+
+[MIT](LICENSE) © 2026 Avinash Gaurav.
