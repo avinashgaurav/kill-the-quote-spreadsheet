@@ -190,7 +190,7 @@ The note on how the tests were run (above) still applies: these runs used the Cl
 
 In every run: Kestrel 18/18, Tarang 13/13, Nilgiri 11/11, Tejas moderate photo 15/15 and Saptarishi 5/5, all exact. Every miss was on the very hard Tejas photograph, which read 10, 8 and 10 of 15 correctly. Without that photograph, the new set scores 62/62 in all three runs.
 
-Two caveats. First, the two sets are not the same size or mix, so 92.6% against 100% is not a like-for-like drop. The 107 from the building cases counts documents only (its photos are scored separately), while the new set's 77 includes the very hard photograph. Second, the wrong prices had higher confidence than before (0.65 against 0.47 on average, up to 0.70). Every one is still below 0.8, the level at which the screen marks a value as low-confidence, and the test script's 0.75 confidence check passed in every run. But the safety margin is smaller.
+Two caveats. First, the two sets are not the same size or mix, so 92.6% against 100% is not a like-for-like drop. The 107 from the building cases counts documents only (its photos are scored separately), while the new set's 77 includes the very hard photograph. Second, the wrong prices had higher confidence than before (0.65 against 0.47 on average, up to 0.70). Every one is still below 0.8, the level at which the screen marks a value as low-confidence, and the test script's 0.75 confidence check passed in every run. But the margin is smaller.
 
 ### Every miss on the new cases
 
